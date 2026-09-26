@@ -1,4 +1,4 @@
-# AGENTS.md — biat-ui contributor guide (humans + AI agents)
+# AGENTS.md: biat-ui contributor guide (humans + AI agents)
 
 This repo is a **headless UI primitives library** for Jetpack Compose
 (Radix/Bits-style). Behavior is the product. There is no design system here.
@@ -9,9 +9,9 @@ This repo is a **headless UI primitives library** for Jetpack Compose
    typography, shapes, spacing, elevation, or opinionated layouts in the library.
    Styling demos belong in `sample/` only.
 2. **Three layers per primitive:**
-   - `core/state/` — logic only (`mutableStateOf`, open/close/select transitions).
-   - `core/` behavior (`focus/`, `dismiss/`, `portal/`, `accessibility/`) — library-owned.
-   - `primitives/*/` — thin composable structure wiring state + behavior to
+   - `core/state/`: logic only (`mutableStateOf`, open/close/select transitions).
+   - `core/` behavior (`focus/`, `dismiss/`, `portal/`, `accessibility/`): library-owned.
+   - `primitives/*/`: thin composable structure wiring state + behavior to
      user-provided `trigger` / `content` slots. No default visuals.
 3. **Composability over convenience.** Expose `Trigger`/`Content`/`Close` slots.
    Never hardcode a Button, Card, Surface, scrim color, padding, or animation.
@@ -61,12 +61,13 @@ AGENTS.md | ROADMAP.md | README.md
 
 Requirements: JDK 17, Android SDK (`sdk.dir` in `local.properties` or
 `ANDROID_HOME`/`ANDROID_SDK_ROOT`). Compile SDK 37, min SDK 24.
-Toolchain: Kotlin 2.4.20, AGP 9.4.1 (built-in Kotlin — do NOT apply
+Toolchain: Kotlin 2.4.20, AGP 9.4.1 (built-in Kotlin; do NOT apply
 `org.jetbrains.kotlin.android`), Gradle 9.8.0, Compose BOM 2026.09.00.
 
 ## Code style
 
 - Kotlin official style, `jvmTarget = 17`.
+- No emojis or em-dashes in code, docs, or comments.
 - Public API needs KDoc explaining the behavior contract.
 - Prefer `Modifier` extension behavior helpers over wrapper Box soup.
 - Keep files small and single-responsibility; one concept per file.

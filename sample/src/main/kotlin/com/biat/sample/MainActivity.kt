@@ -141,7 +141,7 @@ private fun PopoverDemo() {
 private fun MenuDemo() {
     val state = rememberMenuState(itemCount = 3)
     var chosen by remember { mutableStateOf("none") }
-    DemoCard("Menu — chosen: $chosen") {
+    DemoCard("Menu (chosen: $chosen)") {
         Menu(
             state = state,
             trigger = { DemoButton("Open menu") },
@@ -181,7 +181,7 @@ private fun TooltipDemo() {
 private fun SelectDemo() {
     val state = rememberSelectState(initialSelected = "Kotlin")
     val options = listOf("Kotlin", "Java", "Rust")
-    DemoCard("Select — selected: ${state.selected}") {
+    DemoCard("Select (selected: ${state.selected})") {
         Select(
             state = state,
             options = options,
@@ -193,7 +193,7 @@ private fun SelectDemo() {
                         .background(if (highlighted) Color.LightGray else Color.White)
                         .padding(12.dp),
                 ) {
-                    BasicText((if (selected) "✓ " else "") + value)
+                    BasicText((if (selected) "* " else "") + value)
                 }
             },
         )

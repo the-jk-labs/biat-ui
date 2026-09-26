@@ -20,7 +20,7 @@ import com.biat.ui.core.state.SheetState
 import com.biat.ui.core.state.rememberSheetState
 
 /**
- * Headless Sheet (bottom overlay behavior). Zero styling or animation —
+ * Headless Sheet (bottom overlay behavior). Zero styling or animation:
  * caller owns visuals, drag gestures, and positioning. Provides portal,
  * focus trap, ESC + outside-click dismiss.
  */

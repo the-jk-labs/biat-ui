@@ -1,9 +1,9 @@
-# ROADMAP.md — biat-ui
+# ROADMAP.md: biat-ui
 
 Headless UI primitives for Jetpack Compose. Behavior-first, zero styling.
 Status as of v0.1.0 scaffold (2026-09-26).
 
-## v0.1.0 — Foundation ✅ (this init)
+## v0.1.0: Foundation (this init)
 
 - [x] Gradle scaffold: `:biat-ui` library + `:sample` app, version catalog, wrapper
 - [x] State layer: Dialog, Popover, Menu, Tooltip, Select, Tabs, Sheet
@@ -14,7 +14,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [x] Sample app proving arbitrary user styling
 - [x] AGENTS.md / ROADMAP.md / README.md
 
-## v0.2.0 — Behavior hardening
+## v0.2.0: Behavior hardening
 
 - [ ] True focus-trap cycling (Tab/Shift+Tab wrap via focusManager, automated test)
 - [ ] Focus return on close for every overlay primitive (currently Menu + partial)
@@ -25,7 +25,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [ ] Instrumented keyboard-nav tests (Esc/arrows/Enter/Home/End per primitive)
 - [ ] Screen-reader pass (TalkBack roles, labels, traversal order)
 
-## v0.3.0 — Primitive depth
+## v0.3.0: Primitive depth
 
 - [ ] Select: typeahead filtering (Combobox), async options, clearable
 - [ ] Menu: submenus, checkbox/radio items, separators, disabled items
@@ -35,7 +35,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [ ] Tooltip: placement + collision avoidance, touch long-press trigger
 - [ ] Popover: modal vs non-modal modes, anchor-follow on scroll/resize
 
-## v0.4.0 — New primitives (Bits-parity)
+## v0.4.0: New primitives (Bits parity)
 
 - [ ] Accordion / Collapsible
 - [ ] Checkbox / Switch / Radio-group (headless toggle behavior)
@@ -45,7 +45,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [ ] Avatar (fallback behavior) / Separator / Label primitives if justified
 - [ ] Each ships with state + behavior + slots + tests + sample, per AGENTS.md
 
-## v0.5.0 — Polish for 1.0 candidacy
+## v0.5.0: Polish for 1.0 candidacy
 
 - [ ] Public API review: naming consistency (`Trigger/Content/Close/Item` suffixes)
 - [ ] Binary-compatibility validation (binary-compatibility-validator plugin)
@@ -53,7 +53,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [ ] Detekt/ktlint + API lint in CI
 - [ ] Screenshot-free sample gallery (all styling in sample, themes switcher)
 
-## v1.0.0 — Stable
+## v1.0.0: Stable
 
 - [ ] Frozen public API, semantic versioning commitment
 - [ ] Maven Central publish (`com.biat:biat-ui`), signing, SBOM

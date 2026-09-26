@@ -6,7 +6,7 @@ import androidx.compose.ui.window.DialogProperties
 
 /**
  * Headless portal: renders [content] in a platform dialog window so overlays
- * escape parent clipping / z-order. Deliberately unstyled — the user owns
+ * escape parent clipping / z-order. Deliberately unstyled: the user owns
  * all visuals inside [content].
  *
  * The scrim / positioning is the caller's responsibility.

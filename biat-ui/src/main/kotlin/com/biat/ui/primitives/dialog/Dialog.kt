@@ -20,7 +20,7 @@ import com.biat.ui.core.state.DialogState
 import com.biat.ui.core.state.rememberDialogState
 
 /**
- * Headless Dialog. Behavior only — zero styling.
+ * Headless Dialog. Behavior only, zero styling.
  *
  * - [trigger] renders inline and opens the dialog on click.
  * - [content] renders in a [BiatPortal] with focus trap + ESC + outside-click.
