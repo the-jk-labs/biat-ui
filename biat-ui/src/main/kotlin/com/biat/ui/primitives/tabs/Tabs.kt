@@ -25,11 +25,14 @@ data class TabValue<T>(val value: T, val label: String)
 /**
  * Headless Tabs. Roving arrow-key navigation (Left/Right + Home/End,
  * RTL-aware), selection state in [TabsState]. Zero styling.
+ * [label] is exposed as the tab list content description for screen
+ * readers; each tab already announces its own label + selected state.
  */
 @Composable
 fun <T> Tabs(
     state: TabsState = rememberTabsState(),
     tabs: List<TabValue<T>>,
+    label: String? = null,
     tab: @Composable RowScope.(tab: TabValue<T>, selected: Boolean, onSelect: () -> Unit) -> Unit,
     panel: @Composable (selected: TabValue<T>?) -> Unit,
 ) {
@@ -40,7 +43,7 @@ fun <T> Tabs(
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     Row(
         modifier = Modifier
-            .tabListSemantics()
+            .tabListSemantics(label)
             .onPreviewKeyEvent { event ->
                 if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
                 val current = tabs.indexOfFirst { state.isSelected(it.value) }.let {

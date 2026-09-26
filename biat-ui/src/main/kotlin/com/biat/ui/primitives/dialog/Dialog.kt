@@ -36,6 +36,8 @@ import com.biat.ui.core.state.rememberDialogState
  * - [trigger] renders inline and opens the dialog on click.
  * - [content] renders in a [BiatPortal] with focus trap + ESC + outside-click.
  * - Focus returns to the trigger whenever the dialog closes.
+ * - [label] is exposed as the dialog content description for screen readers.
+ *   Content text remains the caller's responsibility.
  * - [content] sizes the outside-click dismiss boundary: keep it wrap-content.
  *   A full-window content claims the whole window and disables scrim
  *   dismissal (every tap reads as inside).
@@ -48,6 +50,7 @@ fun Dialog(
     dismissOnOutsideClick: Boolean = true,
     dismissOnEscape: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    label: String? = null,
     scrim: @Composable (() -> Unit)? = null,
     trigger: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
@@ -100,7 +103,7 @@ fun Dialog(
                 modifier = Modifier
                     .onGloballyPositioned { contentBounds = it.boundsInParent() }
                     .consumeOverlayTaps()
-                    .dialogSemantics()
+                    .dialogSemantics(label)
                     .focusTrap(
                         active = true,
                         trapRequester = trapRequester,

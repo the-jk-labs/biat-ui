@@ -36,6 +36,7 @@ import com.biat.ui.core.state.rememberMenuState
  * Placement follows [side]/[align] with [sideOffset]/[alignOffset] gaps;
  * [avoidCollisions] flips to the opposite side when it overflows less and
  * shifts the menu to stay on-screen.
+ * [label] is exposed as the menu content description for screen readers.
  * Focus returns to the trigger whenever the menu closes.
  */
 @Composable
@@ -43,6 +44,7 @@ fun Menu(
     state: MenuState = rememberMenuState(),
     dismissOnOutsideClick: Boolean = true,
     dismissOnEscape: Boolean = true,
+    label: String? = null,
     side: PopupSide = PopupSide.Bottom,
     align: PopupAlign = PopupAlign.Start,
     sideOffset: Dp = 0.dp,
@@ -101,7 +103,7 @@ fun Menu(
             ) {
                 Column(
                     modifier = Modifier
-                        .menuSemantics()
+                        .menuSemantics(label)
                         .onPreviewKeyEvent { event ->
                             if (event.type != KeyEventType.KeyDown) {
                                 return@onPreviewKeyEvent false

@@ -31,7 +31,13 @@ Status as of v0.1.0 scaffold (2026-09-26).
       Dialog/Sheet/Popover/Menu/Select, Enter/Down opens triggers, Menu/Select
       arrows + Home/End highlight, Select Enter commits, Tabs arrows wrap +
       Home/End, Tooltip focus shows overlay)
-- [ ] Screen-reader pass (TalkBack roles, labels, traversal order)
+- [x] Screen-reader pass (TalkBack roles, labels, traversal order):
+      8 on-device SemanticsTest tests pin Dialog/Sheet/Menu/TabList caller
+      labels, MenuItem Button role + selection, Tab role + selection,
+      Tooltip anchor content/state description, Select DropdownList role.
+      New `label` params on Dialog/Sheet/Menu/Tabs close the gap where
+      helpers accepted labels the primitives never exposed. Certified on
+      ALT-LX1 (API 14): 32/32 instrumented, 24/24 JVM green.
 
 ## v0.3.0: Primitive depth
 

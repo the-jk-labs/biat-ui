@@ -43,6 +43,7 @@ import com.biat.ui.core.state.rememberSheetState
  *   anchor is known to return to.
  * - [content] height sizes the outside-click dismiss boundary: keep it
  *   wrap-content. Full-height content disables scrim dismissal.
+ * - [label] is exposed as the sheet content description for screen readers.
  */
 @Composable
 fun Sheet(
@@ -50,6 +51,7 @@ fun Sheet(
     dismissOnOutsideClick: Boolean = true,
     dismissOnEscape: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    label: String? = null,
     trigger: (@Composable () -> Unit)? = null,
     scrim: @Composable (BoxScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
@@ -112,7 +114,7 @@ fun Sheet(
                     .align(Alignment.BottomCenter)
                     .onGloballyPositioned { contentBounds = it.boundsInParent() }
                     .consumeOverlayTaps()
-                    .dialogSemantics()
+                    .dialogSemantics(label)
                     .focusTrap(
                         active = true,
                         trapRequester = trapRequester,
