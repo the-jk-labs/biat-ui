@@ -27,7 +27,10 @@ Status as of v0.1.0 scaffold (2026-09-26).
       tap consumption, proven on-device for modifiers, Dialog, Sheet)
 - [x] Popup positioning API for Popover/Menu/Select (side, align, Dp
       offsets, collision flip + window shift, pure resolver unit-tested)
-- [ ] Instrumented keyboard-nav tests (Esc/arrows/Enter/Home/End per primitive)
+- [x] Instrumented keyboard-nav tests (15 on-device tests: Esc closes
+      Dialog/Sheet/Popover/Menu/Select, Enter/Down opens triggers, Menu/Select
+      arrows + Home/End highlight, Select Enter commits, Tabs arrows wrap +
+      Home/End, Tooltip focus shows overlay)
 - [ ] Screen-reader pass (TalkBack roles, labels, traversal order)
 
 ## v0.3.0: Primitive depth
