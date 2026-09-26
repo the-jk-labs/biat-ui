@@ -14,7 +14,13 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
+      # ubuntu-latest ships an Android SDK; install only what AGP needs.
+      # (android-actions/setup-android is unmaintained and installs the
+      # obsolete 'tools' package, which no longer exists upstream.)
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platforms;android-37"
       - name: Test and assemble
         run: ./gradlew :biat-ui:testDebugUnitTest :biat-ui:assembleRelease :sample:assembleDebug
