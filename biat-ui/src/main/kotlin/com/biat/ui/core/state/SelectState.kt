@@ -10,16 +10,35 @@ import androidx.compose.runtime.setValue
 
 /**
  * Generic single-select state backing Select / Combobox.
+ *
+ * Openness contract (controlled vs uncontrolled):
+ * - Uncontrolled (default): pass [initialOpen]; the state owns the value and
+ *   [open]/[close]/[toggle]/[setOpen] mutate it, notifying [onOpenChange].
+ * - Controlled: pass non-null [controlledOpen] plus [onOpenChange]; the caller
+ *   owns the value and [open]/[close]/[toggle]/[setOpen] only notify via
+ *   [onOpenChange] without mutating. The caller must reflect the new value
+ *   back into [controlledOpen] ([rememberSelectState] does this every
+ *   recomposition). Do not switch modes during the state's lifetime.
+ * - Selection itself ([select]/[clearSelection]) stays uncontrolled; the
+ *   committed value is mirrored to [onSelectedChange].
  */
 @Stable
 class SelectState<T>(
     initialOpen: Boolean = false,
     initialSelected: T? = null,
-    val onOpenChange: ((Boolean) -> Unit)? = null,
+    controlledOpen: Boolean? = null,
+    var onOpenChange: ((Boolean) -> Unit)? = null,
     val onSelectedChange: ((T?) -> Unit)? = null,
 ) {
-    var isOpen by mutableStateOf(initialOpen)
-        private set
+    private var internalOpen by mutableStateOf(initialOpen)
+
+    /**
+     * Caller-owned value in controlled mode. Managed by [rememberSelectState];
+     * assign only to reflect the caller's value.
+     */
+    var controlledOpen: Boolean? by mutableStateOf(controlledOpen)
+
+    val isOpen: Boolean get() = controlledOpen ?: internalOpen
     var selected: T? by mutableStateOf(initialSelected)
         private set
     var highlightedIndex by mutableIntStateOf(-1)
@@ -32,8 +51,12 @@ class SelectState<T>(
     @JvmName("setOpenState")
     fun setOpen(open: Boolean) {
         if (isOpen == open) return
-        isOpen = open
-        onOpenChange?.invoke(open)
+        if (controlledOpen != null) {
+            onOpenChange?.invoke(open)
+        } else {
+            internalOpen = open
+            onOpenChange?.invoke(open)
+        }
     }
 
     fun select(value: T?) {
@@ -49,8 +72,16 @@ class SelectState<T>(
 fun <T> rememberSelectState(
     initialOpen: Boolean = false,
     initialSelected: T? = null,
+    controlledOpen: Boolean? = null,
     onOpenChange: ((Boolean) -> Unit)? = null,
     onSelectedChange: ((T?) -> Unit)? = null,
 ): SelectState<T> = remember {
-    SelectState(initialOpen, initialSelected, onOpenChange, onSelectedChange)
+    SelectState<T>(
+        initialOpen = initialOpen,
+        initialSelected = initialSelected,
+        onSelectedChange = onSelectedChange,
+    )
+}.apply {
+    this.controlledOpen = controlledOpen
+    this.onOpenChange = onOpenChange
 }

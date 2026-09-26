@@ -67,6 +67,7 @@ fun SampleApp() {
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         DialogDemo()
+        ControlledDialogDemo()
         PopoverDemo()
         MenuDemo()
         TooltipDemo()
@@ -113,6 +114,31 @@ private fun DialogDemo() {
             Box(Modifier.background(Color.White).padding(24.dp)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     BasicText("Headless dialog content")
+                    DialogClose(state = state) {
+                        DemoButton("Close")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ControlledDialogDemo() {
+    var open by remember { mutableStateOf(false) }
+    val state = rememberDialogState(
+        controlledOpen = open,
+        onOpenChange = { open = it },
+    )
+    DemoCard("Controlled dialog (open: $open)") {
+        Dialog(
+            state = state,
+            trigger = { DemoButton("Toggle controlled") },
+            scrim = { Box(Modifier.fillMaxSize().background(Color(0x88000000))) },
+        ) {
+            Box(Modifier.background(Color.White).padding(24.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    BasicText("Caller owns the open boolean")
                     DialogClose(state = state) {
                         DemoButton("Close")
                     }

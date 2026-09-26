@@ -18,8 +18,9 @@ Status as of v0.1.0 scaffold (2026-09-26).
 
 - [ ] True focus-trap cycling (Tab/Shift+Tab wrap via focusManager, automated test)
 - [ ] Focus return on close for every overlay primitive (currently Menu + partial)
-- [ ] Controlled vs uncontrolled state contract documented + tested
-      (`initialOpen` vs `open + onOpenChange`)
+- [x] Controlled vs uncontrolled state contract documented + tested
+      (`initialOpen` vs `controlledOpen + onOpenChange`; notify-only in
+      controlled mode, selection stays uncontrolled)
 - [ ] Outside-click vs inside-tap disambiguation tests (scrim consumption)
 - [ ] Popup positioning API for Popover/Menu/Select (alignment, offset, collision flip)
 - [ ] Instrumented keyboard-nav tests (Esc/arrows/Enter/Home/End per primitive)

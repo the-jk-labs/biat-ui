@@ -12,15 +12,31 @@ import androidx.compose.runtime.setValue
  *
  * Behavior contract:
  * - [open] shows content, [close] hides it, [toggle] flips.
- * - [onOpenChange] is the single source of truth hook for controlled usage.
+ *
+ * Openness contract (controlled vs uncontrolled):
+ * - Uncontrolled (default): pass [initialOpen]; the state owns the value and
+ *   [open]/[close]/[toggle]/[setOpen] mutate it, notifying [onOpenChange].
+ * - Controlled: pass non-null [controlledOpen] plus [onOpenChange]; the caller
+ *   owns the value and [open]/[close]/[toggle]/[setOpen] only notify via
+ *   [onOpenChange] without mutating. The caller must reflect the new value
+ *   back into [controlledOpen] ([rememberDialogState] does this every
+ *   recomposition). Do not switch modes during the state's lifetime.
  */
 @Stable
 class DialogState(
     initialOpen: Boolean = false,
-    val onOpenChange: ((Boolean) -> Unit)? = null,
+    controlledOpen: Boolean? = null,
+    var onOpenChange: ((Boolean) -> Unit)? = null,
 ) {
-    var isOpen by mutableStateOf(initialOpen)
-        private set
+    private var internalOpen by mutableStateOf(initialOpen)
+
+    /**
+     * Caller-owned value in controlled mode. Managed by [rememberDialogState];
+     * assign only to reflect the caller's value.
+     */
+    var controlledOpen: Boolean? by mutableStateOf(controlledOpen)
+
+    val isOpen: Boolean get() = controlledOpen ?: internalOpen
 
     fun open() = setOpen(true)
     fun close() = setOpen(false)
@@ -29,15 +45,23 @@ class DialogState(
     @JvmName("setOpenState")
     fun setOpen(open: Boolean) {
         if (isOpen == open) return
-        isOpen = open
-        onOpenChange?.invoke(open)
+        if (controlledOpen != null) {
+            onOpenChange?.invoke(open)
+        } else {
+            internalOpen = open
+            onOpenChange?.invoke(open)
+        }
     }
 }
 
 @Composable
 fun rememberDialogState(
     initialOpen: Boolean = false,
+    controlledOpen: Boolean? = null,
     onOpenChange: ((Boolean) -> Unit)? = null,
 ): DialogState = remember {
-    DialogState(initialOpen, onOpenChange)
+    DialogState(initialOpen = initialOpen)
+}.apply {
+    this.controlledOpen = controlledOpen
+    this.onOpenChange = onOpenChange
 }

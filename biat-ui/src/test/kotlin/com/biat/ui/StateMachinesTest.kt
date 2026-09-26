@@ -2,9 +2,11 @@ package com.biat.ui
 
 import com.biat.ui.core.state.DialogState
 import com.biat.ui.core.state.MenuState
+import com.biat.ui.core.state.PopoverState
 import com.biat.ui.core.state.SelectState
 import com.biat.ui.core.state.SheetState
 import com.biat.ui.core.state.TabsState
+import com.biat.ui.core.state.TooltipState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -75,5 +77,96 @@ class StateMachinesTest {
         assertTrue(state.isOpen)
         state.close()
         assertFalse(state.isOpen)
+    }
+
+    @Test
+    fun dialog_controlled_notifiesWithoutMutating() {
+        val events = mutableListOf<Boolean>()
+        val state = DialogState(
+            controlledOpen = false,
+            onOpenChange = { events.add(it) },
+        )
+        state.open()
+        assertFalse(state.isOpen) // caller owns the value; no mutation
+        assertEquals(listOf(true), events)
+        // Controlled notifications are at-least-once: the value is still
+        // false (caller has not reflected it), so requesting again notifies.
+        state.open()
+        assertEquals(listOf(true, true), events)
+
+        // Caller reflects the value back, as rememberDialogState does.
+        state.controlledOpen = true
+        assertTrue(state.isOpen)
+        state.close()
+        assertTrue(state.isOpen)
+        assertEquals(listOf(true, true, false), events)
+        state.controlledOpen = false
+        assertFalse(state.isOpen)
+    }
+
+    @Test
+    fun menu_controlled_closeResetsHighlightButNotifies() {
+        val events = mutableListOf<Boolean>()
+        val state = MenuState(
+            itemCount = 3,
+            controlledOpen = true,
+            onOpenChange = { events.add(it) },
+        )
+        assertTrue(state.isOpen)
+        state.highlight(2)
+        state.close()
+        assertEquals(-1, state.highlightedIndex) // transient state resets
+        assertTrue(state.isOpen) // openness stays until the caller updates
+        assertEquals(listOf(false), events)
+    }
+
+    @Test
+    fun tooltip_controlled_showHide() {
+        val events = mutableListOf<Boolean>()
+        val state = TooltipState(
+            controlledVisible = false,
+            onVisibleChange = { events.add(it) },
+        )
+        state.show()
+        assertFalse(state.isVisible)
+        assertEquals(listOf(true), events)
+        state.hide() // no-op: already not visible
+        assertEquals(listOf(true), events)
+        state.controlledVisible = true
+        assertTrue(state.isVisible)
+        state.hide()
+        assertTrue(state.isVisible)
+        assertEquals(listOf(true, false), events)
+    }
+
+    @Test
+    fun popover_select_sheet_controlled_notifyOnly() {
+        val popoverEvents = mutableListOf<Boolean>()
+        val popover = PopoverState(
+            controlledOpen = true,
+            onOpenChange = { popoverEvents.add(it) },
+        )
+        popover.close()
+        assertTrue(popover.isOpen)
+        assertEquals(listOf(false), popoverEvents)
+
+        val selectEvents = mutableListOf<Boolean>()
+        val select = SelectState<String>(
+            controlledOpen = false,
+            onOpenChange = { selectEvents.add(it) },
+        )
+        select.toggle()
+        assertFalse(select.isOpen)
+        assertEquals(listOf(true), selectEvents)
+
+        val sheetEvents = mutableListOf<Boolean>()
+        val sheet = SheetState(
+            controlledOpen = false,
+            onOpenChange = { sheetEvents.add(it) },
+        )
+        sheet.open(expanded = true)
+        assertFalse(sheet.isOpen)
+        assertTrue(sheet.isExpanded) // expansion stays internal
+        assertEquals(listOf(true), sheetEvents)
     }
 }
