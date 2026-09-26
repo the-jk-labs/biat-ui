@@ -1,0 +1,51 @@
+package com.biat.ui.core.accessibility
+
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+
+/** Semantics for overlay dialogs. Headless: label comes from caller. */
+fun Modifier.dialogSemantics(label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        if (label != null) contentDescription = label
+    }
+
+/** Semantics for menu containers. */
+fun Modifier.menuSemantics(label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        if (label != null) contentDescription = label
+    }
+
+/** Semantics for a menu item with selection state. */
+fun Modifier.menuItemSemantics(
+    label: String? = null,
+    selected: Boolean = false,
+): Modifier = this.semantics(mergeDescendants = false) {
+    role = Role.Button
+    this.selected = selected
+    if (label != null) contentDescription = label
+}
+
+/** Semantics for tabs. */
+fun Modifier.tabSemantics(selected: Boolean, label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Tab
+        this.selected = selected
+        if (label != null) contentDescription = label
+    }
+
+fun Modifier.tabListSemantics(label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        if (label != null) contentDescription = label
+    }
+
+/** Semantics for tooltip anchors. */
+fun Modifier.tooltipAnchorSemantics(tip: String): Modifier =
+    this.semantics(mergeDescendants = false) {
+        contentDescription = tip
+        stateDescription = tip
+    }
