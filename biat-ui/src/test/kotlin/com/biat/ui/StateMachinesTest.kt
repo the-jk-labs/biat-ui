@@ -172,6 +172,68 @@ class StateMachinesTest {
     }
 
     @Test
+    fun select_queryFiltersOpensAndResetsHighlight() {
+        val queries = mutableListOf<String>()
+        val state = SelectState<String>(onQueryChange = { queries.add(it) })
+        val options = listOf("Kotlin", "Java", "Kotlin Multiplatform", "Rust")
+        assertEquals(options, state.filteredOptions(options))
+        state.highlightedIndex = 2
+        state.setQuery("kotlin")
+        assertEquals("kotlin", state.query)
+        assertTrue(state.isOpen)
+        assertEquals(-1, state.highlightedIndex)
+        assertEquals(
+            listOf("Kotlin", "Kotlin Multiplatform"),
+            state.filteredOptions(options),
+        )
+        assertEquals(listOf("kotlin"), queries)
+        state.setQuery("kotlin") // no-op, no duplicate event
+        assertEquals(listOf("kotlin"), queries)
+        state.clearQuery()
+        assertEquals("", state.query)
+        assertEquals(options, state.filteredOptions(options))
+    }
+
+    @Test
+    fun select_controlledQuery_notifiesWithoutMutating() {
+        val events = mutableListOf<String>()
+        val state = SelectState<String>(
+            controlledQuery = "a",
+            onQueryChange = { events.add(it) },
+        )
+        state.setQuery("ab")
+        assertEquals("a", state.query)
+        assertEquals(listOf("ab"), events)
+        state.controlledQuery = "ab"
+        assertEquals("ab", state.query)
+    }
+
+    @Test
+    fun select_typeaheadMatchCyclesAndWraps() {
+        val state = SelectState<String>()
+        val options = listOf("Apple", "Apricot", "Banana")
+        assertTrue(state.moveHighlightToMatch(options, { it }, "a"))
+        assertEquals(0, state.highlightedIndex)
+        assertTrue(state.moveHighlightToMatch(options, { it }, "a"))
+        assertEquals(1, state.highlightedIndex)
+        assertTrue(state.moveHighlightToMatch(options, { it }, "b"))
+        assertEquals(2, state.highlightedIndex)
+        assertFalse(state.moveHighlightToMatch(options, { it }, "z"))
+        assertEquals(2, state.highlightedIndex)
+        assertFalse(state.moveHighlightToMatch(emptyList(), { it }, "a"))
+    }
+
+    @Test
+    fun select_closeResetsHighlight() {
+        val state = SelectState<String>()
+        state.open()
+        state.highlightedIndex = 1
+        state.close()
+        assertEquals(-1, state.highlightedIndex)
+        assertFalse(state.isOpen)
+    }
+
+    @Test
     fun focusReturn_onlyOnOpenToClose() {
         assertTrue(shouldReturnFocus(wasOpen = true, isOpen = false))
         assertFalse(shouldReturnFocus(wasOpen = false, isOpen = false))

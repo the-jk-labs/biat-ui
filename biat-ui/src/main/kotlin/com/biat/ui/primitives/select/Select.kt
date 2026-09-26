@@ -6,14 +6,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -38,6 +42,17 @@ import com.biat.ui.core.state.rememberSelectState
  * gaps; [avoidCollisions] flips to the opposite side when it overflows
  * less and shifts the listbox to stay on-screen.
  * Focus returns to the trigger whenever the listbox closes.
+ *
+ * Combobox filtering: bind a text field inside [trigger] to
+ * [SelectState.query] via [SelectState.setQuery]; the listbox renders
+ * [SelectState.filteredOptions] using [queryToString]. Async options work
+ * by passing a new [options] list as data arrives; highlight clamps to
+ * the visible range and [isLoading] swaps the list for [loading].
+ * When the filtered list is empty the [empty] slot renders instead.
+ * Clearable: Backspace/Delete on a closed trigger with an empty query
+ * clears the selection via [SelectState.clearSelection]. Single-key
+ * typeahead moves highlight to the next visible option starting with
+ * the typed character when no text field consumes it.
  */
 @Composable
 fun <T> Select(
@@ -50,10 +65,20 @@ fun <T> Select(
     sideOffset: Dp = 0.dp,
     alignOffset: Dp = 0.dp,
     avoidCollisions: Boolean = true,
+    queryToString: (T) -> String = { it.toString() },
+    isLoading: Boolean = false,
+    loading: @Composable () -> Unit = {},
+    empty: @Composable () -> Unit = {},
     trigger: @Composable (selected: T?) -> Unit,
     option: @Composable ColumnScope.(value: T, highlighted: Boolean, selected: Boolean) -> Unit,
     onSelected: ((T?) -> Unit)? = null,
 ) {
+    val visible = state.filteredOptions(options, queryToString)
+    LaunchedEffect(visible.size, state.isOpen) {
+        if (state.highlightedIndex >= visible.size) {
+            state.highlightedIndex = if (visible.isEmpty()) -1 else visible.size - 1
+        }
+    }
     Box {
         val source = remember { MutableInteractionSource() }
         val returnRequester = rememberFocusReturnRequester()
@@ -72,6 +97,17 @@ fun <T> Select(
                     when (event.key) {
                         Key.Enter, Key.NumPadEnter, Key.Spacebar, Key.DirectionDown -> {
                             if (!state.isOpen) { state.open(); true } else false
+                        }
+                        Key.Backspace, Key.Delete -> {
+                            if (!state.isOpen && state.query.isEmpty() &&
+                                state.selected != null
+                            ) {
+                                state.clearSelection()
+                                onSelected?.invoke(null)
+                                true
+                            } else {
+                                false
+                            }
                         }
                         else -> false
                     }
@@ -103,17 +139,19 @@ fun <T> Select(
                         }
                         when (event.key) {
                             Key.DirectionDown -> {
+                                if (visible.isEmpty()) return@onPreviewKeyEvent false
                                 state.highlightedIndex =
-                                    ((state.highlightedIndex + 1).mod(options.size))
+                                    ((state.highlightedIndex + 1).mod(visible.size))
                                 true
                             }
                             Key.DirectionUp -> {
+                                if (visible.isEmpty()) return@onPreviewKeyEvent false
                                 state.highlightedIndex =
-                                    ((state.highlightedIndex - 1).mod(options.size))
+                                    ((state.highlightedIndex - 1).mod(visible.size))
                                 true
                             }
                             Key.Enter, Key.NumPadEnter -> {
-                                val value = options.getOrNull(state.highlightedIndex)
+                                val value = visible.getOrNull(state.highlightedIndex)
                                 if (value != null) {
                                     state.select(value)
                                     onSelected?.invoke(value)
@@ -123,11 +161,27 @@ fun <T> Select(
                             Key.Escape -> {
                                 if (dismissOnEscape) { state.close(); true } else false
                             }
-                            else -> false
+                            else -> {
+                                val code = event.utf16CodePoint
+                                if (code in 32..126 && !event.isCtrlPressed &&
+                                    !event.isMetaPressed
+                                ) {
+                                    state.moveHighlightToMatch(
+                                        visible,
+                                        queryToString,
+                                        code.toChar().toString(),
+                                    )
+                                } else {
+                                    false
+                                }
+                            }
                         }
                     },
                 ) {
-                    options.forEachIndexed { index, value ->
+                    when {
+                        isLoading -> loading()
+                        visible.isEmpty() -> empty()
+                        else -> visible.forEachIndexed { index, value ->
                         val itemSource = remember { MutableInteractionSource() }
                         Box(
                             modifier = Modifier.clickable(
@@ -147,6 +201,7 @@ fun <T> Select(
                                 )
                             }
                         }
+                    }
                     }
                 }
             }

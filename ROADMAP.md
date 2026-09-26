@@ -41,7 +41,16 @@ Status as of v0.1.0 scaffold (2026-09-26).
 
 ## v0.3.0: Primitive depth
 
-- [ ] Select: typeahead filtering (Combobox), async options, clearable
+- [x] Select: typeahead filtering (Combobox), async options, clearable:
+      query lives in SelectState (uncontrolled or controlled via
+      controlledQuery + onQueryChange); setQuery opens + resets highlight,
+      filteredOptions + moveHighlightToMatch are pure and unit-tested,
+      close resets highlight like MenuState. Select renders the filtered
+      list with loading/empty slots, clamps highlight as async options
+      arrive, jumps highlight on single-key typeahead, and clears via
+      Backspace/Delete on a closed trigger. Sample ComboboxDemo binds
+      BasicTextField to query with simulated async reload. Certified on
+      ALT-LX1 (API 14): 37/37 instrumented, 28/28 JVM green.
 - [ ] Menu: submenus, checkbox/radio items, separators, disabled items
 - [ ] Dialog: nested dialogs, alert vs plain variants, initial-focus target
 - [ ] Sheet: drag-to-dismiss + detents (peek/half/full), swipe velocity
