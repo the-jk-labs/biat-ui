@@ -6,15 +6,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.biat.ui.core.dismiss.onEscape
+import com.biat.ui.core.focus.FocusReturnEffect
+import com.biat.ui.core.focus.rememberFocusReturnRequester
 import com.biat.ui.core.state.PopoverState
 import com.biat.ui.core.state.rememberPopoverState
 
 /**
  * Headless Popover. Non-modal overlay anchored to [trigger].
  * Zero styling; positioning via Popup defaults (caller may wrap content).
+ * Focus returns to the trigger whenever the popover closes.
  */
 @Composable
 fun Popover(
@@ -27,12 +31,16 @@ fun Popover(
 ) {
     Box {
         val source = remember { MutableInteractionSource() }
+        val returnRequester = rememberFocusReturnRequester()
+        FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
         Box(
-            modifier = Modifier.clickable(
-                interactionSource = source,
-                indication = null,
-                onClick = { state.toggle() },
-            ),
+            modifier = Modifier
+                .focusRequester(returnRequester)
+                .clickable(
+                    interactionSource = source,
+                    indication = null,
+                    onClick = { state.toggle() },
+                ),
         ) {
             trigger()
         }

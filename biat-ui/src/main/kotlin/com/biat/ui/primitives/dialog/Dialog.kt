@@ -7,13 +7,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import com.biat.ui.core.accessibility.dialogSemantics
 import com.biat.ui.core.dismiss.consumeOverlayTaps
 import com.biat.ui.core.dismiss.onEscape
 import com.biat.ui.core.dismiss.outsideClick
+import com.biat.ui.core.focus.FocusReturnEffect
 import com.biat.ui.core.focus.FocusTrapEffect
 import com.biat.ui.core.focus.focusTrap
+import com.biat.ui.core.focus.rememberFocusReturnRequester
 import com.biat.ui.core.focus.rememberFocusTrapRequester
 import com.biat.ui.core.portal.BiatPortal
 import com.biat.ui.core.state.DialogState
@@ -24,6 +28,7 @@ import com.biat.ui.core.state.rememberDialogState
  *
  * - [trigger] renders inline and opens the dialog on click.
  * - [content] renders in a [BiatPortal] with focus trap + ESC + outside-click.
+ * - Focus returns to the trigger whenever the dialog closes.
  * - The caller owns scrim visuals: wrap [content] in their own Box/surface.
  *   Set [dismissOnOutsideClick] = false if the scrim handles dismissal itself.
  */
@@ -38,7 +43,13 @@ fun Dialog(
     content: @Composable () -> Unit,
 ) {
     if (trigger != null) {
-        DialogTrigger(state = state, content = trigger)
+        val returnRequester = rememberFocusReturnRequester()
+        FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
+        DialogTrigger(
+            state = state,
+            returnFocusRequester = returnRequester,
+            content = trigger,
+        )
     }
     if (!state.isOpen) return
 
@@ -83,15 +94,20 @@ fun Dialog(
 @Composable
 fun DialogTrigger(
     state: DialogState,
+    returnFocusRequester: FocusRequester? = null,
     content: @Composable () -> Unit,
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier.clickable(
-            interactionSource = source,
-            indication = null,
-            onClick = { state.open() },
-        ),
+        modifier = Modifier
+            .let { m ->
+                if (returnFocusRequester != null) m.focusRequester(returnFocusRequester) else m
+            }
+            .clickable(
+                interactionSource = source,
+                indication = null,
+                onClick = { state.open() },
+            ),
     ) {
         content()
     }

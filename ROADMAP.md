@@ -17,7 +17,8 @@ Status as of v0.1.0 scaffold (2026-09-26).
 ## v0.2.0: Behavior hardening
 
 - [ ] True focus-trap cycling (Tab/Shift+Tab wrap via focusManager, automated test)
-- [ ] Focus return on close for every overlay primitive (currently Menu + partial)
+- [x] Focus return on close for every overlay primitive (shared
+      FocusReturnEffect; Tooltip exempt, focus never leaves its anchor)
 - [x] Controlled vs uncontrolled state contract documented + tested
       (`initialOpen` vs `controlledOpen + onOpenChange`; notify-only in
       controlled mode, selection stays uncontrolled)

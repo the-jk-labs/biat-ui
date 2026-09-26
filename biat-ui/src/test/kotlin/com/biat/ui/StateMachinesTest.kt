@@ -1,5 +1,6 @@
 package com.biat.ui
 
+import com.biat.ui.core.focus.shouldReturnFocus
 import com.biat.ui.core.state.DialogState
 import com.biat.ui.core.state.MenuState
 import com.biat.ui.core.state.PopoverState
@@ -168,5 +169,13 @@ class StateMachinesTest {
         assertFalse(sheet.isOpen)
         assertTrue(sheet.isExpanded) // expansion stays internal
         assertEquals(listOf(true), sheetEvents)
+    }
+
+    @Test
+    fun focusReturn_onlyOnOpenToClose() {
+        assertTrue(shouldReturnFocus(wasOpen = true, isOpen = false))
+        assertFalse(shouldReturnFocus(wasOpen = false, isOpen = false))
+        assertFalse(shouldReturnFocus(wasOpen = false, isOpen = true))
+        assertFalse(shouldReturnFocus(wasOpen = true, isOpen = true))
     }
 }

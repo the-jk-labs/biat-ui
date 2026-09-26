@@ -6,13 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -23,6 +18,8 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.biat.ui.core.accessibility.menuItemSemantics
 import com.biat.ui.core.accessibility.menuSemantics
+import com.biat.ui.core.focus.FocusReturnEffect
+import com.biat.ui.core.focus.rememberFocusReturnRequester
 import com.biat.ui.core.state.MenuState
 import com.biat.ui.core.state.rememberMenuState
 
@@ -42,21 +39,11 @@ fun Menu(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val triggerSource = remember { MutableInteractionSource() }
-    val triggerRequester = remember { FocusRequester() }
+    val triggerRequester = rememberFocusReturnRequester()
 
     // Restore focus to the trigger on open -> close transitions only,
     // regardless of how the menu was dismissed (Esc, item, outside tap).
-    var wasOpen by remember { mutableStateOf(state.isOpen) }
-    LaunchedEffect(state.isOpen) {
-        if (wasOpen && !state.isOpen) {
-            try {
-                triggerRequester.requestFocus()
-            } catch (_: IllegalStateException) {
-                // Trigger not laid out; nothing to restore.
-            }
-        }
-        wasOpen = state.isOpen
-    }
+    FocusReturnEffect(isOpen = state.isOpen, returnRequester = triggerRequester)
 
     Box {
         Box(

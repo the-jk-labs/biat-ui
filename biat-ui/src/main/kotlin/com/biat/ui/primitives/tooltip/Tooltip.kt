@@ -53,6 +53,8 @@ fun Tooltip(
             anchor()
         }
         if (state.isVisible) {
+            // No focus return: the overlay is not focusable, so focus never
+            // leaves the anchor while the tip is visible.
             Popup(
                 onDismissRequest = { state.hide() },
                 properties = PopupProperties(focusable = false),

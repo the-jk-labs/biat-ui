@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -18,6 +19,8 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.biat.ui.core.focus.FocusReturnEffect
+import com.biat.ui.core.focus.rememberFocusReturnRequester
 import com.biat.ui.core.state.SelectState
 import com.biat.ui.core.state.rememberSelectState
 
@@ -26,6 +29,7 @@ import com.biat.ui.core.state.rememberSelectState
  *
  * [options] drive keyboard highlight; [onSelected] fires on
  * commit. Caller owns trigger + option row visuals entirely.
+ * Focus returns to the trigger whenever the listbox closes.
  */
 @Composable
 fun <T> Select(
@@ -39,8 +43,11 @@ fun <T> Select(
 ) {
     Box {
         val source = remember { MutableInteractionSource() }
+        val returnRequester = rememberFocusReturnRequester()
+        FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
         Box(
             modifier = Modifier
+                .focusRequester(returnRequester)
                 .semantics(mergeDescendants = false) { role = Role.DropdownList }
                 .clickable(
                     interactionSource = source,
