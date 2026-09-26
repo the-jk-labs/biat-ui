@@ -19,6 +19,7 @@ import com.biat.ui.core.focus.FocusTrapEffect
 import com.biat.ui.core.focus.focusTrap
 import com.biat.ui.core.focus.rememberFocusReturnRequester
 import com.biat.ui.core.focus.rememberFocusTrapRequester
+import com.biat.ui.core.focus.rememberFocusTrapState
 import com.biat.ui.core.portal.BiatPortal
 import com.biat.ui.core.state.DialogState
 import com.biat.ui.core.state.rememberDialogState
@@ -54,6 +55,7 @@ fun Dialog(
     if (!state.isOpen) return
 
     val trapRequester = rememberFocusTrapRequester()
+    val trapState = rememberFocusTrapState()
     val focusManager = LocalFocusManager.current
     FocusTrapEffect(active = true, trapRequester = trapRequester)
 
@@ -78,6 +80,7 @@ fun Dialog(
                         active = true,
                         trapRequester = trapRequester,
                         focusManager = focusManager,
+                        trapState = trapState,
                         onEscape = if (dismissOnEscape) ({ state.close() }) else null,
                     )
                     .let { m ->
