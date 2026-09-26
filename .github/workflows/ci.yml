@@ -15,11 +15,16 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
-      # ubuntu-latest ships an Android SDK; install only what AGP needs.
+      # ubuntu-latest ships an Android SDK, but cmdline-tools is not on PATH.
       # (android-actions/setup-android is unmaintained and installs the
       # obsolete 'tools' package, which no longer exists upstream.)
       - name: Install Android SDK packages
         run: |
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          for d in "$SDK_ROOT"/cmdline-tools/*/bin; do
+            PATH="$d:$PATH"
+          done
+          export PATH
           yes | sdkmanager --licenses > /dev/null
           sdkmanager "platforms;android-37"
       - name: Test and assemble
