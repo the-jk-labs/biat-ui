@@ -5,10 +5,16 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import com.biat.ui.core.accessibility.dialogSemantics
 import com.biat.ui.core.dismiss.consumeOverlayTaps
@@ -30,6 +36,9 @@ import com.biat.ui.core.state.rememberDialogState
  * - [trigger] renders inline and opens the dialog on click.
  * - [content] renders in a [BiatPortal] with focus trap + ESC + outside-click.
  * - Focus returns to the trigger whenever the dialog closes.
+ * - [content] sizes the outside-click dismiss boundary: keep it wrap-content.
+ *   A full-window content claims the whole window and disables scrim
+ *   dismissal (every tap reads as inside).
  * - The caller owns scrim visuals: wrap [content] in their own Box/surface.
  *   Set [dismissOnOutsideClick] = false if the scrim handles dismissal itself.
  */
@@ -59,6 +68,12 @@ fun Dialog(
     val focusManager = LocalFocusManager.current
     FocusTrapEffect(active = true, trapRequester = trapRequester)
 
+    // Dismiss boundary follows the content bounds, not the scrim: taps
+    // inside the card are ignored even when content fills the container
+    // (e.g. a centered card), where tap consumption alone cannot tell
+    // scrim from content.
+    var contentBounds by remember { mutableStateOf<Rect?>(null) }
+
     BiatPortal(
         onDismissRequest = { state.close() },
         dismissOnBackPress = dismissOnBackPress,
@@ -68,12 +83,22 @@ fun Dialog(
             modifier = Modifier
                 .fillMaxSize()
                 .let { m ->
-                    if (dismissOnOutsideClick) m.outsideClick { state.close() } else m
+                    if (dismissOnOutsideClick) {
+                        m.outsideClick(
+                            onOutsideClick = { state.close() },
+                            isInsideContent = { offset ->
+                                contentBounds?.contains(offset) == true
+                            },
+                        )
+                    } else {
+                        m
+                    }
                 },
         ) {
             scrim?.invoke()
             Box(
                 modifier = Modifier
+                    .onGloballyPositioned { contentBounds = it.boundsInParent() }
                     .consumeOverlayTaps()
                     .dialogSemantics()
                     .focusTrap(
