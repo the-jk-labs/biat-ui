@@ -25,7 +25,8 @@ Status as of v0.1.0 scaffold (2026-09-26).
       controlled mode, selection stays uncontrolled)
 - [x] Outside-click vs inside-tap disambiguation tests (geometry exclusion +
       tap consumption, proven on-device for modifiers, Dialog, Sheet)
-- [ ] Popup positioning API for Popover/Menu/Select (alignment, offset, collision flip)
+- [x] Popup positioning API for Popover/Menu/Select (side, align, Dp
+      offsets, collision flip + window shift, pure resolver unit-tested)
 - [ ] Instrumented keyboard-nav tests (Esc/arrows/Enter/Home/End per primitive)
 - [ ] Screen-reader pass (TalkBack roles, labels, traversal order)
 

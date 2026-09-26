@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.biat.ui.core.positioning.PopupAlign
+import com.biat.ui.core.positioning.PopupSide
 import com.biat.ui.core.state.rememberDialogState
 import com.biat.ui.core.state.rememberMenuState
 import com.biat.ui.core.state.rememberPopoverState
@@ -66,6 +68,7 @@ fun SampleApp() {
         DialogDemo()
         ControlledDialogDemo()
         PopoverDemo()
+        PopoverPlacementDemo()
         MenuDemo()
         TooltipDemo()
         SelectDemo()
@@ -155,6 +158,24 @@ private fun PopoverDemo() {
         ) {
             Box(Modifier.background(Color.White).padding(16.dp)) {
                 BasicText("Popover body (user-styled)")
+            }
+        }
+    }
+}
+
+@Composable
+private fun PopoverPlacementDemo() {
+    val state = rememberPopoverState()
+    DemoCard("Popover placement (top-end, 8.dp gap)") {
+        Popover(
+            state = state,
+            side = PopupSide.Top,
+            align = PopupAlign.End,
+            sideOffset = 8.dp,
+            trigger = { DemoButton("Toggle placed popover") },
+        ) {
+            Box(Modifier.background(Color.White).padding(16.dp)) {
+                BasicText("Placed above, aligned end")
             }
         }
     }

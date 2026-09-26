@@ -17,10 +17,15 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.biat.ui.core.focus.FocusReturnEffect
 import com.biat.ui.core.focus.rememberFocusReturnRequester
+import com.biat.ui.core.positioning.PopupAlign
+import com.biat.ui.core.positioning.PopupSide
+import com.biat.ui.core.positioning.rememberBiatPopupPosition
 import com.biat.ui.core.state.SelectState
 import com.biat.ui.core.state.rememberSelectState
 
@@ -29,6 +34,9 @@ import com.biat.ui.core.state.rememberSelectState
  *
  * [options] drive keyboard highlight; [onSelected] fires on
  * commit. Caller owns trigger + option row visuals entirely.
+ * Listbox placement follows [side]/[align] with [sideOffset]/[alignOffset]
+ * gaps; [avoidCollisions] flips to the opposite side when it overflows
+ * less and shifts the listbox to stay on-screen.
  * Focus returns to the trigger whenever the listbox closes.
  */
 @Composable
@@ -37,6 +45,11 @@ fun <T> Select(
     options: List<T>,
     dismissOnOutsideClick: Boolean = true,
     dismissOnEscape: Boolean = true,
+    side: PopupSide = PopupSide.Bottom,
+    align: PopupAlign = PopupAlign.Start,
+    sideOffset: Dp = 0.dp,
+    alignOffset: Dp = 0.dp,
+    avoidCollisions: Boolean = true,
     trigger: @Composable (selected: T?) -> Unit,
     option: @Composable ColumnScope.(value: T, highlighted: Boolean, selected: Boolean) -> Unit,
     onSelected: ((T?) -> Unit)? = null,
@@ -69,6 +82,13 @@ fun <T> Select(
 
         if (state.isOpen) {
             Popup(
+                popupPositionProvider = rememberBiatPopupPosition(
+                    side = side,
+                    align = align,
+                    sideOffset = sideOffset,
+                    alignOffset = alignOffset,
+                    avoidCollisions = avoidCollisions,
+                ),
                 onDismissRequest = { state.close() },
                 properties = PopupProperties(
                     focusable = true,

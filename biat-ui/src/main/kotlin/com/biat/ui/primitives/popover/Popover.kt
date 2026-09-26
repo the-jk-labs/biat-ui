@@ -7,18 +7,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.biat.ui.core.dismiss.onEscape
 import com.biat.ui.core.focus.FocusReturnEffect
 import com.biat.ui.core.focus.rememberFocusReturnRequester
+import com.biat.ui.core.positioning.PopupAlign
+import com.biat.ui.core.positioning.PopupSide
+import com.biat.ui.core.positioning.rememberBiatPopupPosition
 import com.biat.ui.core.state.PopoverState
 import com.biat.ui.core.state.rememberPopoverState
 
 /**
  * Headless Popover. Non-modal overlay anchored to [trigger].
- * Zero styling; positioning via Popup defaults (caller may wrap content).
- * Focus returns to the trigger whenever the popover closes.
+ * Zero styling; the caller owns every pixel inside [content].
+ * Placement follows [side]/[align] with [sideOffset]/[alignOffset] gaps;
+ * [avoidCollisions] flips to the opposite side when it overflows less and
+ * shifts the popup to stay on-screen. Focus returns to the trigger
+ * whenever the popover closes.
  */
 @Composable
 fun Popover(
@@ -26,6 +34,11 @@ fun Popover(
     dismissOnOutsideClick: Boolean = true,
     dismissOnEscape: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    side: PopupSide = PopupSide.Bottom,
+    align: PopupAlign = PopupAlign.Start,
+    sideOffset: Dp = 0.dp,
+    alignOffset: Dp = 0.dp,
+    avoidCollisions: Boolean = true,
     trigger: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -46,6 +59,13 @@ fun Popover(
         }
         if (state.isOpen) {
             Popup(
+                popupPositionProvider = rememberBiatPopupPosition(
+                    side = side,
+                    align = align,
+                    sideOffset = sideOffset,
+                    alignOffset = alignOffset,
+                    avoidCollisions = avoidCollisions,
+                ),
                 onDismissRequest = { state.close() },
                 properties = PopupProperties(
                     focusable = true,
