@@ -8,7 +8,9 @@ import com.biat.ui.core.state.SelectState
 import com.biat.ui.core.state.SheetDetent
 import com.biat.ui.core.state.SheetSettle
 import com.biat.ui.core.state.SheetState
+import com.biat.ui.core.state.TabMove
 import com.biat.ui.core.state.resolveSheetSettle
+import com.biat.ui.core.state.resolveTabIndex
 import com.biat.ui.core.state.TabsState
 import com.biat.ui.core.state.TooltipState
 import org.junit.Assert.assertEquals
@@ -68,6 +70,23 @@ class StateMachinesTest {
         state.select("b")
         assertTrue(state.isSelected("b"))
         assertEquals("b", last)
+    }
+
+    @Test
+    fun tabs_resolveIndex_wraps() {
+        assertEquals(1, resolveTabIndex(0, 3, TabMove.Next))
+        assertEquals(0, resolveTabIndex(2, 3, TabMove.Next))
+        assertEquals(2, resolveTabIndex(0, 3, TabMove.Previous))
+        assertEquals(0, resolveTabIndex(0, 3, TabMove.First))
+        assertEquals(2, resolveTabIndex(0, 3, TabMove.Last))
+    }
+
+    @Test
+    fun tabs_resolveIndex_clampsAndSingle() {
+        assertEquals(0, resolveTabIndex(9, 3, TabMove.Next))
+        assertEquals(2, resolveTabIndex(-4, 3, TabMove.Previous))
+        assertEquals(0, resolveTabIndex(0, 1, TabMove.Next))
+        assertEquals(0, resolveTabIndex(0, 1, TabMove.Last))
     }
 
     @Test
