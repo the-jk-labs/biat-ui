@@ -34,8 +34,8 @@ import com.biat.ui.core.state.rememberSheetState
 
 /**
  * Headless Sheet (bottom overlay behavior). Zero styling or animation:
- * caller owns visuals, drag gestures, and positioning. Provides portal,
- * focus trap, ESC + outside-click dismiss.
+ * caller owns visuals and positioning. Provides portal, focus trap,
+ * ESC + outside-click dismiss, detents, and drag-to-dismiss.
  *
  * - [trigger] (optional) renders inline and opens the sheet on click.
  *   When provided, focus returns to it whenever the sheet closes.
@@ -44,6 +44,9 @@ import com.biat.ui.core.state.rememberSheetState
  * - [content] height sizes the outside-click dismiss boundary: keep it
  *   wrap-content. Full-height content disables scrim dismissal.
  * - [label] is exposed as the sheet content description for screen readers.
+ * - Detents ([SheetDetent] Peek/Half/Full) live in [SheetState.detent];
+ *   render content per detent and attach [sheetDrag] to the caller's drag
+ *   handle for finger-following drags with settle-on-release.
  */
 @Composable
 fun Sheet(

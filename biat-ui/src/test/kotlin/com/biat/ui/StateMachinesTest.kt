@@ -5,7 +5,10 @@ import com.biat.ui.core.state.DialogState
 import com.biat.ui.core.state.MenuState
 import com.biat.ui.core.state.PopoverState
 import com.biat.ui.core.state.SelectState
+import com.biat.ui.core.state.SheetDetent
+import com.biat.ui.core.state.SheetSettle
 import com.biat.ui.core.state.SheetState
+import com.biat.ui.core.state.resolveSheetSettle
 import com.biat.ui.core.state.TabsState
 import com.biat.ui.core.state.TooltipState
 import org.junit.Assert.assertEquals
@@ -269,6 +272,94 @@ class StateMachinesTest {
         assertEquals(-1, state.highlightedIndex)
         state.highlight(0)
         assertEquals(-1, state.highlightedIndex)
+    }
+
+    @Test
+    fun sheet_settlePositionalStepsAndDismisses() {
+        // From Half, small drags snap back.
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Half),
+            resolveSheetSettle(SheetDetent.Half, dragPx = 100f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+        // Down 30% steps one stop down; down 60% dismisses.
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Peek),
+            resolveSheetSettle(SheetDetent.Half, dragPx = 300f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+        assertEquals(
+            SheetSettle.Dismiss,
+            resolveSheetSettle(SheetDetent.Half, dragPx = 600f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+        // Down from the lowest stop dismisses past the step line.
+        assertEquals(
+            SheetSettle.Dismiss,
+            resolveSheetSettle(SheetDetent.Peek, dragPx = 300f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+        // Up 30% steps one stop up; Full stays Full.
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Full),
+            resolveSheetSettle(SheetDetent.Half, dragPx = -300f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Full),
+            resolveSheetSettle(SheetDetent.Full, dragPx = -300f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+    }
+
+    @Test
+    fun sheet_settleFlingsMoveOneStop() {
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Full),
+            resolveSheetSettle(SheetDetent.Half, dragPx = 0f, sheetHeightPx = 1000f, velocityPxPerSec = -2000f),
+        )
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Peek),
+            resolveSheetSettle(SheetDetent.Half, dragPx = 0f, sheetHeightPx = 1000f, velocityPxPerSec = 2000f),
+        )
+        assertEquals(
+            SheetSettle.Dismiss,
+            resolveSheetSettle(SheetDetent.Peek, dragPx = 0f, sheetHeightPx = 1000f, velocityPxPerSec = 2000f),
+        )
+        // Slow drags below the fling line stay positional.
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Half),
+            resolveSheetSettle(SheetDetent.Half, dragPx = 0f, sheetHeightPx = 1000f, velocityPxPerSec = 1499f),
+        )
+    }
+
+    @Test
+    fun sheet_settleHonorsEnabledDetents() {
+        val two = setOf(SheetDetent.Peek, SheetDetent.Full)
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Full),
+            resolveSheetSettle(SheetDetent.Peek, enabled = two, dragPx = -300f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Peek),
+            resolveSheetSettle(SheetDetent.Full, enabled = two, dragPx = 300f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+        assertEquals(
+            SheetSettle.Snap(SheetDetent.Peek),
+            resolveSheetSettle(SheetDetent.Peek, enabled = setOf(SheetDetent.Peek), dragPx = 0f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+        )
+    }
+
+    @Test
+    fun sheet_detentNotifiesAndMapsExpandCollapse() {
+        val events = mutableListOf<SheetDetent>()
+        val state = SheetState(onDetentChange = { events.add(it) })
+        assertEquals(SheetDetent.Half, state.detent)
+        assertFalse(state.isExpanded)
+        state.expand()
+        assertTrue(state.isExpanded)
+        state.collapse()
+        assertFalse(state.isExpanded)
+        assertEquals(SheetDetent.Half, state.detent)
+        state.snapTo(SheetDetent.Half) // no-op, no duplicate event
+        assertEquals(listOf(SheetDetent.Full, SheetDetent.Half), events)
+        state.open(SheetDetent.Peek)
+        assertEquals(SheetDetent.Peek, state.detent)
+        assertTrue(state.isOpen)
     }
 
     @Test
