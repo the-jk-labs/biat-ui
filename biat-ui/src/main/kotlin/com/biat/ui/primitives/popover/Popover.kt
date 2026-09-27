@@ -4,13 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -41,9 +37,10 @@ import com.biat.ui.core.state.rememberPopoverState
  *   the popup root on open. Non-modal (the default) leaves focus alone.
  *   Either way callers render their own scrim; outside-click dismissal is
  *   still governed by [dismissOnOutsideClick].
- * - [followAnchor]: repositions the popup when the trigger moves (scroll,
- *   resize) by refreshing the position provider on every trigger layout.
- *   Off by default; enable when the trigger lives in scrolling content.
+ *
+ * Anchor-follow on scroll/resize comes from the platform: Popup re-resolves
+ * the shared placement engine against fresh anchor bounds whenever the
+ * anchor moves, so the popup tracks scrolling content with no extra API.
  */
 @Composable
 fun Popover(
@@ -57,7 +54,6 @@ fun Popover(
     alignOffset: Dp = 0.dp,
     avoidCollisions: Boolean = true,
     modal: Boolean = false,
-    followAnchor: Boolean = false,
     trigger: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -66,19 +62,11 @@ fun Popover(
         val returnRequester = rememberFocusReturnRequester()
         val trapRequester = rememberFocusTrapRequester()
         val trapState = rememberFocusTrapState()
-        var followTick by remember { mutableIntStateOf(0) }
         FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
         FocusTrapEffect(active = modal && state.isOpen, trapRequester = trapRequester)
         Box(
             modifier = Modifier
                 .focusRequester(returnRequester)
-                .then(
-                    if (followAnchor) {
-                        Modifier.onGloballyPositioned { followTick++ }
-                    } else {
-                        Modifier
-                    },
-                )
                 .clickable(
                     interactionSource = source,
                     indication = null,
@@ -95,7 +83,6 @@ fun Popover(
                     sideOffset = sideOffset,
                     alignOffset = alignOffset,
                     avoidCollisions = avoidCollisions,
-                    followKey = followTick,
                 ),
                 onDismissRequest = { state.close() },
                 properties = PopupProperties(
