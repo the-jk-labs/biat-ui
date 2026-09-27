@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,7 +22,6 @@ import com.biat.ui.core.dismiss.consumeOverlayTaps
 import com.biat.ui.core.dismiss.onEscape
 import com.biat.ui.core.dismiss.outsideClick
 import com.biat.ui.core.focus.FocusReturnEffect
-import com.biat.ui.core.focus.FocusTrapEffect
 import com.biat.ui.core.focus.focusTrap
 import com.biat.ui.core.focus.rememberFocusReturnRequester
 import com.biat.ui.core.focus.rememberFocusTrapRequester
@@ -43,13 +43,23 @@ import com.biat.ui.core.state.rememberDialogState
  *   dismissal (every tap reads as inside).
  * - The caller owns scrim visuals: wrap [content] in their own Box/surface.
  *   Set [dismissOnOutsideClick] = false if the scrim handles dismissal itself.
+ * - Alert variant ([isAlert] = true): explicit-action dialog. Outside-click
+ *   dismissal defaults to off (pass [dismissOnOutsideClick] = true to opt
+ *   back in); Esc/back still dismiss unless disabled.
+ * - [initialFocusRequester]: node focused on open (e.g. a text field or the
+ *   confirm button). Defaults to the trap root. Tab cycling is unaffected.
+ * - Nesting: a Dialog composes inside another dialog's [content] with its
+ *   own state. Windows layer naturally: Esc/back/outside-tap hit only the
+ *   topmost open dialog, and focus returns down the trigger chain on close.
  */
 @Composable
 fun Dialog(
     state: DialogState = rememberDialogState(),
-    dismissOnOutsideClick: Boolean = true,
+    dismissOnOutsideClick: Boolean? = null,
     dismissOnEscape: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    isAlert: Boolean = false,
+    initialFocusRequester: FocusRequester? = null,
     label: String? = null,
     scrim: @Composable (() -> Unit)? = null,
     trigger: (@Composable () -> Unit)? = null,
@@ -66,10 +76,24 @@ fun Dialog(
     }
     if (!state.isOpen) return
 
+    val effectiveOutsideClick = dismissOnOutsideClick ?: !isAlert
     val trapRequester = rememberFocusTrapRequester()
     val trapState = rememberFocusTrapState()
     val focusManager = LocalFocusManager.current
-    FocusTrapEffect(active = true, trapRequester = trapRequester)
+    LaunchedEffect(Unit) {
+        val target = initialFocusRequester ?: trapRequester
+        try {
+            target.requestFocus()
+        } catch (_: IllegalStateException) {
+            if (target !== trapRequester) {
+                try {
+                    trapRequester.requestFocus()
+                } catch (_: IllegalStateException) {
+                    // Neither attached; caller ordering decides.
+                }
+            }
+        }
+    }
 
     // Dismiss boundary follows the content bounds, not the scrim: taps
     // inside the card are ignored even when content fills the container
@@ -86,7 +110,7 @@ fun Dialog(
             modifier = Modifier
                 .fillMaxSize()
                 .let { m ->
-                    if (dismissOnOutsideClick) {
+                    if (effectiveOutsideClick) {
                         m.outsideClick(
                             onOutsideClick = { state.close() },
                             isInsideContent = { offset ->
