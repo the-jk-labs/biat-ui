@@ -89,8 +89,19 @@ Status as of v0.1.0 scaffold (2026-09-26).
       per-tab requesters; pure resolveTabIndex (wrap, clamp) unit-tested.
       Sample TabsDepthDemo shows manual + vertical. Certified on ALT-LX1
       (API 14): 58/58 instrumented, 37/37 JVM green.
-- [ ] Tooltip: placement + collision avoidance, touch long-press trigger
-- [ ] Popover: modal vs non-modal modes, anchor-follow on scroll/resize
+- [x] Tooltip: placement + collision avoidance, touch long-press trigger:
+      side/align/offsets wired to the shared placement engine (default Top
+      Center, avoidCollisions flips + clamps); long-press shows on touch
+      with enableLongPress opt-out. Flip/clamp math JVM-pinned; on-device
+      long-press, opt-out, and per-side render certified. Sample
+      TooltipDepthDemo shows end-side placement.
+- [x] Popover: modal vs non-modal modes, anchor-follow on scroll/resize:
+      modal traps Tab with popup-window FocusManager plus entry focus and
+      Escape dismissal (non-modal default untouched); anchor-follow needs
+      no API, the platform re-resolves placement against fresh anchor
+      bounds on scroll/resize (verified on-device: 300px scroll tracked
+      exactly). A followAnchor attempt was built, proven redundant by
+      measurement, and removed. Sample PopoverDepthDemo shows modal.
 
 ## v0.4.0: New primitives (Bits parity)
 

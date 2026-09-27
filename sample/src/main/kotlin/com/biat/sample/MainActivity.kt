@@ -87,9 +87,11 @@ fun SampleApp() {
         DialogDepthDemo()
         PopoverDemo()
         PopoverPlacementDemo()
+        PopoverDepthDemo()
         MenuDemo()
         MenuDepthDemo()
         TooltipDemo()
+        TooltipDepthDemo()
         SelectDemo()
         ComboboxDemo()
         TabsDemo()
@@ -262,6 +264,27 @@ private fun PopoverPlacementDemo() {
 }
 
 @Composable
+private fun PopoverDepthDemo() {
+    val state = rememberPopoverState()
+    DemoCard("Popover depth (modal: Tab cycles inside, Esc closes)") {
+        Popover(
+            state = state,
+            modal = true,
+            trigger = { DemoButton("Toggle modal popover") },
+        ) {
+            Column {
+                Box(Modifier.focusable().background(Color.White).padding(16.dp)) {
+                    BasicText("Item one")
+                }
+                Box(Modifier.focusable().background(Color.White).padding(16.dp)) {
+                    BasicText("Item two")
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun MenuDemo() {
     val state = rememberMenuState(itemCount = 3)
     var chosen by remember { mutableStateOf("none") }
@@ -372,6 +395,27 @@ private fun TooltipDemo() {
                 }
             },
             anchor = { DemoButton("Hover / focus me") },
+        )
+    }
+}
+
+@Composable
+private fun TooltipDepthDemo() {
+    val state = rememberTooltipState()
+    DemoCard("Tooltip depth (end side, long-press on touch)") {
+        Tooltip(
+            state = state,
+            tip = "Delete item",
+            side = PopupSide.End,
+            overlay = {
+                Box(Modifier.background(Color.Black).padding(8.dp)) {
+                    BasicText(
+                        "Delete item",
+                        style = TextStyle(color = Color.White),
+                    )
+                }
+            },
+            anchor = { DemoButton("Hover, focus, or long-press me") },
         )
     }
 }
