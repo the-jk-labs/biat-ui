@@ -42,7 +42,11 @@ import com.biat.ui.core.state.rememberTooltipState
 import com.biat.ui.primitives.dialog.Dialog
 import com.biat.ui.primitives.dialog.DialogClose
 import com.biat.ui.primitives.menu.Menu
+import com.biat.ui.primitives.menu.MenuCheckboxItem
 import com.biat.ui.primitives.menu.MenuItem
+import com.biat.ui.primitives.menu.MenuRadioItem
+import com.biat.ui.primitives.menu.MenuSeparator
+import com.biat.ui.primitives.menu.MenuSub
 import com.biat.ui.primitives.popover.Popover
 import com.biat.ui.primitives.select.Select
 import com.biat.ui.primitives.sheet.Sheet
@@ -76,6 +80,7 @@ fun SampleApp() {
         PopoverDemo()
         PopoverPlacementDemo()
         MenuDemo()
+        MenuDepthDemo()
         TooltipDemo()
         SelectDemo()
         ComboboxDemo()
@@ -205,6 +210,81 @@ private fun MenuDemo() {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun MenuDepthDemo() {
+    // 6 highlightable entries: Edit, Delete(disabled), checkbox, 2 radios, submenu.
+    val state = rememberMenuState(itemCount = 6, disabledIndices = setOf(1))
+    val subState = rememberMenuState(itemCount = 2)
+    var chosen by remember { mutableStateOf("none") }
+    var showHidden by remember { mutableStateOf(false) }
+    var sort by remember { mutableStateOf("Name") }
+    DemoCard("Menu depth (chosen: $chosen, hidden: $showHidden, sort: $sort)") {
+        Menu(
+            state = state,
+            trigger = { DemoButton("Open depth menu") },
+        ) {
+            MenuItem(state = state, label = "Edit", onSelect = { chosen = "Edit" }) {
+                MenuRow("Edit")
+            }
+            MenuItem(
+                state = state,
+                label = "Delete",
+                enabled = false,
+                onSelect = { chosen = "Delete" },
+            ) {
+                MenuRow("Delete (disabled)")
+            }
+            MenuSeparator {
+                Box(Modifier.fillMaxWidth().height(1.dp).background(Color.Gray))
+            }
+            MenuCheckboxItem(
+                checked = showHidden,
+                onCheckedChange = { showHidden = it },
+                label = "Show hidden",
+            ) {
+                MenuRow((if (showHidden) "[x] " else "[ ] ") + "Show hidden")
+            }
+            listOf("Name", "Date").forEach { value ->
+                MenuRadioItem(
+                    state = state,
+                    selected = sort == value,
+                    onSelect = { sort = value },
+                    label = "Sort by $value",
+                ) {
+                    MenuRow((if (sort == value) "(o) " else "( ) ") + "Sort by $value")
+                }
+            }
+            MenuSub(
+                state = subState,
+                label = "Share",
+                trigger = { MenuRow("Share >") },
+            ) {
+                MenuItem(
+                    state = subState,
+                    label = "Copy link",
+                    onSelect = { chosen = "Copy link"; subState.close(); state.close() },
+                ) {
+                    MenuRow("Copy link")
+                }
+                MenuItem(
+                    state = subState,
+                    label = "Email",
+                    onSelect = { chosen = "Email"; subState.close(); state.close() },
+                ) {
+                    MenuRow("Email")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MenuRow(label: String) {
+    Box(Modifier.fillMaxWidth().background(Color.White).padding(12.dp)) {
+        BasicText(label)
     }
 }
 

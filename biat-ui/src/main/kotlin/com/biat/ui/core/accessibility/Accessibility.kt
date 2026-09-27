@@ -3,6 +3,7 @@ package com.biat.ui.core.accessibility
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -24,9 +25,11 @@ fun Modifier.menuSemantics(label: String? = null): Modifier =
 fun Modifier.menuItemSemantics(
     label: String? = null,
     selected: Boolean = false,
+    enabled: Boolean = true,
 ): Modifier = this.semantics(mergeDescendants = false) {
     role = Role.Button
     this.selected = selected
+    if (!enabled) disabled()
     if (label != null) contentDescription = label
 }
 

@@ -51,7 +51,17 @@ Status as of v0.1.0 scaffold (2026-09-26).
       Backspace/Delete on a closed trigger. Sample ComboboxDemo binds
       BasicTextField to query with simulated async reload. Certified on
       ALT-LX1 (API 14): 37/37 instrumented, 28/28 JVM green.
-- [ ] Menu: submenus, checkbox/radio items, separators, disabled items
+- [x] Menu: submenus, checkbox/radio items, separators, disabled items:
+      disabled indices live in MenuState (moveHighlight skips, highlight
+      snaps to enabled, all-disabled stays -1, unit-tested); MenuItem gains
+      enabled (no click action, disabled semantics); MenuSeparator is a
+      non-interactive slot excluded from itemCount; MenuCheckboxItem uses
+      toggleable checkbox semantics and stays open; MenuRadioItem uses
+      selectable radio semantics and closes; MenuSub anchors a nested menu
+      to its trigger (click/ArrowRight opens, Esc/ArrowLeft closes only the
+      submenu, focus returns to trigger, parent stays open). Sample
+      MenuDepthDemo wires all five. Certified on ALT-LX1 (API 14):
+      43/43 instrumented, 31/31 JVM green.
 - [ ] Dialog: nested dialogs, alert vs plain variants, initial-focus target
 - [ ] Sheet: drag-to-dismiss + detents (peek/half/full), swipe velocity
 - [ ] Tabs: automatic vs manual activation modes, vertical orientation, RTL arrows

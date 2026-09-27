@@ -234,6 +234,44 @@ class StateMachinesTest {
     }
 
     @Test
+    fun menu_highlightSkipsDisabled() {
+        val state = MenuState(itemCount = 4, disabledIndices = setOf(1, 2))
+        state.open()
+        state.moveHighlight(1)
+        assertEquals(0, state.highlightedIndex)
+        state.moveHighlight(1)
+        assertEquals(3, state.highlightedIndex)
+        state.moveHighlight(1)
+        assertEquals(0, state.highlightedIndex)
+        state.moveHighlight(-1)
+        assertEquals(3, state.highlightedIndex)
+        state.moveHighlight(-1)
+        assertEquals(0, state.highlightedIndex)
+    }
+
+    @Test
+    fun menu_highlightSnapsPastDisabled() {
+        val state = MenuState(itemCount = 3, disabledIndices = setOf(0, 1))
+        state.open()
+        state.highlight(0) // Home lands on first enabled
+        assertEquals(2, state.highlightedIndex)
+        state.highlight(2)
+        assertEquals(2, state.highlightedIndex)
+        assertTrue(state.isEnabled(2))
+        assertFalse(state.isEnabled(0))
+    }
+
+    @Test
+    fun menu_allDisabled_neverHighlights() {
+        val state = MenuState(itemCount = 2, disabledIndices = setOf(0, 1))
+        state.open()
+        state.moveHighlight(1)
+        assertEquals(-1, state.highlightedIndex)
+        state.highlight(0)
+        assertEquals(-1, state.highlightedIndex)
+    }
+
+    @Test
     fun focusReturn_onlyOnOpenToClose() {
         assertTrue(shouldReturnFocus(wasOpen = true, isOpen = false))
         assertFalse(shouldReturnFocus(wasOpen = false, isOpen = false))

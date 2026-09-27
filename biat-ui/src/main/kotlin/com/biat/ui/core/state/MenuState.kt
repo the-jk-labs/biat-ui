@@ -22,11 +22,18 @@ import androidx.compose.runtime.setValue
  *   recomposition). Do not switch modes during the state's lifetime.
  * - Highlight is transient internal state in both modes: [close] always
  *   resets it, since dismiss intent is explicit either way.
+ *
+ * Items contract: [itemCount] counts highlightable entries (plain items,
+ * checkbox/radio items, submenu triggers). Separators are caller-drawn and
+ * excluded. Indices in [disabledIndices] are skipped by [moveHighlight] and
+ * snapped past by [highlight]; when every item is disabled highlight stays
+ * -1. [MenuItem] with enabled=false must sit at a disabled index.
  */
 @Stable
 class MenuState(
     initialOpen: Boolean = false,
     val itemCount: Int = 0,
+    val disabledIndices: Set<Int> = emptySet(),
     controlledOpen: Boolean? = null,
     var onOpenChange: ((Boolean) -> Unit)? = null,
 ) {
@@ -64,7 +71,7 @@ class MenuState(
 
     fun highlight(index: Int) {
         if (itemCount > 0) {
-            highlightedIndex = index.coerceIn(-1, itemCount - 1)
+            highlightedIndex = snapToEnabled(index.coerceIn(-1, itemCount - 1))
         } else {
             highlightedIndex = index
         }
@@ -75,12 +82,35 @@ class MenuState(
             highlightedIndex += delta
             return
         }
-        val next = if (highlightedIndex < 0) {
-            if (delta > 0) 0 else itemCount - 1
-        } else {
-            (highlightedIndex + delta).mod(itemCount)
+        if (disabledIndices.size >= itemCount) {
+            highlightedIndex = -1
+            return
         }
-        highlightedIndex = next
+        var next = highlightedIndex
+        repeat(itemCount) {
+            next = if (next < 0) {
+                if (delta > 0) 0 else itemCount - 1
+            } else {
+                (next + delta).mod(itemCount)
+            }
+            if (isEnabled(next)) {
+                highlightedIndex = next
+                return
+            }
+        }
+        highlightedIndex = -1
+    }
+
+    /** True when [index] participates in keyboard highlight. */
+    fun isEnabled(index: Int): Boolean = index !in disabledIndices
+
+    private fun snapToEnabled(index: Int): Int {
+        if (index < 0 || isEnabled(index)) return index
+        for (step in 1 until itemCount) {
+            val candidate = (index + step) % itemCount
+            if (isEnabled(candidate)) return candidate
+        }
+        return -1
     }
 }
 
@@ -88,10 +118,15 @@ class MenuState(
 fun rememberMenuState(
     initialOpen: Boolean = false,
     itemCount: Int = 0,
+    disabledIndices: Set<Int> = emptySet(),
     controlledOpen: Boolean? = null,
     onOpenChange: ((Boolean) -> Unit)? = null,
-): MenuState = remember(itemCount) {
-    MenuState(initialOpen = initialOpen, itemCount = itemCount)
+): MenuState = remember(itemCount, disabledIndices) {
+    MenuState(
+        initialOpen = initialOpen,
+        itemCount = itemCount,
+        disabledIndices = disabledIndices,
+    )
 }.apply {
     this.controlledOpen = controlledOpen
     this.onOpenChange = onOpenChange
