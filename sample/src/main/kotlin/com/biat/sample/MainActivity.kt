@@ -43,6 +43,7 @@ import com.biat.ui.core.state.rememberCollapsibleState
 import com.biat.ui.core.state.rememberDialogState
 import com.biat.ui.core.state.rememberMenuState
 import com.biat.ui.core.state.rememberPopoverState
+import com.biat.ui.core.state.rememberRadioGroupState
 import com.biat.ui.core.state.rememberSelectState
 import com.biat.ui.core.state.rememberSheetState
 import com.biat.ui.core.state.rememberTabsState
@@ -60,6 +61,8 @@ import com.biat.ui.primitives.menu.MenuRadioItem
 import com.biat.ui.primitives.menu.MenuSeparator
 import com.biat.ui.primitives.menu.MenuSub
 import com.biat.ui.primitives.popover.Popover
+import com.biat.ui.primitives.radiogroup.RadioGroup
+import com.biat.ui.primitives.radiogroup.RadioValue
 import com.biat.ui.primitives.select.Select
 import com.biat.ui.primitives.sheet.Sheet
 import com.biat.ui.primitives.sheet.sheetDrag
@@ -112,6 +115,7 @@ fun SampleApp() {
         CollapsibleDemo()
         AccordionDemo()
         ToggleDemo()
+        RadioGroupDemo()
     }
 }
 
@@ -737,5 +741,28 @@ private fun ToggleDemo() {
                 BasicText(if (pressed) "Pressed" else "Not pressed")
             }
         }
+    }
+}
+
+@Composable
+private fun RadioGroupDemo() {
+    val state = rememberRadioGroupState(initialSelected = "a")
+    DemoCard("RadioGroup (${state.selectedValue})") {
+        RadioGroup(
+            state = state,
+            options = listOf(
+                RadioValue("a", "Alpha"),
+                RadioValue("b", "Beta"),
+            ),
+            option = { item, selected ->
+                Box(
+                    Modifier
+                        .background(if (selected) Color.Black else Color.Gray)
+                        .padding(12.dp),
+                ) {
+                    BasicText(item.label, style = TextStyle(color = Color.White))
+                }
+            },
+        )
     }
 }

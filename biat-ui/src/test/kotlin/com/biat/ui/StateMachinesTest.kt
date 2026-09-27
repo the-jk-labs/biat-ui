@@ -7,6 +7,7 @@ import com.biat.ui.core.state.CollapsibleState
 import com.biat.ui.core.state.DialogState
 import com.biat.ui.core.state.MenuState
 import com.biat.ui.core.state.PopoverState
+import com.biat.ui.core.state.RadioGroupState
 import com.biat.ui.core.state.SelectState
 import com.biat.ui.core.state.SheetDetent
 import com.biat.ui.core.state.SheetSettle
@@ -486,5 +487,23 @@ class StateMachinesTest {
         state.toggle()
         assertFalse(state.isOn)
         assertEquals(listOf(ToggleValue.On), events)
+    }
+
+    @Test
+    fun radioGroup_selectNoDeselect() {
+        var last: Any? = "none"
+        val state = RadioGroupState(
+            initialSelected = "a",
+            onSelectedChange = { last = it },
+        )
+        assertTrue(state.isSelected("a"))
+        state.select("a") // no-op, no duplicate event
+        assertEquals("none", last)
+        state.select("b")
+        assertTrue(state.isSelected("b"))
+        assertEquals("b", last)
+        state.enabled = false
+        state.select("c")
+        assertTrue(state.isSelected("b"))
     }
 }

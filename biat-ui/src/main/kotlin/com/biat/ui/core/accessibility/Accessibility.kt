@@ -116,6 +116,25 @@ fun Modifier.switchSemantics(
     if (label != null) contentDescription = label
 }
 
+/** Semantics for radio group containers. */
+fun Modifier.radioGroupSemantics(label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        if (label != null) contentDescription = label
+    }
+
+/**
+ * Semantics for one radio option. Selection is the caller's [selected].
+ */
+fun Modifier.radioOptionSemantics(
+    selected: Boolean,
+    enabled: Boolean = true,
+    label: String? = null,
+): Modifier = this.semantics(mergeDescendants = false) {
+    role = Role.RadioButton
+    this.selected = selected
+    if (!enabled) disabled()
+    if (label != null) contentDescription = label
+}
 /**
  * Semantics for a headless toggle button. Announces pressed state.
  */
