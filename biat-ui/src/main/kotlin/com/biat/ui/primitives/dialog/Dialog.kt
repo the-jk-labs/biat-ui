@@ -5,7 +5,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,20 +79,10 @@ fun Dialog(
     val trapRequester = rememberFocusTrapRequester()
     val trapState = rememberFocusTrapState()
     val focusManager = LocalFocusManager.current
-    LaunchedEffect(Unit) {
-        val target = initialFocusRequester ?: trapRequester
-        try {
-            target.requestFocus()
-        } catch (_: IllegalStateException) {
-            if (target !== trapRequester) {
-                try {
-                    trapRequester.requestFocus()
-                } catch (_: IllegalStateException) {
-                    // Neither attached; caller ordering decides.
-                }
-            }
-        }
-    }
+    // Requested once at first layout: the portal window is attached by then,
+    // which a composition-time effect cannot guarantee. Falls back to the
+    // trap root when a caller target is missing or detached.
+    var initialFocusDone by remember { mutableStateOf(false) }
 
     // Dismiss boundary follows the content bounds, not the scrim: taps
     // inside the card are ignored even when content fills the container
@@ -125,7 +114,24 @@ fun Dialog(
             scrim?.invoke()
             Box(
                 modifier = Modifier
-                    .onGloballyPositioned { contentBounds = it.boundsInParent() }
+                    .onGloballyPositioned {
+                        contentBounds = it.boundsInParent()
+                        if (!initialFocusDone) {
+                            initialFocusDone = true
+                            val target = initialFocusRequester ?: trapRequester
+                            try {
+                                target.requestFocus()
+                            } catch (_: IllegalStateException) {
+                                if (target !== trapRequester) {
+                                    try {
+                                        trapRequester.requestFocus()
+                                    } catch (_: IllegalStateException) {
+                                        // Neither attached; caller ordering decides.
+                                    }
+                                }
+                            }
+                        }
+                    }
                     .consumeOverlayTaps()
                     .dialogSemantics(label)
                     .focusTrap(
