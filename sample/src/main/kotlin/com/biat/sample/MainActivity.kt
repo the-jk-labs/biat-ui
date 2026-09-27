@@ -35,6 +35,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.biat.ui.core.positioning.PopupAlign
 import com.biat.ui.core.positioning.PopupSide
+import com.biat.ui.core.state.SheetDetent
 import com.biat.ui.core.state.rememberDialogState
 import com.biat.ui.core.state.rememberMenuState
 import com.biat.ui.core.state.rememberPopoverState
@@ -53,6 +54,7 @@ import com.biat.ui.primitives.menu.MenuSub
 import com.biat.ui.primitives.popover.Popover
 import com.biat.ui.primitives.select.Select
 import com.biat.ui.primitives.sheet.Sheet
+import com.biat.ui.primitives.sheet.sheetDrag
 import com.biat.ui.primitives.tabs.TabValue
 import com.biat.ui.primitives.tabs.Tabs
 import com.biat.ui.primitives.tooltip.Tooltip
@@ -90,6 +92,7 @@ fun SampleApp() {
         ComboboxDemo()
         TabsDemo()
         SheetDemo()
+        SheetDepthDemo()
     }
 }
 
@@ -512,6 +515,45 @@ private fun SheetDemo() {
         ) {
             Box(Modifier.fillMaxWidth().background(Color.White).padding(24.dp)) {
                 BasicText("Headless sheet content")
+            }
+        }
+    }
+}
+
+@Composable
+private fun SheetDepthDemo() {
+    val state = rememberSheetState()
+    DemoCard("Sheet depth (detent: ${state.detent}, drag the handle)") {
+        Sheet(
+            state = state,
+            trigger = { DemoButton("Open depth sheet") },
+            scrim = { Box(Modifier.fillMaxSize().background(Color(0x88000000))) },
+        ) {
+            val height = when (state.detent) {
+                SheetDetent.Peek -> 160.dp
+                SheetDetent.Half -> 320.dp
+                SheetDetent.Full -> 520.dp
+            }
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(height)
+                    .background(Color.White)
+                    .padding(16.dp),
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(32.dp)
+                            .background(Color.LightGray)
+                            .sheetDrag(state),
+                    ) {
+                        BasicText("Drag handle (${state.detent})")
+                    }
+                    BasicText("Fling or drag past a quarter to move stops")
+                    BasicText("Drag past half, or fling from Peek, to dismiss")
+                }
             }
         }
     }
