@@ -4,16 +4,25 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.biat.ui.core.dismiss.onEscape
 import com.biat.ui.core.focus.FocusReturnEffect
+import com.biat.ui.core.focus.FocusTrapEffect
+import com.biat.ui.core.focus.focusTrap
 import com.biat.ui.core.focus.rememberFocusReturnRequester
+import com.biat.ui.core.focus.rememberFocusTrapRequester
+import com.biat.ui.core.focus.rememberFocusTrapState
 import com.biat.ui.core.positioning.PopupAlign
 import com.biat.ui.core.positioning.PopupSide
 import com.biat.ui.core.positioning.rememberBiatPopupPosition
@@ -21,12 +30,20 @@ import com.biat.ui.core.state.PopoverState
 import com.biat.ui.core.state.rememberPopoverState
 
 /**
- * Headless Popover. Non-modal overlay anchored to [trigger].
+ * Headless Popover. Overlay anchored to [trigger].
  * Zero styling; the caller owns every pixel inside [content].
  * Placement follows [side]/[align] with [sideOffset]/[alignOffset] gaps;
  * [avoidCollisions] flips to the opposite side when it overflows less and
  * shifts the popup to stay on-screen. Focus returns to the trigger
  * whenever the popover closes.
+ *
+ * - [modal]: traps Tab focus inside the popup and moves initial focus to
+ *   the popup root on open. Non-modal (the default) leaves focus alone.
+ *   Either way callers render their own scrim; outside-click dismissal is
+ *   still governed by [dismissOnOutsideClick].
+ * - [followAnchor]: repositions the popup when the trigger moves (scroll,
+ *   resize) by refreshing the position provider on every trigger layout.
+ *   Off by default; enable when the trigger lives in scrolling content.
  */
 @Composable
 fun Popover(
@@ -39,16 +56,29 @@ fun Popover(
     sideOffset: Dp = 0.dp,
     alignOffset: Dp = 0.dp,
     avoidCollisions: Boolean = true,
+    modal: Boolean = false,
+    followAnchor: Boolean = false,
     trigger: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Box {
         val source = remember { MutableInteractionSource() }
         val returnRequester = rememberFocusReturnRequester()
+        val trapRequester = rememberFocusTrapRequester()
+        val trapState = rememberFocusTrapState()
+        var followTick by remember { mutableIntStateOf(0) }
         FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
+        FocusTrapEffect(active = modal && state.isOpen, trapRequester = trapRequester)
         Box(
             modifier = Modifier
                 .focusRequester(returnRequester)
+                .then(
+                    if (followAnchor) {
+                        Modifier.onGloballyPositioned { followTick++ }
+                    } else {
+                        Modifier
+                    },
+                )
                 .clickable(
                     interactionSource = source,
                     indication = null,
@@ -65,6 +95,7 @@ fun Popover(
                     sideOffset = sideOffset,
                     alignOffset = alignOffset,
                     avoidCollisions = avoidCollisions,
+                    followKey = followTick,
                 ),
                 onDismissRequest = { state.close() },
                 properties = PopupProperties(
@@ -73,9 +104,22 @@ fun Popover(
                     dismissOnClickOutside = dismissOnOutsideClick,
                 ),
             ) {
+                // FocusManager is read inside the popup: the popup window
+                // owns focus separately, so the main window manager cannot
+                // move focus between popup items.
+                val popupFocusManager = LocalFocusManager.current
                 Box(
                     modifier = Modifier.let { m ->
-                        if (dismissOnEscape) m.onEscape { state.close() } else m
+                        var acc = if (dismissOnEscape) m.onEscape { state.close() } else m
+                        if (modal) {
+                            acc = acc.focusTrap(
+                                active = true,
+                                trapRequester = trapRequester,
+                                focusManager = popupFocusManager,
+                                trapState = trapState,
+                            )
+                        }
+                        acc
                     },
                 ) {
                     content()

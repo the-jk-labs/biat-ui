@@ -206,6 +206,8 @@ class BiatPopupPositionProvider(
 /**
  * Remembers a [BiatPopupPositionProvider] from Dp offsets. Density is read
  * here so the pure resolver and [PopupPlacement] stay in pixels and testable.
+ * [followKey] forces a fresh provider (and popup reposition) whenever the
+ * caller observes anchor movement, e.g. scroll or resize.
  */
 @Composable
 fun rememberBiatPopupPosition(
@@ -214,6 +216,7 @@ fun rememberBiatPopupPosition(
     sideOffset: Dp = 0.dp,
     alignOffset: Dp = 0.dp,
     avoidCollisions: Boolean = true,
+    followKey: Any? = null,
 ): PopupPositionProvider {
     val density = LocalDensity.current
     val placement = PopupPlacement(
@@ -223,5 +226,5 @@ fun rememberBiatPopupPosition(
         alignOffsetPx = with(density) { alignOffset.toPx().roundToInt() },
         avoidCollisions = avoidCollisions,
     )
-    return remember(placement) { BiatPopupPositionProvider(placement) }
+    return remember(placement, followKey) { BiatPopupPositionProvider(placement) }
 }
