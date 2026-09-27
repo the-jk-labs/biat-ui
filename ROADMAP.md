@@ -71,7 +71,16 @@ Status as of v0.1.0 scaffold (2026-09-26).
       root fallback (composition-time requests race the portal window).
       Sample DialogDepthDemo wires all three. Certified on ALT-LX1 (API 14):
       47/47 instrumented, 31/31 JVM green.
-- [ ] Sheet: drag-to-dismiss + detents (peek/half/full), swipe velocity
+- [x] Sheet: drag-to-dismiss + detents (peek/half/full), swipe velocity:
+      detent lives in SheetState with onDetentChange (expand/collapse map to
+      Full/Half, isExpanded derived); pure resolveSheetSettle maps
+      drag + velocity to Dismiss/Snap (positional fractions, one-stop
+      flings, configurable enabled stops, unit-tested); headless
+      Modifier.sheetDrag attaches to caller handles with finger-following
+      offset and settle-on-release. Fixed consumeOverlayTaps to contain
+      taps on release instead of gobbling down/move, which had starved
+      inner draggables. Sample SheetDepthDemo drives heights from detent.
+      Certified on ALT-LX1 (API 14): 52/52 instrumented, 35/35 JVM green.
 - [ ] Tabs: automatic vs manual activation modes, vertical orientation, RTL arrows
 - [ ] Tooltip: placement + collision avoidance, touch long-press trigger
 - [ ] Popover: modal vs non-modal modes, anchor-follow on scroll/resize
