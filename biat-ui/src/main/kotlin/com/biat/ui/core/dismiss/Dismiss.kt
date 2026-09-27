@@ -3,6 +3,7 @@ package com.biat.ui.core.dismiss
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
@@ -48,18 +49,20 @@ fun Modifier.outsideClick(
 
 /**
  * Modifier for overlay content: stop taps from reaching the scrim.
- * Consumes the whole gesture (down through up) inside content bounds, so
- * ancestor tap detectors cancel. Kept as defense in depth alongside the
- * [outsideClick] geometry check.
+ * Consumes tap-up inside content bounds, so ancestor tap detectors cancel.
+ * Deliberately leaves down/move unconsumed so inner draggables and scrolls
+ * (e.g. sheet drag handles) still start; a gesture another handler claims
+ * cancels the wait and consumes nothing. Kept as defense in depth alongside
+ * the [outsideClick] geometry check.
  */
 fun Modifier.consumeOverlayTaps(): Modifier =
     this.pointerInput(Unit) {
         awaitEachGesture {
-            val down = awaitFirstDown()
-            down.consume()
-            do {
-                val event = awaitPointerEvent()
-                event.changes.forEach { it.consume() }
-            } while (event.changes.any { it.pressed })
+            awaitFirstDown(requireUnconsumed = false)
+            val up = waitForUpOrCancellation()
+            val inside = up != null &&
+                up.position.x in 0f..size.width.toFloat() &&
+                up.position.y in 0f..size.height.toFloat()
+            if (inside) up?.consume()
         }
     }
