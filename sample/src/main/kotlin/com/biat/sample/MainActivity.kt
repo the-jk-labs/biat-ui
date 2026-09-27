@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -77,6 +80,7 @@ fun SampleApp() {
     ) {
         DialogDemo()
         ControlledDialogDemo()
+        DialogDepthDemo()
         PopoverDemo()
         PopoverPlacementDemo()
         MenuDemo()
@@ -128,6 +132,64 @@ private fun DialogDemo() {
                     BasicText("Headless dialog content")
                     DialogClose(state = state) {
                         DemoButton("Close")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialogDepthDemo() {
+    val outer = rememberDialogState()
+    val inner = rememberDialogState()
+    val alert = rememberDialogState()
+    val focused = rememberDialogState()
+    val confirmFocus = remember { FocusRequester() }
+    DemoCard("Dialog depth (nested, alert, initial focus)") {
+        Dialog(
+            state = outer,
+            trigger = { DemoButton("Open outer") },
+            scrim = { Box(Modifier.fillMaxSize().background(Color(0x88000000))) },
+        ) {
+            Box(Modifier.background(Color.White).padding(24.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    BasicText("Outer dialog")
+                    Dialog(
+                        state = inner,
+                        trigger = { DemoButton("Open inner") },
+                        scrim = { Box(Modifier.fillMaxSize().background(Color(0x66000000))) },
+                    ) {
+                        Box(Modifier.background(Color.White).padding(24.dp)) {
+                            BasicText("Inner dialog")
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Dialog(
+            state = alert,
+            isAlert = true,
+            trigger = { DemoButton("Open alert") },
+            scrim = { Box(Modifier.fillMaxSize().background(Color(0x88000000))) },
+        ) {
+            Box(Modifier.background(Color.White).padding(24.dp)) {
+                BasicText("Alert: scrim tap will not close me")
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Dialog(
+            state = focused,
+            initialFocusRequester = confirmFocus,
+            trigger = { DemoButton("Open focused") },
+            scrim = { Box(Modifier.fillMaxSize().background(Color(0x88000000))) },
+        ) {
+            Box(Modifier.background(Color.White).padding(24.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    BasicText("Confirm lands focused")
+                    Box(Modifier.focusRequester(confirmFocus).focusable()) {
+                        DemoButton("Confirm")
                     }
                 }
             }
