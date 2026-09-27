@@ -62,7 +62,15 @@ Status as of v0.1.0 scaffold (2026-09-26).
       submenu, focus returns to trigger, parent stays open). Sample
       MenuDepthDemo wires all five. Certified on ALT-LX1 (API 14):
       43/43 instrumented, 31/31 JVM green.
-- [ ] Dialog: nested dialogs, alert vs plain variants, initial-focus target
+- [x] Dialog: nested dialogs, alert vs plain variants, initial-focus target:
+      nesting layers naturally (own state + window per level, Esc/tap hits
+      only the topmost, focus returns down the trigger chain, on-device
+      certified); isAlert switches outside-click default off for
+      explicit-action dialogs (explicit param still wins); new
+      initialFocusRequester focuses a caller node at first layout with trap
+      root fallback (composition-time requests race the portal window).
+      Sample DialogDepthDemo wires all three. Certified on ALT-LX1 (API 14):
+      47/47 instrumented, 31/31 JVM green.
 - [ ] Sheet: drag-to-dismiss + detents (peek/half/full), swipe velocity
 - [ ] Tabs: automatic vs manual activation modes, vertical orientation, RTL arrows
 - [ ] Tooltip: placement + collision avoidance, touch long-press trigger
