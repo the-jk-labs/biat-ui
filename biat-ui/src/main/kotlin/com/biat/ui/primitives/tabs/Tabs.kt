@@ -123,13 +123,13 @@ fun <T> Tabs(
     if (orientation == TabsOrientation.Horizontal) {
         Row(modifier = listModifier) {
             tabs.forEachIndexed { index, item ->
-                TabCell(requesters, index, state, item, tab) { focusedIndex = index }
+                TabCell(requesters[index], state, item, tab) { focusedIndex = index }
             }
         }
     } else {
         Column(modifier = listModifier) {
             tabs.forEachIndexed { index, item ->
-                TabCell(requesters, index, state, item, tab) { focusedIndex = index }
+                TabCell(requesters[index], state, item, tab) { focusedIndex = index }
             }
         }
     }
@@ -138,8 +138,7 @@ fun <T> Tabs(
 
 @Composable
 private fun <T> TabCell(
-    requesters: List<FocusRequester>,
-    index: Int,
+    requester: FocusRequester,
     state: TabsState,
     item: TabValue<T>,
     tab: @Composable RowScope.(tab: TabValue<T>, selected: Boolean, onSelect: () -> Unit) -> Unit,
@@ -151,7 +150,7 @@ private fun <T> TabCell(
     // turns Enter/Space on the focused tab into activation for manual mode.
     Box(
         modifier = Modifier
-            .focusRequester(requesters.getOrElse(index) { FocusRequester() })
+            .focusRequester(requester)
             .tabSemantics(selected = selected, label = item.label)
             .clickable(
                 interactionSource = source,

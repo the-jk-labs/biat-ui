@@ -57,6 +57,8 @@ import com.biat.ui.primitives.sheet.Sheet
 import com.biat.ui.primitives.sheet.sheetDrag
 import com.biat.ui.primitives.tabs.TabValue
 import com.biat.ui.primitives.tabs.Tabs
+import com.biat.ui.primitives.tabs.TabsActivation
+import com.biat.ui.primitives.tabs.TabsOrientation
 import com.biat.ui.primitives.tooltip.Tooltip
 
 class MainActivity : ComponentActivity() {
@@ -91,6 +93,7 @@ fun SampleApp() {
         SelectDemo()
         ComboboxDemo()
         TabsDemo()
+        TabsDepthDemo()
         SheetDemo()
         SheetDepthDemo()
     }
@@ -483,6 +486,65 @@ private fun TabsDemo() {
         Tabs(
             state = state,
             tabs = tabs,
+            tab = { item, selected, _ ->
+                Box(
+                    Modifier
+                        .background(if (selected) Color.Black else Color.Gray)
+                        .padding(12.dp),
+                ) {
+                    BasicText(
+                        item.label,
+                        style = TextStyle(color = Color.White),
+                    )
+                }
+            },
+            panel = { selected ->
+                Box(Modifier.padding(top = 12.dp)) {
+                    BasicText("Panel: ${selected?.label ?: "none"}")
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun TabsDepthDemo() {
+    val manual = rememberTabsState(initialSelected = "a")
+    val vertical = rememberTabsState(initialSelected = "b")
+    val tabs = listOf(
+        TabValue("a", "Account"),
+        TabValue("b", "Password"),
+        TabValue("c", "Billing"),
+    )
+    DemoCard("Tabs depth (manual + vertical)") {
+        BasicText("Manual: arrows move focus, Enter selects")
+        Tabs(
+            state = manual,
+            tabs = tabs,
+            activation = TabsActivation.Manual,
+            tab = { item, selected, _ ->
+                Box(
+                    Modifier
+                        .background(if (selected) Color.Black else Color.Gray)
+                        .padding(12.dp),
+                ) {
+                    BasicText(
+                        item.label,
+                        style = TextStyle(color = Color.White),
+                    )
+                }
+            },
+            panel = { selected ->
+                Box(Modifier.padding(top = 12.dp, bottom = 12.dp)) {
+                    BasicText("Panel: ${selected?.label ?: "none"}")
+                }
+            },
+        )
+        BasicText("Vertical: Up/Down navigate")
+        Tabs(
+            state = vertical,
+            tabs = tabs,
+            orientation = TabsOrientation.Vertical,
             tab = { item, selected, _ ->
                 Box(
                     Modifier

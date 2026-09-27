@@ -81,7 +81,14 @@ Status as of v0.1.0 scaffold (2026-09-26).
       taps on release instead of gobbling down/move, which had starved
       inner draggables. Sample SheetDepthDemo drives heights from detent.
       Certified on ALT-LX1 (API 14): 52/52 instrumented, 35/35 JVM green.
-- [ ] Tabs: automatic vs manual activation modes, vertical orientation, RTL arrows
+- [x] Tabs: automatic vs manual activation modes, vertical orientation, RTL arrows:
+      TabsActivation Automatic (arrows select, the default) vs Manual
+      (arrows move focus only, Enter/Space or click activates via the
+      tab click handler); TabsOrientation Horizontal (Left/Right) vs
+      Vertical (Up/Down, Left/Right ignored); focus follows arrows via
+      per-tab requesters; pure resolveTabIndex (wrap, clamp) unit-tested.
+      Sample TabsDepthDemo shows manual + vertical. Certified on ALT-LX1
+      (API 14): 58/58 instrumented, 37/37 JVM green.
 - [ ] Tooltip: placement + collision avoidance, touch long-press trigger
 - [ ] Popover: modal vs non-modal modes, anchor-follow on scroll/resize
 
