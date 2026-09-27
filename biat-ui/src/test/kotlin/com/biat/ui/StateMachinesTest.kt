@@ -12,6 +12,10 @@ import com.biat.ui.core.state.SheetDetent
 import com.biat.ui.core.state.SheetSettle
 import com.biat.ui.core.state.SheetState
 import com.biat.ui.core.state.TabMove
+import com.biat.ui.core.state.ToggleState
+import com.biat.ui.core.state.ToggleValue
+import com.biat.ui.core.state.isOn
+import com.biat.ui.core.state.next
 import com.biat.ui.core.state.resolveSheetSettle
 import com.biat.ui.core.state.resolveTabIndex
 import com.biat.ui.core.state.TabsState
@@ -450,5 +454,37 @@ class StateMachinesTest {
         state.select("a")
         assertFalse(state.isOpen("a"))
         assertTrue(state.isOpen("b"))
+    }
+
+    @Test
+    fun toggle_triStateAndDisabled() {
+        val events = mutableListOf<ToggleValue>()
+        val state = ToggleState(
+            initialValue = ToggleValue.Indeterminate,
+            onValueChange = { events.add(it) },
+        )
+        assertFalse(state.isOn)
+        assertTrue(state.isIndeterminate)
+        assertEquals(ToggleValue.On, ToggleValue.Indeterminate.next())
+        state.toggle()
+        assertTrue(state.isOn)
+        state.enabled = false
+        state.toggle()
+        assertTrue(state.isOn)
+        assertEquals(listOf(ToggleValue.On), events)
+        assertTrue(ToggleValue.On.isOn())
+        assertFalse(ToggleValue.Off.isOn())
+    }
+
+    @Test
+    fun toggle_controlledNotifiesWithoutMutating() {
+        val events = mutableListOf<ToggleValue>()
+        val state = ToggleState(
+            controlledValue = ToggleValue.Off,
+            onValueChange = { events.add(it) },
+        )
+        state.toggle()
+        assertFalse(state.isOn)
+        assertEquals(listOf(ToggleValue.On), events)
     }
 }

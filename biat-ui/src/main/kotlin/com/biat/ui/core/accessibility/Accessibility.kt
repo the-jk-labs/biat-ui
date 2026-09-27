@@ -79,3 +79,54 @@ fun Modifier.accordionTriggerSemantics(
     stateDescription = if (expanded) "Expanded" else "Collapsed"
     contentDescription = listOfNotNull(type, label).joinToString(": ")
 }
+
+/**
+ * Semantics for a headless checkbox. The announcement covers
+ * checked/unchecked plus indeterminate.
+ */
+fun Modifier.checkboxSemantics(
+    checked: Boolean,
+    indeterminate: Boolean = false,
+    enabled: Boolean = true,
+    label: String? = null,
+): Modifier = this.semantics(mergeDescendants = false) {
+    role = Role.Checkbox
+    this.selected = checked
+    stateDescription = when {
+        indeterminate -> "Indeterminate"
+        checked -> "Checked"
+        else -> "Unchecked"
+    }
+    if (!enabled) disabled()
+    if (label != null) contentDescription = label
+}
+
+/**
+ * Semantics for a headless switch. Announces on/off plus the caller label.
+ */
+fun Modifier.switchSemantics(
+    checked: Boolean,
+    enabled: Boolean = true,
+    label: String? = null,
+): Modifier = this.semantics(mergeDescendants = false) {
+    role = Role.Switch
+    this.selected = checked
+    stateDescription = if (checked) "On" else "Off"
+    if (!enabled) disabled()
+    if (label != null) contentDescription = label
+}
+
+/**
+ * Semantics for a headless toggle button. Announces pressed state.
+ */
+fun Modifier.toggleSemantics(
+    pressed: Boolean,
+    enabled: Boolean = true,
+    label: String? = null,
+): Modifier = this.semantics(mergeDescendants = false) {
+    role = Role.Button
+    this.selected = pressed
+    stateDescription = if (pressed) "Pressed" else "Not pressed"
+    if (!enabled) disabled()
+    if (label != null) contentDescription = label
+}

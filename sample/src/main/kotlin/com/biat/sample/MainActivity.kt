@@ -37,6 +37,7 @@ import com.biat.ui.core.positioning.PopupAlign
 import com.biat.ui.core.positioning.PopupSide
 import com.biat.ui.core.state.AccordionType
 import com.biat.ui.core.state.SheetDetent
+import com.biat.ui.core.state.ToggleValue
 import com.biat.ui.core.state.rememberAccordionState
 import com.biat.ui.core.state.rememberCollapsibleState
 import com.biat.ui.core.state.rememberDialogState
@@ -45,6 +46,7 @@ import com.biat.ui.core.state.rememberPopoverState
 import com.biat.ui.core.state.rememberSelectState
 import com.biat.ui.core.state.rememberSheetState
 import com.biat.ui.core.state.rememberTabsState
+import com.biat.ui.core.state.rememberToggleState
 import com.biat.ui.core.state.rememberTooltipState
 import com.biat.ui.primitives.accordion.Accordion
 import com.biat.ui.primitives.accordion.AccordionValue
@@ -65,6 +67,9 @@ import com.biat.ui.primitives.tabs.TabValue
 import com.biat.ui.primitives.tabs.Tabs
 import com.biat.ui.primitives.tabs.TabsActivation
 import com.biat.ui.primitives.tabs.TabsOrientation
+import com.biat.ui.primitives.toggle.Checkbox
+import com.biat.ui.primitives.toggle.Switch
+import com.biat.ui.primitives.toggle.ToggleButton
 import com.biat.ui.primitives.tooltip.Tooltip
 
 class MainActivity : ComponentActivity() {
@@ -106,6 +111,7 @@ fun SampleApp() {
         SheetDepthDemo()
         CollapsibleDemo()
         AccordionDemo()
+        ToggleDemo()
     }
 }
 
@@ -705,6 +711,30 @@ private fun AccordionDemo() {
         ) { item ->
             Box(Modifier.background(Color.White).padding(12.dp)) {
                 BasicText("Panel ${item.label}")
+            }
+        }
+    }
+}
+
+@Composable
+private fun ToggleDemo() {
+    val check = rememberToggleState(initialValue = ToggleValue.Off)
+    val tri = rememberToggleState(initialValue = ToggleValue.Indeterminate)
+    val switch = rememberToggleState()
+    val toggle = rememberToggleState()
+    DemoCard("Checkbox / Switch / Toggle") {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Checkbox(state = check, label = "Accept") { value ->
+                BasicText("Checkbox: $value")
+            }
+            Checkbox(state = tri, label = "Partial") { value ->
+                BasicText("Tri-state: $value")
+            }
+            Switch(state = switch, label = "Alerts") { checked ->
+                BasicText(if (checked) "Switch on" else "Switch off")
+            }
+            ToggleButton(state = toggle, label = "Bold") { pressed ->
+                BasicText(if (pressed) "Pressed" else "Not pressed")
             }
         }
     }
