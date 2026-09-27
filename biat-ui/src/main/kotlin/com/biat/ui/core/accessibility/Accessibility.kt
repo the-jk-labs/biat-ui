@@ -52,3 +52,30 @@ fun Modifier.tooltipAnchorSemantics(tip: String): Modifier =
         contentDescription = tip
         stateDescription = tip
     }
+
+/**
+ * Semantics for collapsible triggers. Announces the trigger label plus
+ * expanded state for screen readers.
+ */
+fun Modifier.collapsibleTriggerSemantics(expanded: Boolean, label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Button
+        this.selected = expanded
+        stateDescription = if (expanded) "Expanded" else "Collapsed"
+        if (label != null) contentDescription = label
+    }
+
+/**
+ * Semantics for accordion item triggers. [type] names the widget
+ * ("Accordion item" by default) so grouped items stay distinct.
+ */
+fun Modifier.accordionTriggerSemantics(
+    expanded: Boolean,
+    label: String? = null,
+    type: String = "Accordion item",
+): Modifier = this.semantics(mergeDescendants = false) {
+    role = Role.Button
+    this.selected = expanded
+    stateDescription = if (expanded) "Expanded" else "Collapsed"
+    contentDescription = listOfNotNull(type, label).joinToString(": ")
+}

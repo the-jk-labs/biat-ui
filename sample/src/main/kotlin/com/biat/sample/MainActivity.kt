@@ -35,7 +35,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.biat.ui.core.positioning.PopupAlign
 import com.biat.ui.core.positioning.PopupSide
+import com.biat.ui.core.state.AccordionType
 import com.biat.ui.core.state.SheetDetent
+import com.biat.ui.core.state.rememberAccordionState
+import com.biat.ui.core.state.rememberCollapsibleState
 import com.biat.ui.core.state.rememberDialogState
 import com.biat.ui.core.state.rememberMenuState
 import com.biat.ui.core.state.rememberPopoverState
@@ -43,6 +46,9 @@ import com.biat.ui.core.state.rememberSelectState
 import com.biat.ui.core.state.rememberSheetState
 import com.biat.ui.core.state.rememberTabsState
 import com.biat.ui.core.state.rememberTooltipState
+import com.biat.ui.primitives.accordion.Accordion
+import com.biat.ui.primitives.accordion.AccordionValue
+import com.biat.ui.primitives.collapsible.Collapsible
 import com.biat.ui.primitives.dialog.Dialog
 import com.biat.ui.primitives.dialog.DialogClose
 import com.biat.ui.primitives.menu.Menu
@@ -98,6 +104,8 @@ fun SampleApp() {
         TabsDepthDemo()
         SheetDemo()
         SheetDepthDemo()
+        CollapsibleDemo()
+        AccordionDemo()
     }
 }
 
@@ -660,6 +668,43 @@ private fun SheetDepthDemo() {
                     BasicText("Fling or drag past a quarter to move stops")
                     BasicText("Drag past half, or fling from Peek, to dismiss")
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CollapsibleDemo() {
+    val state = rememberCollapsibleState()
+    DemoCard("Collapsible (${if (state.isExpanded) "open" else "closed"})") {
+        Collapsible(
+            state = state,
+            trigger = { DemoButton(if (state.isExpanded) "Hide" else "Show") },
+        ) {
+            Box(Modifier.background(Color.White).padding(12.dp)) {
+                BasicText("Headless collapsible panel")
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccordionDemo() {
+    val state = rememberAccordionState(type = AccordionType.Multiple)
+    val items = listOf(
+        AccordionValue("a", "First"),
+        AccordionValue("b", "Second"),
+    )
+    DemoCard("Accordion (${state.openValues.size} open)") {
+        Accordion(
+            state = state,
+            items = items,
+            trigger = { item, expanded ->
+                DemoButton("${if (expanded) "-" else "+"} ${item.label}")
+            },
+        ) { item ->
+            Box(Modifier.background(Color.White).padding(12.dp)) {
+                BasicText("Panel ${item.label}")
             }
         }
     }

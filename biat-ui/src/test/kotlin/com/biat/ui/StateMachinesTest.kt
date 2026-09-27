@@ -1,6 +1,9 @@
 package com.biat.ui
 
 import com.biat.ui.core.focus.shouldReturnFocus
+import com.biat.ui.core.state.AccordionState
+import com.biat.ui.core.state.AccordionType
+import com.biat.ui.core.state.CollapsibleState
 import com.biat.ui.core.state.DialogState
 import com.biat.ui.core.state.MenuState
 import com.biat.ui.core.state.PopoverState
@@ -387,5 +390,65 @@ class StateMachinesTest {
         assertFalse(shouldReturnFocus(wasOpen = false, isOpen = false))
         assertFalse(shouldReturnFocus(wasOpen = false, isOpen = true))
         assertFalse(shouldReturnFocus(wasOpen = true, isOpen = true))
+    }
+
+    @Test
+    fun collapsible_toggleNotifies() {
+        val events = mutableListOf<Boolean>()
+        val state = CollapsibleState(onExpandedChange = { events.add(it) })
+        assertFalse(state.isExpanded)
+        state.toggle()
+        assertTrue(state.isExpanded)
+        state.setExpanded(true) // no-op, no duplicate event
+        state.collapse()
+        assertFalse(state.isExpanded)
+        assertEquals(listOf(true, false), events)
+    }
+
+    @Test
+    fun collapsible_controlledNotifiesWithoutMutating() {
+        val events = mutableListOf<Boolean>()
+        val state = CollapsibleState(
+            controlledExpanded = false,
+            onExpandedChange = { events.add(it) },
+        )
+        state.expand()
+        assertFalse(state.isExpanded)
+        assertEquals(listOf(true), events)
+    }
+
+    @Test
+    fun accordion_singleCollapsible() {
+        val events = mutableListOf<List<Any?>>()
+        val state = AccordionState(onOpenChange = { events.add(it) })
+        state.select("a")
+        assertTrue(state.isOpen("a"))
+        state.select("b")
+        assertFalse(state.isOpen("a"))
+        assertTrue(state.isOpen("b"))
+        state.select("b")
+        assertFalse(state.isOpen("b"))
+        assertEquals(listOf(listOf("a"), listOf("b"), emptyList<Any>()), events)
+    }
+
+    @Test
+    fun accordion_singleNonCollapsibleKeepsOneOpen() {
+        val state = AccordionState(collapsible = false)
+        state.select("a")
+        state.select("a")
+        assertTrue(state.isOpen("a"))
+        assertEquals(listOf("a"), state.openValues)
+    }
+
+    @Test
+    fun accordion_multipleTogglesMembership() {
+        val state = AccordionState(type = AccordionType.Multiple)
+        state.select("a")
+        state.select("b")
+        assertTrue(state.isOpen("a"))
+        assertTrue(state.isOpen("b"))
+        state.select("a")
+        assertFalse(state.isOpen("a"))
+        assertTrue(state.isOpen("b"))
     }
 }
