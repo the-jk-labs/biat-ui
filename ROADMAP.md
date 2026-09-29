@@ -105,13 +105,14 @@ Status as of v0.1.0 scaffold (2026-09-26).
 
 ## v0.4.0: New primitives (Bits parity)
 
-- [ ] Accordion / Collapsible
-- [ ] Checkbox / Switch / Radio-group (headless toggle behavior)
-- [ ] Slider
-- [ ] Toggle / Toggle-group
-- [ ] Toolbar
-- [ ] Avatar (fallback behavior) / Separator / Label primitives if justified
-- [ ] Each ships with state + behavior + slots + tests + sample, per AGENTS.md
+- [x] Accordion / Collapsible
+- [x] Checkbox / Switch / Radio-group (headless toggle behavior)
+- [x] Slider (value range + step snapping, drag + arrows/Home/End, slider semantics)
+- [x] Toggle / Toggle-group (single + multiple pressed, custom-layout scope)
+- [x] Toolbar (roving tabindex, orientation + RTL arrows, disabled skip)
+- [x] Avatar (fallback behavior) / Separator / Label primitives
+- [x] Each ships with state + behavior + slots + tests + sample, per AGENTS.md
+- Certified on ALT-LX1 (API 14): 74/74 instrumented, 54/54 JVM green.
 
 ## v0.5.0: Polish for 1.0 candidacy
 

@@ -36,6 +36,16 @@ Dialog(
 | Select | `SelectState<T>` | `trigger`, `option` |
 | Tabs | `TabsState` / `TabValue` | `tab`, `panel` |
 | Sheet | `SheetState` | `scrim`, `content` |
+| Collapsible | `CollapsibleState` | `trigger`, `content` |
+| Accordion | `AccordionState` / `AccordionValue` | `trigger`, `content` |
+| Checkbox / Switch / ToggleButton | `ToggleState` | `content` |
+| ToggleGroup | `ToggleGroupState` / `ToggleGroupValue` | `item` |
+| RadioGroup | `RadioGroupState` / `RadioValue` | `option` |
+| Slider | `SliderState` | `track`, `thumb` |
+| Toolbar | `ToolbarState` / `ToolbarValue` | `item` |
+| Separator | stateless | `content` |
+| Label | stateless | `content` |
+| Avatar | `AvatarState` | `fallback`, `content` |
 
 Shared behavior lives in `com.biat.ui.core`: state machines, focus trap,
 roving focus, portal, dismiss handling, and accessibility semantics.

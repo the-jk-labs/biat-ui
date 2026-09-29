@@ -37,8 +37,10 @@ import com.biat.ui.core.positioning.PopupAlign
 import com.biat.ui.core.positioning.PopupSide
 import com.biat.ui.core.state.AccordionType
 import com.biat.ui.core.state.SheetDetent
+import com.biat.ui.core.state.ToggleGroupType
 import com.biat.ui.core.state.ToggleValue
 import com.biat.ui.core.state.rememberAccordionState
+import com.biat.ui.core.state.rememberAvatarState
 import com.biat.ui.core.state.rememberCollapsibleState
 import com.biat.ui.core.state.rememberDialogState
 import com.biat.ui.core.state.rememberMenuState
@@ -46,14 +48,19 @@ import com.biat.ui.core.state.rememberPopoverState
 import com.biat.ui.core.state.rememberRadioGroupState
 import com.biat.ui.core.state.rememberSelectState
 import com.biat.ui.core.state.rememberSheetState
+import com.biat.ui.core.state.rememberSliderState
 import com.biat.ui.core.state.rememberTabsState
+import com.biat.ui.core.state.rememberToggleGroupState
 import com.biat.ui.core.state.rememberToggleState
+import com.biat.ui.core.state.rememberToolbarState
 import com.biat.ui.core.state.rememberTooltipState
 import com.biat.ui.primitives.accordion.Accordion
 import com.biat.ui.primitives.accordion.AccordionValue
+import com.biat.ui.primitives.avatar.Avatar
 import com.biat.ui.primitives.collapsible.Collapsible
 import com.biat.ui.primitives.dialog.Dialog
 import com.biat.ui.primitives.dialog.DialogClose
+import com.biat.ui.primitives.label.Label
 import com.biat.ui.primitives.menu.Menu
 import com.biat.ui.primitives.menu.MenuCheckboxItem
 import com.biat.ui.primitives.menu.MenuItem
@@ -64,8 +71,10 @@ import com.biat.ui.primitives.popover.Popover
 import com.biat.ui.primitives.radiogroup.RadioGroup
 import com.biat.ui.primitives.radiogroup.RadioValue
 import com.biat.ui.primitives.select.Select
+import com.biat.ui.primitives.separator.Separator
 import com.biat.ui.primitives.sheet.Sheet
 import com.biat.ui.primitives.sheet.sheetDrag
+import com.biat.ui.primitives.slider.Slider
 import com.biat.ui.primitives.tabs.TabValue
 import com.biat.ui.primitives.tabs.Tabs
 import com.biat.ui.primitives.tabs.TabsActivation
@@ -73,6 +82,10 @@ import com.biat.ui.primitives.tabs.TabsOrientation
 import com.biat.ui.primitives.toggle.Checkbox
 import com.biat.ui.primitives.toggle.Switch
 import com.biat.ui.primitives.toggle.ToggleButton
+import com.biat.ui.primitives.togglegroup.ToggleGroup
+import com.biat.ui.primitives.togglegroup.ToggleGroupValue
+import com.biat.ui.primitives.toolbar.Toolbar
+import com.biat.ui.primitives.toolbar.ToolbarValue
 import com.biat.ui.primitives.tooltip.Tooltip
 
 class MainActivity : ComponentActivity() {
@@ -116,6 +129,10 @@ fun SampleApp() {
         AccordionDemo()
         ToggleDemo()
         RadioGroupDemo()
+        SliderDemo()
+        ToggleGroupDemo()
+        ToolbarDemo()
+        StaticPrimitivesDemo()
     }
 }
 
@@ -764,5 +781,112 @@ private fun RadioGroupDemo() {
                 }
             },
         )
+    }
+}
+
+@Composable
+private fun SliderDemo() {
+    val state = rememberSliderState(initialValue = 4f, valueRange = 0f..10f, step = 1f)
+    DemoCard("Slider (${state.value})") {
+        Slider(
+            state = state,
+            label = "Volume",
+            track = { fraction ->
+                Box(Modifier.fillMaxWidth().height(8.dp).background(Color.Gray)) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth(fraction)
+                            .height(8.dp)
+                            .background(Color.Black),
+                    )
+                }
+            },
+            thumb = {
+                Box(Modifier.background(Color.Black).padding(8.dp)) {
+                    BasicText("${state.value}", style = TextStyle(color = Color.White))
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun ToggleGroupDemo() {
+    val state = rememberToggleGroupState(type = ToggleGroupType.Multiple)
+    DemoCard("ToggleGroup (${state.pressedValues})") {
+        ToggleGroup(
+            state = state,
+            items = listOf(
+                ToggleGroupValue("bold", "Bold"),
+                ToggleGroupValue("italic", "Italic"),
+            ),
+            item = { entry, pressed ->
+                Box(
+                    Modifier
+                        .background(if (pressed) Color.Black else Color.Gray)
+                        .padding(12.dp),
+                ) {
+                    BasicText(entry.label, style = TextStyle(color = Color.White))
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun ToolbarDemo() {
+    var activated by remember { mutableStateOf("none") }
+    DemoCard("Toolbar (activated: $activated)") {
+        Toolbar(
+            items = listOf(
+                ToolbarValue("cut", "Cut"),
+                ToolbarValue("copy", "Copy"),
+                ToolbarValue("paste", "Paste"),
+            ),
+            label = "Editor",
+            onActivate = { activated = it as String },
+            item = { entry, focused ->
+                Box(
+                    Modifier
+                        .background(if (focused) Color.LightGray else Color.White)
+                        .padding(12.dp),
+                ) {
+                    BasicText(entry.label)
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun StaticPrimitivesDemo() {
+    val avatar = rememberAvatarState()
+    DemoCard("Separator / Label / Avatar") {
+        Label(controlLabel = "Name") { BasicText("Name:") }
+        Spacer(Modifier.height(8.dp))
+        Separator { Box(Modifier.fillMaxWidth().height(1.dp).background(Color.Gray)) }
+        Spacer(Modifier.height(8.dp))
+        Avatar(
+            state = avatar,
+            label = "Profile",
+            fallback = {
+                Box(Modifier.background(Color.Gray).padding(16.dp)) {
+                    BasicText("JK")
+                }
+            },
+        ) {
+            Box(Modifier.background(Color.Black).padding(16.dp)) {
+                BasicText("IMG", style = TextStyle(color = Color.White))
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Box(
+            Modifier
+                .background(Color.Black)
+                .clickable { avatar.markLoaded() }
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+        ) {
+            BasicText("Load avatar", style = TextStyle(color = Color.White))
+        }
     }
 }

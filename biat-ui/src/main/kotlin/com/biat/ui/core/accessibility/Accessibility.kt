@@ -149,3 +149,69 @@ fun Modifier.toggleSemantics(
     if (!enabled) disabled()
     if (label != null) contentDescription = label
 }
+
+/**
+ * Semantics for a headless slider. Announces value text plus caller label.
+ */
+fun Modifier.sliderSemantics(
+    value: Float,
+    valueText: String? = null,
+    enabled: Boolean = true,
+    label: String? = null,
+): Modifier = this.semantics(mergeDescendants = false) {
+    stateDescription = valueText ?: value.toString()
+    if (!enabled) disabled()
+    if (label != null) contentDescription = label
+}
+
+/** Semantics for a toolbar container. */
+fun Modifier.toolbarSemantics(label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        if (label != null) contentDescription = label
+    }
+
+/** Semantics for one toolbar item. */
+fun Modifier.toolbarItemSemantics(
+    enabled: Boolean = true,
+    label: String? = null,
+): Modifier = this.semantics(mergeDescendants = false) {
+    role = Role.Button
+    if (!enabled) disabled()
+    if (label != null) contentDescription = label
+}
+
+/** Semantics for a toggle-group container. */
+fun Modifier.toggleGroupSemantics(label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        if (label != null) contentDescription = label
+    }
+
+/**
+ * Semantics for a separator. Decorative separators carry no description;
+ * semantic ones announce orientation.
+ */
+fun Modifier.separatorSemantics(
+    decorative: Boolean = true,
+    vertical: Boolean = false,
+): Modifier = this.semantics(mergeDescendants = false) {
+    stateDescription = if (decorative) {
+        "Separator"
+    } else if (vertical) {
+        "Vertical separator"
+    } else {
+        "Horizontal separator"
+    }
+}
+
+/** Semantics for a field label naming [controlLabel] for screen readers. */
+fun Modifier.labelSemantics(controlLabel: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        if (controlLabel != null) contentDescription = controlLabel
+    }
+
+/** Semantics for an avatar image with caller fallback text. */
+fun Modifier.avatarSemantics(label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Image
+        if (label != null) contentDescription = label
+    }

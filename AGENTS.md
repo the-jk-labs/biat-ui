@@ -33,6 +33,8 @@ biat-ui/                     # the published library (namespace com.biat.ui)
     core/portal/         # BiatPortal (androidx.compose.ui.window.Dialog)
     core/accessibility/  # semantics helpers
     primitives/dialog|popover|menu|tooltip|select|tabs|sheet/
+      accordion|collapsible|toggle|togglegroup|radiogroup|slider|
+      toolbar|separator|label|avatar/
   src/test/              # pure state-machine unit tests (JUnit4)
 sample/                      # demo app; ONLY place allowed to style things
 AGENTS.md | ROADMAP.md | README.md
