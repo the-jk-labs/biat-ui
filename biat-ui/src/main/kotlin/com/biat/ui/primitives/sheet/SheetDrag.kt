@@ -48,37 +48,40 @@ fun Modifier.sheetDrag(
     stepFraction: Float = 0.25f,
     flingVelocityPxPerSec: Float = 1500f,
     sheetHeightPx: Float? = null,
-): Modifier = composed {
-    var offsetPx by remember { mutableFloatStateOf(0f) }
-    var heightPx by remember { mutableIntStateOf(0) }
-    this
-        .onGloballyPositioned { heightPx = it.size.height }
-        .offset { IntOffset(0, offsetPx.roundToInt()) }
-        .draggable(
-            state = rememberDraggableState { delta ->
-                if (enabled) offsetPx += delta
-            },
-            orientation = Orientation.Vertical,
-            enabled = enabled,
-            onDragStopped = { velocity ->
-                if (!enabled) return@draggable
-                val drag = offsetPx
-                offsetPx = 0f
-                when (
-                    val target = resolveSheetSettle(
-                        from = state.detent,
-                        enabled = detents,
-                        dragPx = drag,
-                        sheetHeightPx = sheetHeightPx ?: heightPx.toFloat(),
-                        velocityPxPerSec = velocity,
-                        dismissFraction = dismissFraction,
-                        stepFraction = stepFraction,
-                        flingVelocityPxPerSec = flingVelocityPxPerSec,
-                    )
-                ) {
-                    SheetSettle.Dismiss -> state.close()
-                    is SheetSettle.Snap -> state.snapTo(target.detent)
-                }
-            },
-        )
-}
+): Modifier =
+    composed {
+        var offsetPx by remember { mutableFloatStateOf(0f) }
+        var heightPx by remember { mutableIntStateOf(0) }
+        this
+            .onGloballyPositioned { heightPx = it.size.height }
+            .offset { IntOffset(0, offsetPx.roundToInt()) }
+            .draggable(
+                state =
+                    rememberDraggableState { delta ->
+                        if (enabled) offsetPx += delta
+                    },
+                orientation = Orientation.Vertical,
+                enabled = enabled,
+                onDragStopped = { velocity ->
+                    if (!enabled) return@draggable
+                    val drag = offsetPx
+                    offsetPx = 0f
+                    when (
+                        val target =
+                            resolveSheetSettle(
+                                from = state.detent,
+                                enabled = detents,
+                                dragPx = drag,
+                                sheetHeightPx = sheetHeightPx ?: heightPx.toFloat(),
+                                velocityPxPerSec = velocity,
+                                dismissFraction = dismissFraction,
+                                stepFraction = stepFraction,
+                                flingVelocityPxPerSec = flingVelocityPxPerSec,
+                            )
+                    ) {
+                        SheetSettle.Dismiss -> state.close()
+                        is SheetSettle.Snap -> state.snapTo(target.detent)
+                    }
+                },
+            )
+    }

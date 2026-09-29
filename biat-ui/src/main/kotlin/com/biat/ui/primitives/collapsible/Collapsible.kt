@@ -31,14 +31,15 @@ fun Collapsible(
     Column {
         val source = remember { MutableInteractionSource() }
         Box(
-            modifier = Modifier
-                .collapsibleTriggerSemantics(expanded = state.isExpanded, label = label)
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    enabled = enabled,
-                    onClick = { state.toggle() },
-                ),
+            modifier =
+                Modifier
+                    .collapsibleTriggerSemantics(expanded = state.isExpanded, label = label)
+                    .clickable(
+                        interactionSource = source,
+                        indication = null,
+                        enabled = enabled,
+                        onClick = { state.toggle() },
+                    ),
         ) {
             trigger()
         }

@@ -51,11 +51,12 @@ class ToggleGroupState(
                 onPressedChange?.invoke(pressedValues)
             }
         } else {
-            pressedValues = if (isPressed(value)) {
-                pressedValues.filterNot { it == value }
-            } else {
-                pressedValues + value
-            }
+            pressedValues =
+                if (isPressed(value)) {
+                    pressedValues.filterNot { it == value }
+                } else {
+                    pressedValues + value
+                }
             onPressedChange?.invoke(pressedValues)
         }
     }
@@ -81,14 +82,15 @@ fun rememberToggleGroupState(
     allowDeselect: Boolean = true,
     enabled: Boolean = true,
     onPressedChange: ((List<Any?>) -> Unit)? = null,
-): ToggleGroupState = remember {
-    ToggleGroupState(
-        initialPressed = initialPressed,
-        type = type,
-        allowDeselect = allowDeselect,
-        enabled = enabled,
-    )
-}.apply {
-    this.enabled = enabled
-    this.onPressedChange = onPressedChange
-}
+): ToggleGroupState =
+    remember {
+        ToggleGroupState(
+            initialPressed = initialPressed,
+            type = type,
+            allowDeselect = allowDeselect,
+            enabled = enabled,
+        )
+    }.apply {
+        this.enabled = enabled
+        this.onPressedChange = onPressedChange
+    }

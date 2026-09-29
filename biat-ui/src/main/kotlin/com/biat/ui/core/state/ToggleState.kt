@@ -20,11 +20,12 @@ fun ToggleValue.isOn(): Boolean = this == ToggleValue.On
  * Next value for a headless toggle. Indeterminate activates to On;
  * On and Off flip each other.
  */
-fun ToggleValue.next(): ToggleValue = when (this) {
-    ToggleValue.Off -> ToggleValue.On
-    ToggleValue.On -> ToggleValue.Off
-    ToggleValue.Indeterminate -> ToggleValue.On
-}
+fun ToggleValue.next(): ToggleValue =
+    when (this) {
+        ToggleValue.Off -> ToggleValue.On
+        ToggleValue.On -> ToggleValue.Off
+        ToggleValue.Indeterminate -> ToggleValue.On
+    }
 
 /**
  * Logic-only state for a headless toggle (Checkbox / Switch).
@@ -82,10 +83,11 @@ fun rememberToggleState(
     controlledValue: ToggleValue? = null,
     enabled: Boolean = true,
     onValueChange: ((ToggleValue) -> Unit)? = null,
-): ToggleState = remember {
-    ToggleState(initialValue = initialValue, enabled = enabled)
-}.apply {
-    this.controlledValue = controlledValue
-    this.enabled = enabled
-    this.onValueChange = onValueChange
-}
+): ToggleState =
+    remember {
+        ToggleState(initialValue = initialValue, enabled = enabled)
+    }.apply {
+        this.controlledValue = controlledValue
+        this.enabled = enabled
+        this.onValueChange = onValueChange
+    }

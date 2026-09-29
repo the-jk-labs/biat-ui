@@ -24,7 +24,6 @@ import org.junit.Test
  * accordion keeps two panels open at once.
  */
 class BitsParityCollapsibleTest {
-
     @get:Rule
     val rule = createComposeRule()
 

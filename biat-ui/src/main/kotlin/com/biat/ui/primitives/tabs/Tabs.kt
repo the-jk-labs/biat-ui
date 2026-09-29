@@ -29,7 +29,10 @@ import com.biat.ui.core.state.TabsState
 import com.biat.ui.core.state.rememberTabsState
 import com.biat.ui.core.state.resolveTabIndex
 
-data class TabValue<T>(val value: T, val label: String)
+data class TabValue<T>(
+    val value: T,
+    val label: String,
+)
 
 /** Layout axis of the tab list. Vertical lists use Up/Down instead of Left/Right. */
 enum class TabsOrientation {
@@ -85,42 +88,60 @@ fun <T> Tabs(
         }
     }
 
-    val listModifier = Modifier
-        .tabListSemantics(label)
-        .onPreviewKeyEvent { event ->
-            if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-            val move: TabMove = when (event.key) {
-                Key.DirectionRight ->
-                    if (orientation == TabsOrientation.Horizontal) {
-                        if (isRtl) TabMove.Previous else TabMove.Next
-                    } else {
-                        return@onPreviewKeyEvent false
+    val listModifier =
+        Modifier
+            .tabListSemantics(label)
+            .onPreviewKeyEvent { event ->
+                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                val move: TabMove =
+                    when (event.key) {
+                        Key.DirectionRight -> {
+                            if (orientation == TabsOrientation.Horizontal) {
+                                if (isRtl) TabMove.Previous else TabMove.Next
+                            } else {
+                                return@onPreviewKeyEvent false
+                            }
+                        }
+
+                        Key.DirectionLeft -> {
+                            if (orientation == TabsOrientation.Horizontal) {
+                                if (isRtl) TabMove.Next else TabMove.Previous
+                            } else {
+                                return@onPreviewKeyEvent false
+                            }
+                        }
+
+                        Key.DirectionUp -> {
+                            if (orientation == TabsOrientation.Vertical) {
+                                TabMove.Previous
+                            } else {
+                                return@onPreviewKeyEvent false
+                            }
+                        }
+
+                        Key.DirectionDown -> {
+                            if (orientation == TabsOrientation.Vertical) {
+                                TabMove.Next
+                            } else {
+                                return@onPreviewKeyEvent false
+                            }
+                        }
+
+                        Key.MoveHome -> {
+                            TabMove.First
+                        }
+
+                        Key.MoveEnd -> {
+                            TabMove.Last
+                        }
+
+                        else -> {
+                            return@onPreviewKeyEvent false
+                        }
                     }
-                Key.DirectionLeft ->
-                    if (orientation == TabsOrientation.Horizontal) {
-                        if (isRtl) TabMove.Next else TabMove.Previous
-                    } else {
-                        return@onPreviewKeyEvent false
-                    }
-                Key.DirectionUp ->
-                    if (orientation == TabsOrientation.Vertical) {
-                        TabMove.Previous
-                    } else {
-                        return@onPreviewKeyEvent false
-                    }
-                Key.DirectionDown ->
-                    if (orientation == TabsOrientation.Vertical) {
-                        TabMove.Next
-                    } else {
-                        return@onPreviewKeyEvent false
-                    }
-                Key.MoveHome -> TabMove.First
-                Key.MoveEnd -> TabMove.Last
-                else -> return@onPreviewKeyEvent false
+                moveFocus(resolveTabIndex(focusedIndex, tabs.size, move))
+                true
             }
-            moveFocus(resolveTabIndex(focusedIndex, tabs.size, move))
-            true
-        }
     if (orientation == TabsOrientation.Horizontal) {
         Row(modifier = listModifier) {
             tabs.forEachIndexed { index, item ->
@@ -150,17 +171,18 @@ private fun <T> TabCell(
     // Wrap caller tab UI with headless click + semantics. Clickable also
     // turns Enter/Space on the focused tab into activation for manual mode.
     Box(
-        modifier = Modifier
-            .focusRequester(requester)
-            .tabSemantics(selected = selected, label = item.label)
-            .clickable(
-                interactionSource = source,
-                indication = null,
-                onClick = {
-                    onFocused()
-                    state.select(item.value as Any?)
-                },
-            ),
+        modifier =
+            Modifier
+                .focusRequester(requester)
+                .tabSemantics(selected = selected, label = item.label)
+                .clickable(
+                    interactionSource = source,
+                    indication = null,
+                    onClick = {
+                        onFocused()
+                        state.select(item.value as Any?)
+                    },
+                ),
     ) {
         Row {
             tab(item, selected) {

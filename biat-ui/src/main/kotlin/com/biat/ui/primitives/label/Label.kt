@@ -24,11 +24,12 @@ fun Label(
     val source = remember { MutableInteractionSource() }
     var modifier = Modifier.labelSemantics(controlLabel)
     if (onClick != null) {
-        modifier = modifier.clickable(
-            interactionSource = source,
-            indication = null,
-            onClick = onClick,
-        )
+        modifier =
+            modifier.clickable(
+                interactionSource = source,
+                indication = null,
+                onClick = onClick,
+            )
     }
     Box(modifier = modifier) {
         content()

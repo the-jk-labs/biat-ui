@@ -18,7 +18,6 @@ import org.junit.Test
  * empty/loading slots, clearable selection, controlled query.
  */
 class SelectDepthTest {
-
     @get:Rule
     val rule = createComposeRule()
 
@@ -85,10 +84,11 @@ class SelectDepthTest {
     fun controlledQuery_filtersWithoutOwningText() {
         rule.setContent {
             var query by remember { mutableStateOf("j") }
-            val state = rememberSelectState<String>(
-                controlledQuery = query,
-                onQueryChange = { query = it },
-            )
+            val state =
+                rememberSelectState<String>(
+                    controlledQuery = query,
+                    onQueryChange = { query = it },
+                )
             Select(
                 state = state,
                 options = listOf("Kotlin", "Java", "Rust"),

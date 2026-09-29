@@ -28,7 +28,10 @@ import com.biat.ui.core.state.rememberToolbarState
  * Caller key for one toolbar item. [value] is caller-owned; [label] is
  * announced on the button for screen readers.
  */
-data class ToolbarValue<T>(val value: T, val label: String)
+data class ToolbarValue<T>(
+    val value: T,
+    val label: String,
+)
 
 /**
  * Headless Toolbar. Behavior only, zero styling.
@@ -51,39 +54,57 @@ fun <T> Toolbar(
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val requesters = remember(items.size) { List(items.size) { FocusRequester() } }
 
-    val container = Modifier
-        .toolbarSemantics(label)
-        .onPreviewKeyEvent { event ->
-            if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-            val delta: Int = when (event.key) {
-                Key.DirectionRight ->
-                    if (orientation == ToolbarOrientation.Horizontal) {
-                        if (isRtl) -1 else 1
-                    } else null
-                Key.DirectionLeft ->
-                    if (orientation == ToolbarOrientation.Horizontal) {
-                        if (isRtl) 1 else -1
-                    } else null
-                Key.DirectionDown ->
-                    if (orientation == ToolbarOrientation.Vertical) 1 else null
-                Key.DirectionUp ->
-                    if (orientation == ToolbarOrientation.Vertical) -1 else null
-                Key.MoveHome -> {
-                    state.moveToFirst()
-                    requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
-                    return@onPreviewKeyEvent true
-                }
-                Key.MoveEnd -> {
-                    state.moveToLast()
-                    requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
-                    return@onPreviewKeyEvent true
-                }
-                else -> null
-            } ?: return@onPreviewKeyEvent false
-            state.move(delta)
-            requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
-            true
-        }
+    val container =
+        Modifier
+            .toolbarSemantics(label)
+            .onPreviewKeyEvent { event ->
+                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                val delta: Int =
+                    when (event.key) {
+                        Key.DirectionRight -> {
+                            if (orientation == ToolbarOrientation.Horizontal) {
+                                if (isRtl) -1 else 1
+                            } else {
+                                null
+                            }
+                        }
+
+                        Key.DirectionLeft -> {
+                            if (orientation == ToolbarOrientation.Horizontal) {
+                                if (isRtl) 1 else -1
+                            } else {
+                                null
+                            }
+                        }
+
+                        Key.DirectionDown -> {
+                            if (orientation == ToolbarOrientation.Vertical) 1 else null
+                        }
+
+                        Key.DirectionUp -> {
+                            if (orientation == ToolbarOrientation.Vertical) -1 else null
+                        }
+
+                        Key.MoveHome -> {
+                            state.moveToFirst()
+                            requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
+                            return@onPreviewKeyEvent true
+                        }
+
+                        Key.MoveEnd -> {
+                            state.moveToLast()
+                            requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
+                            return@onPreviewKeyEvent true
+                        }
+
+                        else -> {
+                            null
+                        }
+                    } ?: return@onPreviewKeyEvent false
+                state.move(delta)
+                requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
+                true
+            }
 
     val rows: @Composable () -> Unit = {
         items.forEachIndexed { index, entry ->
@@ -120,12 +141,13 @@ fun ToolbarItem(
     var modifier = Modifier.toolbarItemSemantics(enabled = enabled, label = label)
     if (requester != null) modifier = modifier.focusRequester(requester)
     Box(
-        modifier = modifier.clickable(
-            interactionSource = source,
-            indication = null,
-            enabled = enabled,
-            onClick = onActivate,
-        ),
+        modifier =
+            modifier.clickable(
+                interactionSource = source,
+                indication = null,
+                enabled = enabled,
+                onClick = onActivate,
+            ),
     ) {
         content()
     }
@@ -143,10 +165,11 @@ fun <T> Toolbar(
     onActivate: (T) -> Unit = {},
     item: @Composable (item: ToolbarValue<T>, focused: Boolean) -> Unit,
 ) {
-    val state = rememberToolbarState(
-        itemCount = items.size,
-        disabledIndices = disabledIndices,
-    )
+    val state =
+        rememberToolbarState(
+            itemCount = items.size,
+            disabledIndices = disabledIndices,
+        )
     Toolbar(
         state = state,
         items = items,

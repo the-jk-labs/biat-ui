@@ -36,6 +36,7 @@ class TooltipState(
     val isVisible: Boolean get() = controlledVisible ?: internalVisible
 
     fun show() = setVisible(true)
+
     fun hide() = setVisible(false)
 
     fun setVisible(visible: Boolean) {
@@ -54,9 +55,10 @@ fun rememberTooltipState(
     initialVisible: Boolean = false,
     controlledVisible: Boolean? = null,
     onVisibleChange: ((Boolean) -> Unit)? = null,
-): TooltipState = remember {
-    TooltipState(initialVisible = initialVisible)
-}.apply {
-    this.controlledVisible = controlledVisible
-    this.onVisibleChange = onVisibleChange
-}
+): TooltipState =
+    remember {
+        TooltipState(initialVisible = initialVisible)
+    }.apply {
+        this.controlledVisible = controlledVisible
+        this.onVisibleChange = onVisibleChange
+    }

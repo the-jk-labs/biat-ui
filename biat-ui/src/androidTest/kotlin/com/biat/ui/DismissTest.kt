@@ -36,7 +36,6 @@ import org.junit.Test
  * ./gradlew :biat-ui:connectedDebugAndroidTest
  */
 class DismissTest {
-
     @get:Rule
     val rule = createComposeRule()
 

@@ -19,7 +19,10 @@ import com.biat.ui.core.state.rememberToggleGroupState
  * Caller key for one toggle-group item. [value] drives [ToggleGroupState]
  * pressed membership; [label] is announced on the button for screen readers.
  */
-data class ToggleGroupValue<T>(val value: T, val label: String)
+data class ToggleGroupValue<T>(
+    val value: T,
+    val label: String,
+)
 
 /**
  * Headless ToggleGroup. Behavior only, zero styling.
@@ -71,14 +74,15 @@ fun ToggleGroupItem(
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier
-            .toggleSemantics(pressed = pressed, enabled = enabled, label = label)
-            .clickable(
-                interactionSource = source,
-                indication = null,
-                enabled = enabled,
-                onClick = onToggle,
-            ),
+        modifier =
+            Modifier
+                .toggleSemantics(pressed = pressed, enabled = enabled, label = label)
+                .clickable(
+                    interactionSource = source,
+                    indication = null,
+                    enabled = enabled,
+                    onClick = onToggle,
+                ),
     ) {
         content()
     }
@@ -88,7 +92,9 @@ fun ToggleGroupItem(
  * Scope for [ToggleGroupContent]: buttons bound to a shared [state].
  * Prefer [ToggleGroup] for flat lists; use this only for custom layouts.
  */
-class ToggleGroupScope internal constructor(private val state: ToggleGroupState) {
+class ToggleGroupScope internal constructor(
+    private val state: ToggleGroupState,
+) {
     @Composable
     fun <T> Item(
         item: ToggleGroupValue<T>,
@@ -113,9 +119,10 @@ class ToggleGroupScope internal constructor(private val state: ToggleGroupState)
  */
 @Composable
 fun ToggleGroupContent(
-    state: ToggleGroupState = rememberToggleGroupState(
-        type = ToggleGroupType.Multiple,
-    ),
+    state: ToggleGroupState =
+        rememberToggleGroupState(
+            type = ToggleGroupType.Multiple,
+        ),
     label: String? = null,
     content: @Composable ColumnScope.(scope: ToggleGroupScope) -> Unit,
 ) {

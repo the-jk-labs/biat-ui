@@ -43,43 +43,62 @@ fun Slider(
 ) {
     var trackWidthPx by remember { mutableFloatStateOf(0f) }
     Box(
-        modifier = Modifier
-            .sliderSemantics(
-                value = state.value,
-                valueText = valueText,
-                enabled = enabled && state.enabled,
-                label = label,
-            )
-            .onSizeChanged { trackWidthPx = it.width.toFloat() }
-            .focusable(enabled = enabled && state.enabled)
-            .pointerInput(enabled, state) {
-                if (!enabled || !state.enabled) return@pointerInput
-                detectHorizontalDragGestures { change, dragAmount ->
-                    change.consume()
-                    if (trackWidthPx > 0f) {
-                        state.setFraction(state.fraction + dragAmount / trackWidthPx)
+        modifier =
+            Modifier
+                .sliderSemantics(
+                    value = state.value,
+                    valueText = valueText,
+                    enabled = enabled && state.enabled,
+                    label = label,
+                ).onSizeChanged { trackWidthPx = it.width.toFloat() }
+                .focusable(enabled = enabled && state.enabled)
+                .pointerInput(enabled, state) {
+                    if (!enabled || !state.enabled) return@pointerInput
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        change.consume()
+                        if (trackWidthPx > 0f) {
+                            state.setFraction(state.fraction + dragAmount / trackWidthPx)
+                        }
                     }
-                }
-            }
-            .onPreviewKeyEvent { event ->
-                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                if (!enabled || !state.enabled) return@onPreviewKeyEvent false
-                when (event.key) {
-                    Key.DirectionLeft, Key.DirectionDown -> { state.decrease(); true }
-                    Key.DirectionRight, Key.DirectionUp -> { state.increase(); true }
-                    Key.MoveHome -> { state.toMin(); true }
-                    Key.MoveEnd -> { state.toMax(); true }
-                    Key.PageUp -> {
-                        state.setFraction(state.fraction + 0.1f)
-                        true
+                }.onPreviewKeyEvent { event ->
+                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                    if (!enabled || !state.enabled) return@onPreviewKeyEvent false
+                    when (event.key) {
+                        Key.DirectionLeft, Key.DirectionDown -> {
+                            state.decrease()
+                            true
+                        }
+
+                        Key.DirectionRight, Key.DirectionUp -> {
+                            state.increase()
+                            true
+                        }
+
+                        Key.MoveHome -> {
+                            state.toMin()
+                            true
+                        }
+
+                        Key.MoveEnd -> {
+                            state.toMax()
+                            true
+                        }
+
+                        Key.PageUp -> {
+                            state.setFraction(state.fraction + 0.1f)
+                            true
+                        }
+
+                        Key.PageDown -> {
+                            state.setFraction(state.fraction - 0.1f)
+                            true
+                        }
+
+                        else -> {
+                            false
+                        }
                     }
-                    Key.PageDown -> {
-                        state.setFraction(state.fraction - 0.1f)
-                        true
-                    }
-                    else -> false
-                }
-            },
+                },
     ) {
         track(state.fraction)
         thumb()

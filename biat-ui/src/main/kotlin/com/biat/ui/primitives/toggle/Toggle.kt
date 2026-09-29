@@ -27,11 +27,12 @@ private fun ToggleBox(
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = modifier.clickable(
-            interactionSource = source,
-            indication = null,
-            onClick = onToggle,
-        ),
+        modifier =
+            modifier.clickable(
+                interactionSource = source,
+                indication = null,
+                onClick = onToggle,
+            ),
     ) {
         content()
     }
@@ -53,12 +54,13 @@ fun Checkbox(
 ) {
     ToggleBox(
         onToggle = { if (enabled) state.toggle() },
-        modifier = Modifier.checkboxSemantics(
-            checked = state.isOn,
-            indeterminate = state.isIndeterminate,
-            enabled = enabled,
-            label = label,
-        ),
+        modifier =
+            Modifier.checkboxSemantics(
+                checked = state.isOn,
+                indeterminate = state.isIndeterminate,
+                enabled = enabled,
+                label = label,
+            ),
     ) {
         content(state.value)
     }
@@ -77,16 +79,17 @@ fun Switch(
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier
-            .switchSemantics(checked = state.isOn, enabled = enabled, label = label)
-            .toggleable(
-                value = state.isOn,
-                interactionSource = source,
-                indication = null,
-                enabled = enabled,
-                role = Role.Switch,
-                onValueChange = { state.setValue(if (it) ToggleValue.On else ToggleValue.Off) },
-            ),
+        modifier =
+            Modifier
+                .switchSemantics(checked = state.isOn, enabled = enabled, label = label)
+                .toggleable(
+                    value = state.isOn,
+                    interactionSource = source,
+                    indication = null,
+                    enabled = enabled,
+                    role = Role.Switch,
+                    onValueChange = { state.setValue(if (it) ToggleValue.On else ToggleValue.Off) },
+                ),
     ) {
         content(state.isOn)
     }
@@ -108,11 +111,12 @@ fun ToggleButton(
 ) {
     ToggleBox(
         onToggle = { if (enabled) state.toggle() },
-        modifier = Modifier.toggleSemantics(
-            pressed = state.isOn,
-            enabled = enabled,
-            label = label,
-        ),
+        modifier =
+            Modifier.toggleSemantics(
+                pressed = state.isOn,
+                enabled = enabled,
+                label = label,
+            ),
     ) {
         content(state.isOn)
     }

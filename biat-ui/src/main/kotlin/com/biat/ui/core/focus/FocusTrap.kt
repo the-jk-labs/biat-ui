@@ -63,8 +63,7 @@ fun Modifier.focusTrap(
             } else {
                 m
             }
-        }
-        .onPreviewKeyEvent { event ->
+        }.onPreviewKeyEvent { event ->
             if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
             when (event.key) {
                 Key.Tab -> {
@@ -96,17 +95,24 @@ fun Modifier.focusTrap(
                     }
                     true
                 }
+
                 Key.Escape -> {
                     onEscape?.invoke()
                     onEscape != null
                 }
-                else -> false
+
+                else -> {
+                    false
+                }
             }
         }
 }
 
 @Composable
-fun FocusTrapEffect(active: Boolean, trapRequester: FocusRequester) {
+fun FocusTrapEffect(
+    active: Boolean,
+    trapRequester: FocusRequester,
+) {
     LaunchedEffect(active) {
         if (active) {
             try {

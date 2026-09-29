@@ -96,54 +96,54 @@ fun Dialog(
         dismissOnClickOutside = false, // handled explicitly for headless control
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .let { m ->
-                    if (effectiveOutsideClick) {
-                        m.outsideClick(
-                            onOutsideClick = { state.close() },
-                            isInsideContent = { offset ->
-                                contentBounds?.contains(offset) == true
-                            },
-                        )
-                    } else {
-                        m
-                    }
-                },
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .let { m ->
+                        if (effectiveOutsideClick) {
+                            m.outsideClick(
+                                onOutsideClick = { state.close() },
+                                isInsideContent = { offset ->
+                                    contentBounds?.contains(offset) == true
+                                },
+                            )
+                        } else {
+                            m
+                        }
+                    },
         ) {
             scrim?.invoke()
             Box(
-                modifier = Modifier
-                    .onGloballyPositioned {
-                        contentBounds = it.boundsInParent()
-                        if (!initialFocusDone) {
-                            initialFocusDone = true
-                            val target = initialFocusRequester ?: trapRequester
-                            try {
-                                target.requestFocus()
-                            } catch (_: IllegalStateException) {
-                                if (target !== trapRequester) {
-                                    try {
-                                        trapRequester.requestFocus()
-                                    } catch (_: IllegalStateException) {
-                                        // Neither attached; caller ordering decides.
+                modifier =
+                    Modifier
+                        .onGloballyPositioned {
+                            contentBounds = it.boundsInParent()
+                            if (!initialFocusDone) {
+                                initialFocusDone = true
+                                val target = initialFocusRequester ?: trapRequester
+                                try {
+                                    target.requestFocus()
+                                } catch (_: IllegalStateException) {
+                                    if (target !== trapRequester) {
+                                        try {
+                                            trapRequester.requestFocus()
+                                        } catch (_: IllegalStateException) {
+                                            // Neither attached; caller ordering decides.
+                                        }
                                     }
                                 }
                             }
-                        }
-                    }
-                    .consumeOverlayTaps()
-                    .dialogSemantics(label)
-                    .focusTrap(
-                        active = true,
-                        trapRequester = trapRequester,
-                        focusManager = focusManager,
-                        trapState = trapState,
-                        onEscape = if (dismissOnEscape) ({ state.close() }) else null,
-                    )
-                    .let { m ->
-                        if (dismissOnEscape) m.onEscape { state.close() } else m
-                    },
+                        }.consumeOverlayTaps()
+                        .dialogSemantics(label)
+                        .focusTrap(
+                            active = true,
+                            trapRequester = trapRequester,
+                            focusManager = focusManager,
+                            trapState = trapState,
+                            onEscape = if (dismissOnEscape) ({ state.close() }) else null,
+                        ).let { m ->
+                            if (dismissOnEscape) m.onEscape { state.close() } else m
+                        },
             ) {
                 content()
             }
@@ -160,15 +160,15 @@ fun DialogTrigger(
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier
-            .let { m ->
-                if (returnFocusRequester != null) m.focusRequester(returnFocusRequester) else m
-            }
-            .clickable(
-                interactionSource = source,
-                indication = null,
-                onClick = { state.open() },
-            ),
+        modifier =
+            Modifier
+                .let { m ->
+                    if (returnFocusRequester != null) m.focusRequester(returnFocusRequester) else m
+                }.clickable(
+                    interactionSource = source,
+                    indication = null,
+                    onClick = { state.open() },
+                ),
     ) {
         content()
     }
@@ -182,11 +182,12 @@ fun DialogClose(
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier.clickable(
-            interactionSource = source,
-            indication = null,
-            onClick = { state.close() },
-        ),
+        modifier =
+            Modifier.clickable(
+                interactionSource = source,
+                indication = null,
+                onClick = { state.close() },
+            ),
     ) {
         content()
     }

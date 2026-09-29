@@ -12,8 +12,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import com.biat.ui.core.dismiss.onEscape
 import com.biat.ui.core.accessibility.overlayTriggerSemantics
+import com.biat.ui.core.dismiss.onEscape
 import com.biat.ui.core.focus.FocusReturnEffect
 import com.biat.ui.core.focus.FocusTrapEffect
 import com.biat.ui.core.focus.focusTrap
@@ -41,10 +41,10 @@ import com.biat.ui.core.state.rememberPopoverState
  * - [label] names the trigger for screen readers (announced with
  *   expanded/collapsed state).
  *
-  * Anchor-follow on scroll/resize comes from the platform: Popup re-resolves
-  * the shared placement engine against fresh anchor bounds whenever the
-  * anchor moves, so the popup tracks scrolling content with no extra API.
-  */
+ * Anchor-follow on scroll/resize comes from the platform: Popup re-resolves
+ * the shared placement engine against fresh anchor bounds whenever the
+ * anchor moves, so the popup tracks scrolling content with no extra API.
+ */
 @Composable
 fun Popover(
     state: PopoverState = rememberPopoverState(),
@@ -69,50 +69,55 @@ fun Popover(
         FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
         FocusTrapEffect(active = modal && state.isOpen, trapRequester = trapRequester)
         Box(
-            modifier = Modifier
-                .focusRequester(returnRequester)
-                .overlayTriggerSemantics(expanded = state.isOpen, label = label)
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    onClick = { state.toggle() },
-                ),
+            modifier =
+                Modifier
+                    .focusRequester(returnRequester)
+                    .overlayTriggerSemantics(expanded = state.isOpen, label = label)
+                    .clickable(
+                        interactionSource = source,
+                        indication = null,
+                        onClick = { state.toggle() },
+                    ),
         ) {
             trigger()
         }
         if (state.isOpen) {
             Popup(
-                popupPositionProvider = rememberBiatPopupPosition(
-                    side = side,
-                    align = align,
-                    sideOffset = sideOffset,
-                    alignOffset = alignOffset,
-                    avoidCollisions = avoidCollisions,
-                ),
+                popupPositionProvider =
+                    rememberBiatPopupPosition(
+                        side = side,
+                        align = align,
+                        sideOffset = sideOffset,
+                        alignOffset = alignOffset,
+                        avoidCollisions = avoidCollisions,
+                    ),
                 onDismissRequest = { state.close() },
-                properties = PopupProperties(
-                    focusable = true,
-                    dismissOnBackPress = dismissOnBackPress,
-                    dismissOnClickOutside = dismissOnOutsideClick,
-                ),
+                properties =
+                    PopupProperties(
+                        focusable = true,
+                        dismissOnBackPress = dismissOnBackPress,
+                        dismissOnClickOutside = dismissOnOutsideClick,
+                    ),
             ) {
                 // FocusManager is read inside the popup: the popup window
                 // owns focus separately, so the main window manager cannot
                 // move focus between popup items.
                 val popupFocusManager = LocalFocusManager.current
                 Box(
-                    modifier = Modifier.let { m ->
-                        var acc = if (dismissOnEscape) m.onEscape { state.close() } else m
-                        if (modal) {
-                            acc = acc.focusTrap(
-                                active = true,
-                                trapRequester = trapRequester,
-                                focusManager = popupFocusManager,
-                                trapState = trapState,
-                            )
-                        }
-                        acc
-                    },
+                    modifier =
+                        Modifier.let { m ->
+                            var acc = if (dismissOnEscape) m.onEscape { state.close() } else m
+                            if (modal) {
+                                acc =
+                                    acc.focusTrap(
+                                        active = true,
+                                        trapRequester = trapRequester,
+                                        focusManager = popupFocusManager,
+                                        trapState = trapState,
+                                    )
+                            }
+                            acc
+                        },
                 ) {
                     content()
                 }

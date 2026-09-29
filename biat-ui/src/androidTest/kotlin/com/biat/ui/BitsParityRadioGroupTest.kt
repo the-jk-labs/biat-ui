@@ -17,7 +17,6 @@ import org.junit.Test
  * selection state and a click moves the selection.
  */
 class BitsParityRadioGroupTest {
-
     @get:Rule
     val rule = createComposeRule()
 

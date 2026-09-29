@@ -74,7 +74,10 @@ class ToolbarState(
         focusedIndex = last
     }
 
-    private fun snapToEnabled(index: Int, delta: Int): Int? {
+    private fun snapToEnabled(
+        index: Int,
+        delta: Int,
+    ): Int? {
         if (isEnabled(index)) return index
         return resolveToolbarIndex(index, itemCount, if (delta == 0) 1 else delta, loop, disabledIndices)
             .takeIf { it != -1 }
@@ -87,13 +90,14 @@ fun rememberToolbarState(
     initialFocused: Int = 0,
     loop: Boolean = true,
     disabledIndices: Set<Int> = emptySet(),
-): ToolbarState = remember {
-    ToolbarState(itemCount = itemCount, initialFocused = initialFocused, loop = loop)
-}.apply {
-    this.itemCount = itemCount
-    this.loop = loop
-    this.disabledIndices = disabledIndices
-}
+): ToolbarState =
+    remember {
+        ToolbarState(itemCount = itemCount, initialFocused = initialFocused, loop = loop)
+    }.apply {
+        this.itemCount = itemCount
+        this.loop = loop
+        this.disabledIndices = disabledIndices
+    }
 
 /**
  * Pure roving-index math for toolbars. Moves [delta] steps from [current],
@@ -109,14 +113,22 @@ fun resolveToolbarIndex(
 ): Int {
     if (itemCount <= 0) return -1
     if (disabled.size >= itemCount) return -1
-    val step = if (delta == 0) 1 else if (delta > 0) 1 else -1
+    val step =
+        if (delta == 0) {
+            1
+        } else if (delta > 0) {
+            1
+        } else {
+            -1
+        }
     var index = current
     repeat(itemCount) {
-        index = if (loop) {
-            (index + step).mod(itemCount)
-        } else {
-            (index + step).coerceIn(0, itemCount - 1)
-        }
+        index =
+            if (loop) {
+                (index + step).mod(itemCount)
+            } else {
+                (index + step).coerceIn(0, itemCount - 1)
+            }
         if (index !in disabled) return index
         if (!loop && (index == 0 || index == itemCount - 1) && index in disabled) {
             // Clamped at the edge; keep scanning inward is impossible, stop.

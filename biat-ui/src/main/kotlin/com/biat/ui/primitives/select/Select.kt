@@ -91,139 +91,170 @@ fun <T> Select(
         val returnRequester = rememberFocusReturnRequester()
         FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
         Box(
-            modifier = Modifier
-                .focusRequester(returnRequester)
-                .selectTriggerSemantics(expanded = state.isOpen, label = label)
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    onClick = { state.toggle() },
-                )
-                .onPreviewKeyEvent { event ->
-                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                    when (event.key) {
-                        Key.Enter, Key.NumPadEnter, Key.Spacebar, Key.DirectionDown -> {
-                            if (!state.isOpen) { state.open(); true } else false
-                        }
-                        Key.Backspace, Key.Delete -> {
-                            if (!state.isOpen && state.query.isEmpty() &&
-                                state.selected != null
-                            ) {
-                                state.clearSelection()
-                                onSelected?.invoke(null)
-                                true
-                            } else {
+            modifier =
+                Modifier
+                    .focusRequester(returnRequester)
+                    .selectTriggerSemantics(expanded = state.isOpen, label = label)
+                    .clickable(
+                        interactionSource = source,
+                        indication = null,
+                        onClick = { state.toggle() },
+                    ).onPreviewKeyEvent { event ->
+                        if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                        when (event.key) {
+                            Key.Enter, Key.NumPadEnter, Key.Spacebar, Key.DirectionDown -> {
+                                if (!state.isOpen) {
+                                    state.open()
+                                    true
+                                } else {
+                                    false
+                                }
+                            }
+
+                            Key.Backspace, Key.Delete -> {
+                                if (!state.isOpen && state.query.isEmpty() &&
+                                    state.selected != null
+                                ) {
+                                    state.clearSelection()
+                                    onSelected?.invoke(null)
+                                    true
+                                } else {
+                                    false
+                                }
+                            }
+
+                            else -> {
                                 false
                             }
                         }
-                        else -> false
-                    }
-                },
+                    },
         ) {
             trigger(state.selected)
         }
 
         if (state.isOpen) {
             Popup(
-                popupPositionProvider = rememberBiatPopupPosition(
-                    side = side,
-                    align = align,
-                    sideOffset = sideOffset,
-                    alignOffset = alignOffset,
-                    avoidCollisions = avoidCollisions,
-                ),
+                popupPositionProvider =
+                    rememberBiatPopupPosition(
+                        side = side,
+                        align = align,
+                        sideOffset = sideOffset,
+                        alignOffset = alignOffset,
+                        avoidCollisions = avoidCollisions,
+                    ),
                 onDismissRequest = { state.close() },
-                properties = PopupProperties(
-                    focusable = true,
-                    dismissOnBackPress = true,
-                    dismissOnClickOutside = dismissOnOutsideClick,
-                ),
+                properties =
+                    PopupProperties(
+                        focusable = true,
+                        dismissOnBackPress = true,
+                        dismissOnClickOutside = dismissOnOutsideClick,
+                    ),
             ) {
                 Column(
-                    modifier = Modifier.onPreviewKeyEvent { event ->
-                        if (event.type != KeyEventType.KeyDown) {
-                            return@onPreviewKeyEvent false
-                        }
-                        when (event.key) {
-                            Key.DirectionDown -> {
-                                if (visible.isEmpty()) return@onPreviewKeyEvent false
-                                state.moveHighlight(1, visible.size)
-                                true
+                    modifier =
+                        Modifier.onPreviewKeyEvent { event ->
+                            if (event.type != KeyEventType.KeyDown) {
+                                return@onPreviewKeyEvent false
                             }
-                            Key.DirectionUp -> {
-                                if (visible.isEmpty()) return@onPreviewKeyEvent false
-                                state.moveHighlight(-1, visible.size)
-                                true
-                            }
-                            Key.MoveHome -> {
-                                if (visible.isEmpty()) return@onPreviewKeyEvent false
-                                state.highlightFirst(visible.size)
-                                true
-                            }
-                            Key.MoveEnd -> {
-                                if (visible.isEmpty()) return@onPreviewKeyEvent false
-                                state.highlightLast(visible.size)
-                                true
-                            }
-                            Key.Enter, Key.NumPadEnter -> {
-                                val value = state.commitValue(visible)
-                                if (value != null) {
-                                    state.select(value)
-                                    onSelected?.invoke(value)
+                            when (event.key) {
+                                Key.DirectionDown -> {
+                                    if (visible.isEmpty()) return@onPreviewKeyEvent false
+                                    state.moveHighlight(1, visible.size)
                                     true
-                                } else {
-                                    false
+                                }
+
+                                Key.DirectionUp -> {
+                                    if (visible.isEmpty()) return@onPreviewKeyEvent false
+                                    state.moveHighlight(-1, visible.size)
+                                    true
+                                }
+
+                                Key.MoveHome -> {
+                                    if (visible.isEmpty()) return@onPreviewKeyEvent false
+                                    state.highlightFirst(visible.size)
+                                    true
+                                }
+
+                                Key.MoveEnd -> {
+                                    if (visible.isEmpty()) return@onPreviewKeyEvent false
+                                    state.highlightLast(visible.size)
+                                    true
+                                }
+
+                                Key.Enter, Key.NumPadEnter -> {
+                                    val value = state.commitValue(visible)
+                                    if (value != null) {
+                                        state.select(value)
+                                        onSelected?.invoke(value)
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                }
+
+                                Key.Escape -> {
+                                    if (dismissOnEscape) {
+                                        state.close()
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                }
+
+                                else -> {
+                                    val code = event.utf16CodePoint
+                                    if (code in 32..126 && !event.isCtrlPressed &&
+                                        !event.isMetaPressed
+                                    ) {
+                                        state.moveHighlightToMatch(
+                                            visible,
+                                            queryToString,
+                                            code.toChar().toString(),
+                                        )
+                                    } else {
+                                        false
+                                    }
                                 }
                             }
-                            Key.Escape -> {
-                                if (dismissOnEscape) { state.close(); true } else false
-                            }
-                            else -> {
-                                val code = event.utf16CodePoint
-                                if (code in 32..126 && !event.isCtrlPressed &&
-                                    !event.isMetaPressed
-                                ) {
-                                    state.moveHighlightToMatch(
-                                        visible,
-                                        queryToString,
-                                        code.toChar().toString(),
-                                    )
-                                } else {
-                                    false
-                                }
-                            }
-                        }
-                    },
+                        },
                 ) {
                     when {
-                        isLoading -> loading()
-                        visible.isEmpty() -> empty()
-                        else -> visible.forEachIndexed { index, value ->
-                        val itemSource = remember { MutableInteractionSource() }
-                        Box(
-                            modifier = Modifier
-                                .selectItemSemantics(
-                                    selected = state.selected == value,
-                                    highlighted = state.highlightedIndex == index,
-                                )
-                                .clickable(
-                                interactionSource = itemSource,
-                                indication = null,
-                                onClick = {
-                                    state.select(value)
-                                    onSelected?.invoke(value)
-                                },
-                            ),
-                        ) {
-                            Column {
-                                item(
-                                    value,
-                                    state.highlightedIndex == index,
-                                    state.selected == value,
-                                )
+                        isLoading -> {
+                            loading()
+                        }
+
+                        visible.isEmpty() -> {
+                            empty()
+                        }
+
+                        else -> {
+                            visible.forEachIndexed { index, value ->
+                                val itemSource = remember { MutableInteractionSource() }
+                                Box(
+                                    modifier =
+                                        Modifier
+                                            .selectItemSemantics(
+                                                selected = state.selected == value,
+                                                highlighted = state.highlightedIndex == index,
+                                            ).clickable(
+                                                interactionSource = itemSource,
+                                                indication = null,
+                                                onClick = {
+                                                    state.select(value)
+                                                    onSelected?.invoke(value)
+                                                },
+                                            ),
+                                ) {
+                                    Column {
+                                        item(
+                                            value,
+                                            state.highlightedIndex == index,
+                                            state.selected == value,
+                                        )
+                                    }
+                                }
                             }
                         }
-                    }
                     }
                 }
             }

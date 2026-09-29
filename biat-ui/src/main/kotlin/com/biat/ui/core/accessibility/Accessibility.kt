@@ -26,15 +26,19 @@ fun Modifier.menuItemSemantics(
     label: String? = null,
     selected: Boolean = false,
     enabled: Boolean = true,
-): Modifier = this.semantics(mergeDescendants = false) {
-    role = Role.Button
-    this.selected = selected
-    if (!enabled) disabled()
-    if (label != null) contentDescription = label
-}
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Button
+        this.selected = selected
+        if (!enabled) disabled()
+        if (label != null) contentDescription = label
+    }
 
 /** Semantics for tabs. */
-fun Modifier.tabSemantics(selected: Boolean, label: String? = null): Modifier =
+fun Modifier.tabSemantics(
+    selected: Boolean,
+    label: String? = null,
+): Modifier =
     this.semantics(mergeDescendants = false) {
         role = Role.Tab
         this.selected = selected
@@ -57,7 +61,10 @@ fun Modifier.tooltipAnchorSemantics(tip: String): Modifier =
  * Semantics for collapsible triggers. Announces the trigger label plus
  * expanded state for screen readers.
  */
-fun Modifier.collapsibleTriggerSemantics(expanded: Boolean, label: String? = null): Modifier =
+fun Modifier.collapsibleTriggerSemantics(
+    expanded: Boolean,
+    label: String? = null,
+): Modifier =
     this.semantics(mergeDescendants = false) {
         role = Role.Button
         this.selected = expanded
@@ -73,12 +80,13 @@ fun Modifier.accordionTriggerSemantics(
     expanded: Boolean,
     label: String? = null,
     type: String = "Accordion item",
-): Modifier = this.semantics(mergeDescendants = false) {
-    role = Role.Button
-    this.selected = expanded
-    stateDescription = if (expanded) "Expanded" else "Collapsed"
-    contentDescription = listOfNotNull(type, label).joinToString(": ")
-}
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Button
+        this.selected = expanded
+        stateDescription = if (expanded) "Expanded" else "Collapsed"
+        contentDescription = listOfNotNull(type, label).joinToString(": ")
+    }
 
 /**
  * Semantics for a headless checkbox. The announcement covers
@@ -89,17 +97,19 @@ fun Modifier.checkboxSemantics(
     indeterminate: Boolean = false,
     enabled: Boolean = true,
     label: String? = null,
-): Modifier = this.semantics(mergeDescendants = false) {
-    role = Role.Checkbox
-    this.selected = checked
-    stateDescription = when {
-        indeterminate -> "Indeterminate"
-        checked -> "Checked"
-        else -> "Unchecked"
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Checkbox
+        this.selected = checked
+        stateDescription =
+            when {
+                indeterminate -> "Indeterminate"
+                checked -> "Checked"
+                else -> "Unchecked"
+            }
+        if (!enabled) disabled()
+        if (label != null) contentDescription = label
     }
-    if (!enabled) disabled()
-    if (label != null) contentDescription = label
-}
 
 /**
  * Semantics for a headless switch. Announces on/off plus the caller label.
@@ -108,13 +118,14 @@ fun Modifier.switchSemantics(
     checked: Boolean,
     enabled: Boolean = true,
     label: String? = null,
-): Modifier = this.semantics(mergeDescendants = false) {
-    role = Role.Switch
-    this.selected = checked
-    stateDescription = if (checked) "On" else "Off"
-    if (!enabled) disabled()
-    if (label != null) contentDescription = label
-}
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Switch
+        this.selected = checked
+        stateDescription = if (checked) "On" else "Off"
+        if (!enabled) disabled()
+        if (label != null) contentDescription = label
+    }
 
 /** Semantics for radio group containers. */
 fun Modifier.radioGroupSemantics(label: String? = null): Modifier =
@@ -129,12 +140,14 @@ fun Modifier.radioItemSemantics(
     selected: Boolean,
     enabled: Boolean = true,
     label: String? = null,
-): Modifier = this.semantics(mergeDescendants = false) {
-    role = Role.RadioButton
-    this.selected = selected
-    if (!enabled) disabled()
-    if (label != null) contentDescription = label
-}
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.RadioButton
+        this.selected = selected
+        if (!enabled) disabled()
+        if (label != null) contentDescription = label
+    }
+
 /**
  * Semantics for a headless toggle button. Announces pressed state.
  */
@@ -142,13 +155,14 @@ fun Modifier.toggleSemantics(
     pressed: Boolean,
     enabled: Boolean = true,
     label: String? = null,
-): Modifier = this.semantics(mergeDescendants = false) {
-    role = Role.Button
-    this.selected = pressed
-    stateDescription = if (pressed) "Pressed" else "Not pressed"
-    if (!enabled) disabled()
-    if (label != null) contentDescription = label
-}
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Button
+        this.selected = pressed
+        stateDescription = if (pressed) "Pressed" else "Not pressed"
+        if (!enabled) disabled()
+        if (label != null) contentDescription = label
+    }
 
 /**
  * Semantics for a headless slider. Announces value text plus caller label.
@@ -158,11 +172,12 @@ fun Modifier.sliderSemantics(
     valueText: String? = null,
     enabled: Boolean = true,
     label: String? = null,
-): Modifier = this.semantics(mergeDescendants = false) {
-    stateDescription = valueText ?: value.toString()
-    if (!enabled) disabled()
-    if (label != null) contentDescription = label
-}
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        stateDescription = valueText ?: value.toString()
+        if (!enabled) disabled()
+        if (label != null) contentDescription = label
+    }
 
 /** Semantics for a toolbar container. */
 fun Modifier.toolbarSemantics(label: String? = null): Modifier =
@@ -174,11 +189,12 @@ fun Modifier.toolbarSemantics(label: String? = null): Modifier =
 fun Modifier.toolbarItemSemantics(
     enabled: Boolean = true,
     label: String? = null,
-): Modifier = this.semantics(mergeDescendants = false) {
-    role = Role.Button
-    if (!enabled) disabled()
-    if (label != null) contentDescription = label
-}
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Button
+        if (!enabled) disabled()
+        if (label != null) contentDescription = label
+    }
 
 /** Semantics for a toggle-group container. */
 fun Modifier.toggleGroupSemantics(label: String? = null): Modifier =
@@ -193,15 +209,17 @@ fun Modifier.toggleGroupSemantics(label: String? = null): Modifier =
 fun Modifier.separatorSemantics(
     decorative: Boolean = true,
     vertical: Boolean = false,
-): Modifier = this.semantics(mergeDescendants = false) {
-    stateDescription = if (decorative) {
-        "Separator"
-    } else if (vertical) {
-        "Vertical separator"
-    } else {
-        "Horizontal separator"
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        stateDescription =
+            if (decorative) {
+                "Separator"
+            } else if (vertical) {
+                "Vertical separator"
+            } else {
+                "Horizontal separator"
+            }
     }
-}
 
 /** Semantics for a field label naming [controlLabel] for screen readers. */
 fun Modifier.labelSemantics(controlLabel: String? = null): Modifier =
@@ -220,7 +238,10 @@ fun Modifier.avatarSemantics(label: String? = null): Modifier =
  * Semantics for a select trigger. Announces the dropdown role plus
  * expanded/collapsed state so screen readers know the listbox is open.
  */
-fun Modifier.selectTriggerSemantics(expanded: Boolean, label: String? = null): Modifier =
+fun Modifier.selectTriggerSemantics(
+    expanded: Boolean,
+    label: String? = null,
+): Modifier =
     this.semantics(mergeDescendants = false) {
         role = Role.DropdownList
         stateDescription = if (expanded) "Expanded" else "Collapsed"
@@ -235,18 +256,22 @@ fun Modifier.selectItemSemantics(
     selected: Boolean,
     highlighted: Boolean = false,
     label: String? = null,
-): Modifier = this.semantics(mergeDescendants = false) {
-    role = Role.Button
-    this.selected = selected
-    if (highlighted) stateDescription = "Highlighted"
-    if (label != null) contentDescription = label
-}
+): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Button
+        this.selected = selected
+        if (highlighted) stateDescription = "Highlighted"
+        if (label != null) contentDescription = label
+    }
 
 /**
  * Semantics for menu and popover triggers. Announces a button with the
  * caller label plus expanded state while the overlay is open.
  */
-fun Modifier.overlayTriggerSemantics(expanded: Boolean, label: String? = null): Modifier =
+fun Modifier.overlayTriggerSemantics(
+    expanded: Boolean,
+    label: String? = null,
+): Modifier =
     this.semantics(mergeDescendants = false) {
         role = Role.Button
         stateDescription = if (expanded) "Expanded" else "Collapsed"

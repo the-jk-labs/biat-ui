@@ -44,9 +44,10 @@ fun rememberRadioGroupState(
     initialSelected: Any? = null,
     enabled: Boolean = true,
     onSelectedChange: ((Any?) -> Unit)? = null,
-): RadioGroupState = remember {
-    RadioGroupState(initialSelected = initialSelected, enabled = enabled)
-}.apply {
-    this.enabled = enabled
-    this.onSelectedChange = onSelectedChange
-}
+): RadioGroupState =
+    remember {
+        RadioGroupState(initialSelected = initialSelected, enabled = enabled)
+    }.apply {
+        this.enabled = enabled
+        this.onSelectedChange = onSelectedChange
+    }

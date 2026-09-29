@@ -64,13 +64,14 @@ fun Sheet(
         val returnRequester = rememberFocusReturnRequester()
         FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
         Box(
-            modifier = Modifier
-                .focusRequester(returnRequester)
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    onClick = { state.open() },
-                ),
+            modifier =
+                Modifier
+                    .focusRequester(returnRequester)
+                    .clickable(
+                        interactionSource = source,
+                        indication = null,
+                        onClick = { state.open() },
+                    ),
         ) {
             trigger()
         }
@@ -94,40 +95,41 @@ fun Sheet(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .let { m ->
-                        if (dismissOnOutsideClick) {
-                            m.outsideClick(
-                                onOutsideClick = { state.close() },
-                                isInsideContent = { offset ->
-                                    contentBounds?.contains(offset) == true
-                                },
-                            )
-                        } else {
-                            m
-                        }
-                    },
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .let { m ->
+                            if (dismissOnOutsideClick) {
+                                m.outsideClick(
+                                    onOutsideClick = { state.close() },
+                                    isInsideContent = { offset ->
+                                        contentBounds?.contains(offset) == true
+                                    },
+                                )
+                            } else {
+                                m
+                            }
+                        },
             ) {
                 scrim?.invoke(this)
             }
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .onGloballyPositioned { contentBounds = it.boundsInParent() }
-                    .consumeOverlayTaps()
-                    .dialogSemantics(label)
-                    .focusTrap(
-                        active = true,
-                        trapRequester = trapRequester,
-                        focusManager = focusManager,
-                        trapState = trapState,
-                        onEscape = if (dismissOnEscape) ({ state.close() }) else null,
-                    )
-                    .let { m ->
-                        if (dismissOnEscape) m.onEscape { state.close() } else m
-                    },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .onGloballyPositioned { contentBounds = it.boundsInParent() }
+                        .consumeOverlayTaps()
+                        .dialogSemantics(label)
+                        .focusTrap(
+                            active = true,
+                            trapRequester = trapRequester,
+                            focusManager = focusManager,
+                            trapState = trapState,
+                            onEscape = if (dismissOnEscape) ({ state.close() }) else null,
+                        ).let { m ->
+                            if (dismissOnEscape) m.onEscape { state.close() } else m
+                        },
                 contentAlignment = Alignment.BottomCenter,
             ) {
                 content()

@@ -57,6 +57,7 @@ class SelectState<T>(
     var controlledQuery: String? by mutableStateOf(controlledQuery)
 
     val isOpen: Boolean get() = controlledOpen ?: internalOpen
+
     /** Current filter text. Empty means no filtering. */
     val query: String get() = controlledQuery ?: internalQuery
     var selected: T? by mutableStateOf(initialSelected)
@@ -65,10 +66,12 @@ class SelectState<T>(
         internal set
 
     fun open() = setOpen(true)
+
     fun close() {
         highlightedIndex = -1
         setOpen(false)
     }
+
     fun toggle() {
         if (isOpen) close() else open()
     }
@@ -118,13 +121,17 @@ class SelectState<T>(
      * around. From no-highlight (-1) Down lands on the first option and Up
      * on the last. No-op when [size] is not positive.
      */
-    fun moveHighlight(delta: Int, size: Int) {
+    fun moveHighlight(
+        delta: Int,
+        size: Int,
+    ) {
         if (size <= 0) return
-        highlightedIndex = if (highlightedIndex < 0) {
-            if (delta > 0) 0 else size - 1
-        } else {
-            (highlightedIndex + delta).mod(size)
-        }
+        highlightedIndex =
+            if (highlightedIndex < 0) {
+                if (delta > 0) 0 else size - 1
+            } else {
+                (highlightedIndex + delta).mod(size)
+            }
     }
 
     /** Jumps highlight to the first visible option. No-op when empty. */
@@ -170,9 +177,12 @@ class SelectState<T>(
     ): Boolean {
         if (options.isEmpty() || input.isEmpty()) return false
         val size = options.size
-        val start = if (highlightedIndex < 0) 0 else {
-            (highlightedIndex + 1) % size
-        }
+        val start =
+            if (highlightedIndex < 0) {
+                0
+            } else {
+                (highlightedIndex + 1) % size
+            }
         for (step in 0 until size) {
             val index = (start + step) % size
             if (toDisplay(options[index]).startsWith(input, ignoreCase = true)) {
@@ -194,16 +204,17 @@ fun <T> rememberSelectState(
     onOpenChange: ((Boolean) -> Unit)? = null,
     onSelectedChange: ((T?) -> Unit)? = null,
     onQueryChange: ((String) -> Unit)? = null,
-): SelectState<T> = remember {
-    SelectState<T>(
-        initialOpen = initialOpen,
-        initialSelected = initialSelected,
-        initialQuery = initialQuery,
-    )
-}.apply {
-    this.controlledOpen = controlledOpen
-    this.onOpenChange = onOpenChange
-    this.onSelectedChange = onSelectedChange
-    this.controlledQuery = controlledQuery
-    this.onQueryChange = onQueryChange
-}
+): SelectState<T> =
+    remember {
+        SelectState<T>(
+            initialOpen = initialOpen,
+            initialSelected = initialSelected,
+            initialQuery = initialQuery,
+        )
+    }.apply {
+        this.controlledOpen = controlledOpen
+        this.onOpenChange = onOpenChange
+        this.onSelectedChange = onSelectedChange
+        this.controlledQuery = controlledQuery
+        this.onQueryChange = onQueryChange
+    }

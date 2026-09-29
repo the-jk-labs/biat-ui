@@ -17,7 +17,10 @@ import com.biat.ui.core.state.rememberRadioGroupState
  * Caller key for one radio item. [value] drives [RadioGroupState] selection;
  * [label] is announced on the item for screen readers.
  */
-data class RadioGroupValue<T>(val value: T, val label: String)
+data class RadioGroupValue<T>(
+    val value: T,
+    val label: String,
+)
 
 /**
  * Headless RadioGroup. Behavior only, zero styling.
@@ -63,14 +66,15 @@ fun RadioItem(
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier
-            .radioItemSemantics(selected = selected, enabled = enabled, label = label)
-            .clickable(
-                interactionSource = source,
-                indication = null,
-                enabled = enabled,
-                onClick = onSelect,
-            ),
+        modifier =
+            Modifier
+                .radioItemSemantics(selected = selected, enabled = enabled, label = label)
+                .clickable(
+                    interactionSource = source,
+                    indication = null,
+                    enabled = enabled,
+                    onClick = onSelect,
+                ),
     ) {
         content()
     }
@@ -80,7 +84,9 @@ fun RadioItem(
  * Scope for [RadioGroupContent]: item rows bound to a shared [state].
  * Prefer [RadioGroup] for flat lists; use this only for custom layouts.
  */
-class RadioGroupScope internal constructor(private val state: RadioGroupState) {
+class RadioGroupScope internal constructor(
+    private val state: RadioGroupState,
+) {
     @Composable
     fun <T> Item(
         item: RadioGroupValue<T>,

@@ -39,7 +39,11 @@ enum class TabMove {
  * Pure tab-index math: [Next]/[Previous] wrap around, [First]/[Last] jump.
  * Out-of-range [current] is clamped. [size] must be positive.
  */
-fun resolveTabIndex(current: Int, size: Int, move: TabMove): Int {
+fun resolveTabIndex(
+    current: Int,
+    size: Int,
+    move: TabMove,
+): Int {
     require(size > 0) { "tabs must not be empty" }
     val safe = current.coerceIn(0, size - 1)
     return when (move) {
@@ -54,8 +58,9 @@ fun resolveTabIndex(current: Int, size: Int, move: TabMove): Int {
 fun rememberTabsState(
     initialSelected: Any? = null,
     onSelectedChange: ((Any?) -> Unit)? = null,
-): TabsState = remember {
-    TabsState(initialSelected)
-}.apply {
-    this.onSelectedChange = onSelectedChange
-}
+): TabsState =
+    remember {
+        TabsState(initialSelected)
+    }.apply {
+        this.onSelectedChange = onSelectedChange
+    }

@@ -57,11 +57,12 @@ class AccordionState(
                 onOpenChange?.invoke(openValues)
             }
         } else {
-            openValues = if (isOpen(value)) {
-                openValues.filterNot { it == value }
-            } else {
-                openValues + value
-            }
+            openValues =
+                if (isOpen(value)) {
+                    openValues.filterNot { it == value }
+                } else {
+                    openValues + value
+                }
             onOpenChange?.invoke(openValues)
         }
     }
@@ -86,12 +87,13 @@ fun rememberAccordionState(
     type: AccordionType = AccordionType.Single,
     collapsible: Boolean = true,
     onOpenChange: ((List<Any?>) -> Unit)? = null,
-): AccordionState = remember {
-    AccordionState(
-        initialValues = initialValues,
-        type = type,
-        collapsible = collapsible,
-    )
-}.apply {
-    this.onOpenChange = onOpenChange
-}
+): AccordionState =
+    remember {
+        AccordionState(
+            initialValues = initialValues,
+            type = type,
+            collapsible = collapsible,
+        )
+    }.apply {
+        this.onOpenChange = onOpenChange
+    }

@@ -64,10 +64,12 @@ class MenuState(
         internal set
 
     fun open() = setOpen(true)
+
     fun close() {
         highlightedIndex = -1
         setOpen(false)
     }
+
     fun toggle() {
         if (isOpen) close() else open()
     }
@@ -102,11 +104,12 @@ class MenuState(
         }
         var next = highlightedIndex
         repeat(itemCount) {
-            next = if (next < 0) {
-                if (delta > 0) 0 else itemCount - 1
-            } else {
-                (next + delta).mod(itemCount)
-            }
+            next =
+                if (next < 0) {
+                    if (delta > 0) 0 else itemCount - 1
+                } else {
+                    (next + delta).mod(itemCount)
+                }
             if (isEnabled(next)) {
                 highlightedIndex = next
                 return
@@ -135,15 +138,16 @@ fun rememberMenuState(
     disabledIndices: Set<Int> = emptySet(),
     controlledOpen: Boolean? = null,
     onOpenChange: ((Boolean) -> Unit)? = null,
-): MenuState = remember {
-    MenuState(
-        initialOpen = initialOpen,
-        itemCount = itemCount,
-        disabledIndices = disabledIndices,
-    )
-}.apply {
-    this.itemCount = itemCount
-    this.disabledIndices = disabledIndices
-    this.controlledOpen = controlledOpen
-    this.onOpenChange = onOpenChange
-}
+): MenuState =
+    remember {
+        MenuState(
+            initialOpen = initialOpen,
+            itemCount = itemCount,
+            disabledIndices = disabledIndices,
+        )
+    }.apply {
+        this.itemCount = itemCount
+        this.disabledIndices = disabledIndices
+        this.controlledOpen = controlledOpen
+        this.onOpenChange = onOpenChange
+    }

@@ -22,12 +22,10 @@ import org.junit.Test
  * clicks while still reporting itself disabled.
  */
 class BitsParityToggleTest {
-
     @get:Rule
     val rule = createComposeRule()
 
-    private fun node(label: String) =
-        rule.onNodeWithContentDescription(label, useUnmergedTree = true)
+    private fun node(label: String) = rule.onNodeWithContentDescription(label, useUnmergedTree = true)
 
     @Test
     fun checkbox_clickChecksAndAnnouncesSelected() {

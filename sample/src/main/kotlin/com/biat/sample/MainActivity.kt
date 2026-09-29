@@ -31,8 +31,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.biat.ui.core.positioning.PopupAlign
 import com.biat.ui.core.positioning.PopupSide
 import com.biat.ui.core.state.AccordionType
@@ -87,6 +85,8 @@ import com.biat.ui.primitives.togglegroup.ToggleGroupValue
 import com.biat.ui.primitives.toolbar.Toolbar
 import com.biat.ui.primitives.toolbar.ToolbarValue
 import com.biat.ui.primitives.tooltip.Tooltip
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,10 +103,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SampleApp() {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         DialogDemo()
@@ -137,12 +138,16 @@ fun SampleApp() {
 }
 
 @Composable
-private fun DemoCard(title: String, content: @Composable () -> Unit) {
+private fun DemoCard(
+    title: String,
+    content: @Composable () -> Unit,
+) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFFF1F1F1))
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(Color(0xFFF1F1F1))
+                .padding(16.dp),
     ) {
         BasicText(title)
         Spacer(Modifier.height(8.dp))
@@ -153,9 +158,10 @@ private fun DemoCard(title: String, content: @Composable () -> Unit) {
 @Composable
 private fun DemoButton(label: String) {
     Box(
-        modifier = Modifier
-            .background(Color.Black)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+        modifier =
+            Modifier
+                .background(Color.Black)
+                .padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
         BasicText(label, style = TextStyle(color = Color.White))
     }
@@ -243,10 +249,11 @@ private fun DialogDepthDemo() {
 @Composable
 private fun ControlledDialogDemo() {
     var open by remember { mutableStateOf(false) }
-    val state = rememberDialogState(
-        controlledOpen = open,
-        onOpenChange = { open = it },
-    )
+    val state =
+        rememberDialogState(
+            controlledOpen = open,
+            onOpenChange = { open = it },
+        )
     DemoCard("Controlled dialog (open: $open)") {
         Dialog(
             state = state,
@@ -391,14 +398,22 @@ private fun MenuDepthDemo() {
                 MenuItem(
                     state = subState,
                     label = "Copy link",
-                    onSelect = { chosen = "Copy link"; subState.close(); state.close() },
+                    onSelect = {
+                        chosen = "Copy link"
+                        subState.close()
+                        state.close()
+                    },
                 ) {
                     MenuRow("Copy link")
                 }
                 MenuItem(
                     state = subState,
                     label = "Email",
-                    onSelect = { chosen = "Email"; subState.close(); state.close() },
+                    onSelect = {
+                        chosen = "Email"
+                        subState.close()
+                        state.close()
+                    },
                 ) {
                     MenuRow("Email")
                 }
@@ -535,8 +550,7 @@ private fun ComboboxDemo() {
                             allOptions = listOf("Kotlin", "Java", "Rust", "Go")
                             loading = false
                         }
-                    }
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                    }.padding(horizontal = 16.dp, vertical = 10.dp),
             ) {
                 BasicText("Reload async", style = TextStyle(color = Color.White))
             }
@@ -547,8 +561,7 @@ private fun ComboboxDemo() {
                         .clickable {
                             state.clearSelection()
                             state.clearQuery()
-                        }
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                        }.padding(horizontal = 16.dp, vertical = 10.dp),
                 ) {
                     BasicText("Clear", style = TextStyle(color = Color.White))
                 }
@@ -590,11 +603,12 @@ private fun TabsDemo() {
 private fun TabsDepthDemo() {
     val manual = rememberTabsState(initialSelected = "a")
     val vertical = rememberTabsState(initialSelected = "b")
-    val tabs = listOf(
-        TabValue("a", "Account"),
-        TabValue("b", "Password"),
-        TabValue("c", "Billing"),
-    )
+    val tabs =
+        listOf(
+            TabValue("a", "Account"),
+            TabValue("b", "Password"),
+            TabValue("c", "Billing"),
+        )
     DemoCard("Tabs depth (manual + vertical)") {
         BasicText("Manual: arrows move focus, Enter selects")
         Tabs(
@@ -670,11 +684,12 @@ private fun SheetDepthDemo() {
             trigger = { DemoButton("Open depth sheet") },
             scrim = { Box(Modifier.fillMaxSize().background(Color(0x88000000))) },
         ) {
-            val height = when (state.detent) {
-                SheetDetent.Peek -> 160.dp
-                SheetDetent.Half -> 320.dp
-                SheetDetent.Full -> 520.dp
-            }
+            val height =
+                when (state.detent) {
+                    SheetDetent.Peek -> 160.dp
+                    SheetDetent.Half -> 320.dp
+                    SheetDetent.Full -> 520.dp
+                }
             Box(
                 Modifier
                     .fillMaxWidth()
@@ -718,10 +733,11 @@ private fun CollapsibleDemo() {
 @Composable
 private fun AccordionDemo() {
     val state = rememberAccordionState(type = AccordionType.Multiple)
-    val items = listOf(
-        AccordionValue("a", "First"),
-        AccordionValue("b", "Second"),
-    )
+    val items =
+        listOf(
+            AccordionValue("a", "First"),
+            AccordionValue("b", "Second"),
+        )
     DemoCard("Accordion (${state.openValues.size} open)") {
         Accordion(
             state = state,
@@ -767,10 +783,11 @@ private fun RadioGroupDemo() {
     DemoCard("RadioGroup (${state.selectedValue})") {
         RadioGroup(
             state = state,
-            options = listOf(
-                RadioGroupValue("a", "Alpha"),
-                RadioGroupValue("b", "Beta"),
-            ),
+            options =
+                listOf(
+                    RadioGroupValue("a", "Alpha"),
+                    RadioGroupValue("b", "Beta"),
+                ),
             item = { item, selected ->
                 Box(
                     Modifier
@@ -816,10 +833,11 @@ private fun ToggleGroupDemo() {
     DemoCard("ToggleGroup (${state.pressedValues})") {
         ToggleGroup(
             state = state,
-            items = listOf(
-                ToggleGroupValue("bold", "Bold"),
-                ToggleGroupValue("italic", "Italic"),
-            ),
+            items =
+                listOf(
+                    ToggleGroupValue("bold", "Bold"),
+                    ToggleGroupValue("italic", "Italic"),
+                ),
             item = { entry, pressed ->
                 Box(
                     Modifier
@@ -838,11 +856,12 @@ private fun ToolbarDemo() {
     var activated by remember { mutableStateOf("none") }
     DemoCard("Toolbar (activated: $activated)") {
         Toolbar(
-            items = listOf(
-                ToolbarValue("cut", "Cut"),
-                ToolbarValue("copy", "Copy"),
-                ToolbarValue("paste", "Paste"),
-            ),
+            items =
+                listOf(
+                    ToolbarValue("cut", "Cut"),
+                    ToolbarValue("copy", "Copy"),
+                    ToolbarValue("paste", "Paste"),
+                ),
             label = "Editor",
             onActivate = { activated = it as String },
             item = { entry, focused ->

@@ -36,7 +36,9 @@ class CollapsibleState(
     val isExpanded: Boolean get() = controlledExpanded ?: internalExpanded
 
     fun expand() = setExpanded(true)
+
     fun collapse() = setExpanded(false)
+
     fun toggle() = setExpanded(!isExpanded)
 
     fun setExpanded(expanded: Boolean) {
@@ -55,9 +57,10 @@ fun rememberCollapsibleState(
     initialExpanded: Boolean = false,
     controlledExpanded: Boolean? = null,
     onExpandedChange: ((Boolean) -> Unit)? = null,
-): CollapsibleState = remember {
-    CollapsibleState(initialExpanded = initialExpanded)
-}.apply {
-    this.controlledExpanded = controlledExpanded
-    this.onExpandedChange = onExpandedChange
-}
+): CollapsibleState =
+    remember {
+        CollapsibleState(initialExpanded = initialExpanded)
+    }.apply {
+        this.controlledExpanded = controlledExpanded
+        this.onExpandedChange = onExpandedChange
+    }

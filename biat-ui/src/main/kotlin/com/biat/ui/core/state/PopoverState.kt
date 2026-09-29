@@ -36,7 +36,9 @@ class PopoverState(
     val isOpen: Boolean get() = controlledOpen ?: internalOpen
 
     fun open() = setOpen(true)
+
     fun close() = setOpen(false)
+
     fun toggle() = setOpen(!isOpen)
 
     @JvmName("setOpenState")
@@ -56,9 +58,10 @@ fun rememberPopoverState(
     initialOpen: Boolean = false,
     controlledOpen: Boolean? = null,
     onOpenChange: ((Boolean) -> Unit)? = null,
-): PopoverState = remember {
-    PopoverState(initialOpen = initialOpen)
-}.apply {
-    this.controlledOpen = controlledOpen
-    this.onOpenChange = onOpenChange
-}
+): PopoverState =
+    remember {
+        PopoverState(initialOpen = initialOpen)
+    }.apply {
+        this.controlledOpen = controlledOpen
+        this.onOpenChange = onOpenChange
+    }

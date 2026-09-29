@@ -61,11 +61,12 @@ class RovingFocusState(
     fun move(delta: Int) {
         if (itemCount == 0) return
         val next = currentIndex + delta
-        currentIndex = if (loop) {
-            next.mod(itemCount)
-        } else {
-            next.coerceIn(0, itemCount - 1)
-        }
+        currentIndex =
+            if (loop) {
+                next.mod(itemCount)
+            } else {
+                next.coerceIn(0, itemCount - 1)
+            }
         requesters.getOrNull(currentIndex)?.safeRequestFocus()
     }
 
@@ -88,13 +89,14 @@ fun rememberRovingFocusState(
     initialIndex: Int = 0,
     loop: Boolean = true,
     orientation: RovingFocusState.Orientation = RovingFocusState.Orientation.Vertical,
-): RovingFocusState = remember {
-    RovingFocusState(itemCount, initialIndex, loop, orientation)
-}.apply {
-    this.itemCount = itemCount
-    this.loop = loop
-    this.orientation = orientation
-}
+): RovingFocusState =
+    remember {
+        RovingFocusState(itemCount, initialIndex, loop, orientation)
+    }.apply {
+        this.itemCount = itemCount
+        this.loop = loop
+        this.orientation = orientation
+    }
 
 /**
  * Key handling for a roving container. Attach to the container.
@@ -104,25 +106,79 @@ fun Modifier.rovingKeys(
     state: RovingFocusState,
     onSelectCurrent: (() -> Unit)? = null,
     onEscape: (() -> Unit)? = null,
-): Modifier = this.onPreviewKeyEvent { event ->
-    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-    val vertical = state.orientation != RovingFocusState.Orientation.Horizontal
-    val horizontal = state.orientation != RovingFocusState.Orientation.Vertical
-    when (event.key) {
-        Key.DirectionDown -> if (vertical) { state.move(1); true } else false
-        Key.DirectionUp -> if (vertical) { state.move(-1); true } else false
-        Key.DirectionRight -> if (horizontal) { state.move(1); true } else false
-        Key.DirectionLeft -> if (horizontal) { state.move(-1); true } else false
-        Key.MoveHome -> { state.moveTo(0); true }
-        Key.MoveEnd -> { state.moveTo(state.itemCount - 1); true }
-        Key.Enter, Key.NumPadEnter -> { onSelectCurrent?.invoke(); onSelectCurrent != null }
-        Key.Escape -> { onEscape?.invoke(); onEscape != null }
-        else -> false
+): Modifier =
+    this.onPreviewKeyEvent { event ->
+        if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+        val vertical = state.orientation != RovingFocusState.Orientation.Horizontal
+        val horizontal = state.orientation != RovingFocusState.Orientation.Vertical
+        when (event.key) {
+            Key.DirectionDown -> {
+                if (vertical) {
+                    state.move(1)
+                    true
+                } else {
+                    false
+                }
+            }
+
+            Key.DirectionUp -> {
+                if (vertical) {
+                    state.move(-1)
+                    true
+                } else {
+                    false
+                }
+            }
+
+            Key.DirectionRight -> {
+                if (horizontal) {
+                    state.move(1)
+                    true
+                } else {
+                    false
+                }
+            }
+
+            Key.DirectionLeft -> {
+                if (horizontal) {
+                    state.move(-1)
+                    true
+                } else {
+                    false
+                }
+            }
+
+            Key.MoveHome -> {
+                state.moveTo(0)
+                true
+            }
+
+            Key.MoveEnd -> {
+                state.moveTo(state.itemCount - 1)
+                true
+            }
+
+            Key.Enter, Key.NumPadEnter -> {
+                onSelectCurrent?.invoke()
+                onSelectCurrent != null
+            }
+
+            Key.Escape -> {
+                onEscape?.invoke()
+                onEscape != null
+            }
+
+            else -> {
+                false
+            }
+        }
     }
-}
 
 /** Attach to item at [index] so roving state can request focus on it. */
-fun Modifier.rovingItem(state: RovingFocusState, index: Int): Modifier {
+fun Modifier.rovingItem(
+    state: RovingFocusState,
+    index: Int,
+): Modifier {
     val requester = state.requesters.getOrNull(index) ?: return this
     return this.focusRequester(requester)
 }

@@ -44,8 +44,9 @@ class AvatarState(
 fun rememberAvatarState(
     initialStatus: AvatarStatus = AvatarStatus.Loading,
     onStatusChange: ((AvatarStatus) -> Unit)? = null,
-): AvatarState = remember {
-    AvatarState(initialStatus = initialStatus)
-}.apply {
-    this.onStatusChange = onStatusChange
-}
+): AvatarState =
+    remember {
+        AvatarState(initialStatus = initialStatus)
+    }.apply {
+        this.onStatusChange = onStatusChange
+    }

@@ -109,17 +109,18 @@ fun rememberSliderState(
     step: Float = 0f,
     enabled: Boolean = true,
     onValueChange: ((Float) -> Unit)? = null,
-): SliderState = remember {
-    SliderState(
-        initialValue = initialValue,
-        enabled = enabled,
-    )
-}.apply {
-    updateConfig(valueRange, step)
-    this.controlledValue = controlledValue
-    this.enabled = enabled
-    this.onValueChange = onValueChange
-}
+): SliderState =
+    remember {
+        SliderState(
+            initialValue = initialValue,
+            enabled = enabled,
+        )
+    }.apply {
+        updateConfig(valueRange, step)
+        this.controlledValue = controlledValue
+        this.enabled = enabled
+        this.onValueChange = onValueChange
+    }
 
 /** Clamp [value] into [range] then snap to the [step] grid. Pure. */
 fun coerceAndSnap(
@@ -134,17 +135,22 @@ fun coerceAndSnap(
 }
 
 /** Map [value] to 0..1 within [range]. Pure. */
-fun valueToFraction(value: Float, range: ClosedFloatingPointRange<Float>): Float {
+fun valueToFraction(
+    value: Float,
+    range: ClosedFloatingPointRange<Float>,
+): Float {
     val size = range.endInclusive - range.start
     if (size <= 0f) return 0f
     return ((value - range.start) / size).coerceIn(0f, 1f)
 }
 
 /** Map 0..1 [fraction] to a value within [range]. Pure. */
-fun fractionToValue(fraction: Float, range: ClosedFloatingPointRange<Float>): Float {
+fun fractionToValue(
+    fraction: Float,
+    range: ClosedFloatingPointRange<Float>,
+): Float {
     val size = range.endInclusive - range.start
     return range.start + fraction.coerceIn(0f, 1f) * size
 }
 
-private fun rangeSize(range: ClosedFloatingPointRange<Float>): Float =
-    (range.endInclusive - range.start).coerceAtLeast(0f)
+private fun rangeSize(range: ClosedFloatingPointRange<Float>): Float = (range.endInclusive - range.start).coerceAtLeast(0f)

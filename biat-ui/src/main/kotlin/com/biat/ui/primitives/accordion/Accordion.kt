@@ -17,7 +17,10 @@ import com.biat.ui.core.state.rememberAccordionState
  * Caller key for one accordion item. [value] drives [AccordionState] open
  * membership; [label] is announced on the trigger for screen readers.
  */
-data class AccordionValue<T>(val value: T, val label: String)
+data class AccordionValue<T>(
+    val value: T,
+    val label: String,
+)
 
 /**
  * Headless Accordion. Behavior only, zero styling.
@@ -56,13 +59,14 @@ fun <T> AccordionItem(
     Column {
         val source = remember(item.value) { MutableInteractionSource() }
         Box(
-            modifier = Modifier
-                .accordionTriggerSemantics(expanded = expanded, label = item.label)
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    onClick = { state.select(item.value as Any?) },
-                ),
+            modifier =
+                Modifier
+                    .accordionTriggerSemantics(expanded = expanded, label = item.label)
+                    .clickable(
+                        interactionSource = source,
+                        indication = null,
+                        onClick = { state.select(item.value as Any?) },
+                    ),
         ) {
             trigger(item, expanded)
         }

@@ -45,17 +45,15 @@ import org.junit.Test
  * ./gradlew :biat-ui:connectedDebugAndroidTest
  */
 class KeyboardNavTest {
-
     @get:Rule
     val rule = createComposeRule()
 
     // Clickable parents merge descendant semantics, hiding test tags from
     // the merged tree. The unmerged tree contains every tagged node, so all
     // finders here use it.
-    private fun node(tag: String) =
-        rule.onNodeWithTag(tag, useUnmergedTree = true)
-    private fun text(value: String) =
-        rule.onNodeWithText(value, useUnmergedTree = true)
+    private fun node(tag: String) = rule.onNodeWithTag(tag, useUnmergedTree = true)
+
+    private fun text(value: String) = rule.onNodeWithText(value, useUnmergedTree = true)
 
     @Test
     fun dialog_escapeCloses() {
@@ -274,7 +272,10 @@ class KeyboardNavTest {
 
 /** Focusable tagged node that grabs focus on launch when [request]. */
 @Composable
-private fun FocusableTag(tag: String, request: Boolean = true) {
+private fun FocusableTag(
+    tag: String,
+    request: Boolean = true,
+) {
     val requester = remember { FocusRequester() }
     if (request) {
         LaunchedEffect(Unit) { requester.requestFocus() }
@@ -325,11 +326,12 @@ private fun SelectHarness(
 
 @Composable
 private fun TabsHarness(state: TabsState) {
-    val tabs = listOf(
-        TabValue("a", "A"),
-        TabValue("b", "B"),
-        TabValue("c", "C"),
-    )
+    val tabs =
+        listOf(
+            TabValue("a", "A"),
+            TabValue("b", "B"),
+            TabValue("c", "C"),
+        )
     Tabs(
         state = state,
         tabs = tabs,

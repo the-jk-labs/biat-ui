@@ -36,30 +36,34 @@ import org.junit.Test
  * ./gradlew :biat-ui:connectedDebugAndroidTest
  */
 class SemanticsTest {
-
     @get:Rule
     val rule = createComposeRule()
 
     // Roles and descriptions live on merged parents (clickable wrappers),
     // not on tagged children. Walk the unmerged tree to find the node that
     // carries them, which is what TalkBack announces.
-    private fun findNode(role: Role? = null, contentDescription: String? = null): SemanticsNode {
+    private fun findNode(
+        role: Role? = null,
+        contentDescription: String? = null,
+    ): SemanticsNode {
         val queue = ArrayDeque<SemanticsNode>()
         queue.add(rule.onRoot(useUnmergedTree = true).fetchSemanticsNode())
         while (queue.isNotEmpty()) {
             val current = queue.removeFirst()
-            val currentRole = if (current.config.contains(SemanticsProperties.Role)) {
-                current.config[SemanticsProperties.Role]
-            } else {
-                null
-            }
-            val descriptions = if (
-                current.config.contains(SemanticsProperties.ContentDescription)
-            ) {
-                current.config[SemanticsProperties.ContentDescription]
-            } else {
-                null
-            } ?: emptyList()
+            val currentRole =
+                if (current.config.contains(SemanticsProperties.Role)) {
+                    current.config[SemanticsProperties.Role]
+                } else {
+                    null
+                }
+            val descriptions =
+                if (
+                    current.config.contains(SemanticsProperties.ContentDescription)
+                ) {
+                    current.config[SemanticsProperties.ContentDescription]
+                } else {
+                    null
+                } ?: emptyList()
             if ((role == null || currentRole == role) &&
                 (contentDescription == null || descriptions.contains(contentDescription))
             ) {
@@ -203,10 +207,11 @@ class SemanticsTest {
 
 @Composable
 private fun TabsHarness(label: String?) {
-    val tabs = listOf(
-        TabValue("a", "A"),
-        TabValue("b", "B"),
-    )
+    val tabs =
+        listOf(
+            TabValue("a", "A"),
+            TabValue("b", "B"),
+        )
     Tabs(
         state = TabsState(initialSelected = "a"),
         tabs = tabs,

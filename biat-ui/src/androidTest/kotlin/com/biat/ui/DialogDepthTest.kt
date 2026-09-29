@@ -14,8 +14,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.click
 import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -35,15 +35,12 @@ import org.junit.Test
  * alert outside-tap immunity, initial-focus target.
  */
 class DialogDepthTest {
-
     @get:Rule
     val rule = createComposeRule()
 
-    private fun node(tag: String) =
-        rule.onNodeWithTag(tag, useUnmergedTree = true)
+    private fun node(tag: String) = rule.onNodeWithTag(tag, useUnmergedTree = true)
 
-    private fun text(value: String) =
-        rule.onNodeWithText(value, useUnmergedTree = true)
+    private fun text(value: String) = rule.onNodeWithText(value, useUnmergedTree = true)
 
     @Test
     fun nested_escClosesInnerOnlyThenOuter() {

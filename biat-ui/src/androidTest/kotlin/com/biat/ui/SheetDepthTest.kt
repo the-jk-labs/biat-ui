@@ -27,12 +27,10 @@ import org.junit.Test
  * detents, drag dismissal, and opt-in behavior without the modifier.
  */
 class SheetDepthTest {
-
     @get:Rule
     val rule = createComposeRule()
 
-    private fun node(tag: String) =
-        rule.onNodeWithTag(tag, useUnmergedTree = true)
+    private fun node(tag: String) = rule.onNodeWithTag(tag, useUnmergedTree = true)
 
     @Test
     fun dragDown_stepsFromHalfToPeek() {
@@ -110,7 +108,10 @@ class SheetDepthTest {
      * Slow vertical swipe across fractions of the drag node height.
      * Slow enough to stay positional (below the fling line).
      */
-    private fun slowSwipe(fromFraction: Float, toFraction: Float) {
+    private fun slowSwipe(
+        fromFraction: Float,
+        toFraction: Float,
+    ) {
         val size = node("drag").fetchSemanticsNode().size
         node("drag").performTouchInput {
             swipe(

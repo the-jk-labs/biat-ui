@@ -32,12 +32,10 @@ import org.junit.Test
  * so exact offsets are not assertable here).
  */
 class TooltipDepthTest {
-
     @get:Rule
     val rule = createComposeRule()
 
-    private fun node(tag: String) =
-        rule.onNodeWithTag(tag, useUnmergedTree = true)
+    private fun node(tag: String) = rule.onNodeWithTag(tag, useUnmergedTree = true)
 
     @Test
     fun longPress_showsOverlay() {

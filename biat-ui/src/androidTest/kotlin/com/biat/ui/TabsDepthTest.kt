@@ -33,12 +33,10 @@ import org.junit.Test
  * Up/Down, and horizontal arrows flip in RTL.
  */
 class TabsDepthTest {
-
     @get:Rule
     val rule = createComposeRule()
 
-    private fun node(tag: String) =
-        rule.onNodeWithTag(tag, useUnmergedTree = true)
+    private fun node(tag: String) = rule.onNodeWithTag(tag, useUnmergedTree = true)
 
     @Test
     fun manual_arrowsMoveFocusWithoutSelecting() {
@@ -118,11 +116,12 @@ private fun TabsDepthHarness(
     orientation: TabsOrientation = TabsOrientation.Horizontal,
     activation: TabsActivation = TabsActivation.Automatic,
 ) {
-    val tabs = listOf(
-        TabValue("a", "A"),
-        TabValue("b", "B"),
-        TabValue("c", "C"),
-    )
+    val tabs =
+        listOf(
+            TabValue("a", "A"),
+            TabValue("b", "B"),
+            TabValue("c", "C"),
+        )
     Tabs(
         state = state,
         tabs = tabs,
@@ -141,7 +140,10 @@ private fun TabsDepthHarness(
 
 /** Focusable tagged node that grabs focus on launch when [request]. */
 @Composable
-private fun FocusableInnerTag(tag: String, request: Boolean) {
+private fun FocusableInnerTag(
+    tag: String,
+    request: Boolean,
+) {
     val requester = remember { FocusRequester() }
     if (request) {
         LaunchedEffect(Unit) { requester.requestFocus() }

@@ -77,67 +77,96 @@ fun Menu(
 
     Box {
         Box(
-            modifier = Modifier
-                .focusRequester(triggerRequester)
-                .overlayTriggerSemantics(expanded = state.isOpen, label = label)
-                .clickable(
-                    interactionSource = triggerSource,
-                    indication = null,
-                    onClick = { state.toggle() },
-                )
-                .onPreviewKeyEvent { event ->
-                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                    when (event.key) {
-                        Key.Enter, Key.NumPadEnter, Key.Spacebar, Key.DirectionDown -> {
-                            if (!state.isOpen) {
-                                state.open()
-                                true
-                            } else false
+            modifier =
+                Modifier
+                    .focusRequester(triggerRequester)
+                    .overlayTriggerSemantics(expanded = state.isOpen, label = label)
+                    .clickable(
+                        interactionSource = triggerSource,
+                        indication = null,
+                        onClick = { state.toggle() },
+                    ).onPreviewKeyEvent { event ->
+                        if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                        when (event.key) {
+                            Key.Enter, Key.NumPadEnter, Key.Spacebar, Key.DirectionDown -> {
+                                if (!state.isOpen) {
+                                    state.open()
+                                    true
+                                } else {
+                                    false
+                                }
+                            }
+
+                            else -> {
+                                false
+                            }
                         }
-                        else -> false
-                    }
-                },
+                    },
         ) {
             trigger()
         }
 
         if (state.isOpen) {
             Popup(
-                popupPositionProvider = rememberBiatPopupPosition(
-                    side = side,
-                    align = align,
-                    sideOffset = sideOffset,
-                    alignOffset = alignOffset,
-                    avoidCollisions = avoidCollisions,
-                ),
+                popupPositionProvider =
+                    rememberBiatPopupPosition(
+                        side = side,
+                        align = align,
+                        sideOffset = sideOffset,
+                        alignOffset = alignOffset,
+                        avoidCollisions = avoidCollisions,
+                    ),
                 onDismissRequest = { state.close() },
-                properties = PopupProperties(
-                    focusable = true,
-                    dismissOnBackPress = true,
-                    dismissOnClickOutside = dismissOnOutsideClick,
-                ),
+                properties =
+                    PopupProperties(
+                        focusable = true,
+                        dismissOnBackPress = true,
+                        dismissOnClickOutside = dismissOnOutsideClick,
+                    ),
             ) {
                 Column(
-                    modifier = Modifier
-                        .menuSemantics(label)
-                        .onPreviewKeyEvent { event ->
-                            if (event.type != KeyEventType.KeyDown) {
-                                return@onPreviewKeyEvent false
-                            }
-                            when (event.key) {
-                                Key.DirectionDown -> { state.moveHighlight(1); true }
-                                Key.DirectionUp -> { state.moveHighlight(-1); true }
-                                Key.MoveHome -> { state.highlight(0); true }
-                                Key.MoveEnd -> { state.highlight(state.itemCount - 1); true }
-                                Key.Escape -> {
-                                    if (dismissOnEscape) {
-                                        state.close()
-                                        true
-                                    } else false
+                    modifier =
+                        Modifier
+                            .menuSemantics(label)
+                            .onPreviewKeyEvent { event ->
+                                if (event.type != KeyEventType.KeyDown) {
+                                    return@onPreviewKeyEvent false
                                 }
-                                else -> false
-                            }
-                        },
+                                when (event.key) {
+                                    Key.DirectionDown -> {
+                                        state.moveHighlight(1)
+                                        true
+                                    }
+
+                                    Key.DirectionUp -> {
+                                        state.moveHighlight(-1)
+                                        true
+                                    }
+
+                                    Key.MoveHome -> {
+                                        state.highlight(0)
+                                        true
+                                    }
+
+                                    Key.MoveEnd -> {
+                                        state.highlight(state.itemCount - 1)
+                                        true
+                                    }
+
+                                    Key.Escape -> {
+                                        if (dismissOnEscape) {
+                                            state.close()
+                                            true
+                                        } else {
+                                            false
+                                        }
+                                    }
+
+                                    else -> {
+                                        false
+                                    }
+                                }
+                            },
                     content = content,
                 )
             }
@@ -162,22 +191,24 @@ fun MenuItem(
     content: @Composable () -> Unit,
 ) {
     val source = remember { MutableInteractionSource() }
-    val semantics = Modifier.menuItemSemantics(
-        label = label,
-        selected = selected,
-        enabled = enabled,
-    )
+    val semantics =
+        Modifier.menuItemSemantics(
+            label = label,
+            selected = selected,
+            enabled = enabled,
+        )
     if (enabled) {
         Box(
-            modifier = semantics
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    onClick = {
-                        onSelect()
-                        state.close()
-                    },
-                ),
+            modifier =
+                semantics
+                    .clickable(
+                        interactionSource = source,
+                        indication = null,
+                        onClick = {
+                            onSelect()
+                            state.close()
+                        },
+                    ),
         ) {
             content()
         }
@@ -193,9 +224,7 @@ fun MenuItem(
  * never focusable, clickable, or counted in [MenuState.itemCount].
  */
 @Composable
-fun MenuSeparator(
-    content: @Composable () -> Unit,
-) {
+fun MenuSeparator(content: @Composable () -> Unit) {
     Box {
         content()
     }
@@ -216,18 +245,18 @@ fun MenuCheckboxItem(
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier
-            .semantics(mergeDescendants = false) {
-                if (label != null) contentDescription = label
-            }
-            .toggleable(
-                value = checked,
-                interactionSource = source,
-                indication = null,
-                enabled = enabled,
-                role = Role.Checkbox,
-                onValueChange = onCheckedChange,
-            ),
+        modifier =
+            Modifier
+                .semantics(mergeDescendants = false) {
+                    if (label != null) contentDescription = label
+                }.toggleable(
+                    value = checked,
+                    interactionSource = source,
+                    indication = null,
+                    enabled = enabled,
+                    role = Role.Checkbox,
+                    onValueChange = onCheckedChange,
+                ),
     ) {
         content()
     }
@@ -249,21 +278,21 @@ fun MenuRadioItem(
 ) {
     val source = remember { MutableInteractionSource() }
     Box(
-        modifier = Modifier
-            .semantics(mergeDescendants = false) {
-                if (label != null) contentDescription = label
-            }
-            .selectable(
-                selected = selected,
-                interactionSource = source,
-                indication = null,
-                enabled = enabled,
-                role = Role.RadioButton,
-                onClick = {
-                    onSelect()
-                    state.close()
-                },
-            ),
+        modifier =
+            Modifier
+                .semantics(mergeDescendants = false) {
+                    if (label != null) contentDescription = label
+                }.selectable(
+                    selected = selected,
+                    interactionSource = source,
+                    indication = null,
+                    enabled = enabled,
+                    role = Role.RadioButton,
+                    onClick = {
+                        onSelect()
+                        state.close()
+                    },
+                ),
     ) {
         content()
     }
@@ -299,23 +328,23 @@ fun MenuSub(
     Box {
         val source = remember { MutableInteractionSource() }
         Box(
-            modifier = Modifier
-                .focusRequester(triggerRequester)
-                .menuItemSemantics(label = label)
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    onClick = { state.open() },
-                )
-                .onPreviewKeyEvent { event ->
-                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                    if (event.key == Key.DirectionRight && !state.isOpen) {
-                        state.open()
-                        true
-                    } else {
-                        false
-                    }
-                },
+            modifier =
+                Modifier
+                    .focusRequester(triggerRequester)
+                    .menuItemSemantics(label = label)
+                    .clickable(
+                        interactionSource = source,
+                        indication = null,
+                        onClick = { state.open() },
+                    ).onPreviewKeyEvent { event ->
+                        if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                        if (event.key == Key.DirectionRight && !state.isOpen) {
+                            state.open()
+                            true
+                        } else {
+                            false
+                        }
+                    },
         ) {
             trigger()
         }
@@ -323,43 +352,67 @@ fun MenuSub(
         if (state.isOpen) {
             LaunchedEffect(Unit) { subFocus.safeRequestFocus() }
             Popup(
-                popupPositionProvider = rememberBiatPopupPosition(
-                    side = side,
-                    align = align,
-                    sideOffset = sideOffset,
-                    alignOffset = alignOffset,
-                    avoidCollisions = avoidCollisions,
-                ),
+                popupPositionProvider =
+                    rememberBiatPopupPosition(
+                        side = side,
+                        align = align,
+                        sideOffset = sideOffset,
+                        alignOffset = alignOffset,
+                        avoidCollisions = avoidCollisions,
+                    ),
                 onDismissRequest = { state.close() },
-                properties = PopupProperties(
-                    focusable = true,
-                    dismissOnBackPress = true,
-                    dismissOnClickOutside = dismissOnOutsideClick,
-                ),
+                properties =
+                    PopupProperties(
+                        focusable = true,
+                        dismissOnBackPress = true,
+                        dismissOnClickOutside = dismissOnOutsideClick,
+                    ),
             ) {
                 Column(
-                    modifier = Modifier
-                        .menuSemantics(label)
-                        .focusRequester(subFocus)
-                        .focusable()
-                        .onPreviewKeyEvent { event ->
-                            if (event.type != KeyEventType.KeyDown) {
-                                return@onPreviewKeyEvent false
-                            }
-                            when (event.key) {
-                                Key.DirectionDown -> { state.moveHighlight(1); true }
-                                Key.DirectionUp -> { state.moveHighlight(-1); true }
-                                Key.MoveHome -> { state.highlight(0); true }
-                                Key.MoveEnd -> { state.highlight(state.itemCount - 1); true }
-                                Key.Escape, Key.DirectionLeft -> {
-                                    if (dismissOnEscape) {
-                                        state.close()
-                                        true
-                                    } else false
+                    modifier =
+                        Modifier
+                            .menuSemantics(label)
+                            .focusRequester(subFocus)
+                            .focusable()
+                            .onPreviewKeyEvent { event ->
+                                if (event.type != KeyEventType.KeyDown) {
+                                    return@onPreviewKeyEvent false
                                 }
-                                else -> false
-                            }
-                        },
+                                when (event.key) {
+                                    Key.DirectionDown -> {
+                                        state.moveHighlight(1)
+                                        true
+                                    }
+
+                                    Key.DirectionUp -> {
+                                        state.moveHighlight(-1)
+                                        true
+                                    }
+
+                                    Key.MoveHome -> {
+                                        state.highlight(0)
+                                        true
+                                    }
+
+                                    Key.MoveEnd -> {
+                                        state.highlight(state.itemCount - 1)
+                                        true
+                                    }
+
+                                    Key.Escape, Key.DirectionLeft -> {
+                                        if (dismissOnEscape) {
+                                            state.close()
+                                            true
+                                        } else {
+                                            false
+                                        }
+                                    }
+
+                                    else -> {
+                                        false
+                                    }
+                                }
+                            },
                     content = content,
                 )
             }

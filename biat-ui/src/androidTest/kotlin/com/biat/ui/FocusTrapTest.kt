@@ -31,7 +31,6 @@ import org.junit.Test
  * ./gradlew :biat-ui:connectedDebugAndroidTest
  */
 class FocusTrapTest {
-
     @get:Rule
     val rule = createComposeRule()
 
@@ -85,9 +84,7 @@ class FocusTrapTest {
 }
 
 @Composable
-private fun TrapHarness(
-    onEscape: (() -> Unit)? = null,
-) {
+private fun TrapHarness(onEscape: (() -> Unit)? = null) {
     val trapRequester = rememberFocusTrapRequester()
     val trapState = rememberFocusTrapState()
     val focusManager = LocalFocusManager.current

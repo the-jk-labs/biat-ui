@@ -39,7 +39,9 @@ class DialogState(
     val isOpen: Boolean get() = controlledOpen ?: internalOpen
 
     fun open() = setOpen(true)
+
     fun close() = setOpen(false)
+
     fun toggle() = setOpen(!isOpen)
 
     @JvmName("setOpenState")
@@ -59,9 +61,10 @@ fun rememberDialogState(
     initialOpen: Boolean = false,
     controlledOpen: Boolean? = null,
     onOpenChange: ((Boolean) -> Unit)? = null,
-): DialogState = remember {
-    DialogState(initialOpen = initialOpen)
-}.apply {
-    this.controlledOpen = controlledOpen
-    this.onOpenChange = onOpenChange
-}
+): DialogState =
+    remember {
+        DialogState(initialOpen = initialOpen)
+    }.apply {
+        this.controlledOpen = controlledOpen
+        this.onOpenChange = onOpenChange
+    }

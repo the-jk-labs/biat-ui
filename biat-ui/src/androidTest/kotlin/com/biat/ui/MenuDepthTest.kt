@@ -43,15 +43,12 @@ import org.junit.Test
  * separators, checkbox persistence, radio close, submenu layering.
  */
 class MenuDepthTest {
-
     @get:Rule
     val rule = createComposeRule()
 
-    private fun node(tag: String) =
-        rule.onNodeWithTag(tag, useUnmergedTree = true)
+    private fun node(tag: String) = rule.onNodeWithTag(tag, useUnmergedTree = true)
 
-    private fun text(value: String) =
-        rule.onNodeWithText(value, useUnmergedTree = true)
+    private fun text(value: String) = rule.onNodeWithText(value, useUnmergedTree = true)
 
     @Test
     fun disabledItem_hasNoClickAction_enabledCloses() {
@@ -78,14 +75,20 @@ class MenuDepthTest {
         rule.runOnIdle { state.open() }
         // Disabled items expose no activation: TalkBack offers nothing,
         // touch has nowhere to land, keyboard skips the index (unit-tested).
-        val disabledConfig = rule.onNodeWithContentDescription(
-            "Delete",
-            useUnmergedTree = true,
-        ).fetchSemanticsNode().config
-        val enabledConfig = rule.onNodeWithContentDescription(
-            "Edit",
-            useUnmergedTree = true,
-        ).fetchSemanticsNode().config
+        val disabledConfig =
+            rule
+                .onNodeWithContentDescription(
+                    "Delete",
+                    useUnmergedTree = true,
+                ).fetchSemanticsNode()
+                .config
+        val enabledConfig =
+            rule
+                .onNodeWithContentDescription(
+                    "Edit",
+                    useUnmergedTree = true,
+                ).fetchSemanticsNode()
+                .config
         rule.runOnIdle {
             assertFalse(disabledConfig.contains(SemanticsActions.OnClick))
             assertTrue(disabledConfig.contains(SemanticsProperties.Disabled))
@@ -93,10 +96,11 @@ class MenuDepthTest {
             assertEquals("none", chosen)
             assertTrue(state.isOpen)
         }
-        rule.onNodeWithContentDescription(
-            "Edit",
-            useUnmergedTree = true,
-        ).performTouchInput { click() }
+        rule
+            .onNodeWithContentDescription(
+                "Edit",
+                useUnmergedTree = true,
+            ).performTouchInput { click() }
         rule.runOnIdle {
             assertEquals("Edit", chosen)
             assertFalse(state.isOpen)

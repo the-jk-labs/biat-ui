@@ -12,7 +12,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class PositioningTest {
-
     private val window = IntSize(720, 1600)
     private val popup = IntSize(120, 80)
 
@@ -21,13 +20,14 @@ class PositioningTest {
         popupSize: IntSize = popup,
         placement: PopupPlacement = PopupPlacement(),
         layoutDirection: LayoutDirection = LayoutDirection.Ltr,
-    ): IntOffset = resolvePopupOffset(
-        anchorBounds = anchor,
-        popupSize = popupSize,
-        windowSize = window,
-        layoutDirection = layoutDirection,
-        placement = placement,
-    )
+    ): IntOffset =
+        resolvePopupOffset(
+            anchorBounds = anchor,
+            popupSize = popupSize,
+            windowSize = window,
+            layoutDirection = layoutDirection,
+            placement = placement,
+        )
 
     @Test
     fun default_opensBelowAnchorStart() {
@@ -205,10 +205,11 @@ class PositioningTest {
             IntOffset(300, 210),
             resolve(
                 anchor = IntRect(100, 200, 300, 260),
-                placement = PopupPlacement(
-                    side = PopupSide.End,
-                    alignOffsetPx = 10,
-                ),
+                placement =
+                    PopupPlacement(
+                        side = PopupSide.End,
+                        alignOffsetPx = 10,
+                    ),
                 layoutDirection = LayoutDirection.Rtl,
             ),
         )

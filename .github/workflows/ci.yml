@@ -27,5 +27,7 @@ jobs:
           export PATH
           yes | sdkmanager --licenses > /dev/null
           sdkmanager "platforms;android-37.0"
+      - name: Lint
+        run: ./gradlew ktlintCheck
       - name: Test and assemble
         run: ./gradlew :biat-ui:testDebugUnitTest :biat-ui:assembleRelease :sample:assembleDebug

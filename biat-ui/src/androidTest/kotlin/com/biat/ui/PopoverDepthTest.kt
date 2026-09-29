@@ -36,12 +36,10 @@ import org.junit.Test
  * popover survives anchor scroll with state intact).
  */
 class PopoverDepthTest {
-
     @get:Rule
     val rule = createComposeRule()
 
-    private fun node(tag: String) =
-        rule.onNodeWithTag(tag, useUnmergedTree = true)
+    private fun node(tag: String) = rule.onNodeWithTag(tag, useUnmergedTree = true)
 
     @Test
     fun modal_tabWrapsInside() {
@@ -109,11 +107,12 @@ private fun PopoverDepthHarness(
     scroll: ScrollState? = null,
 ) {
     Column(
-        modifier = if (scroll != null) {
-            Modifier.verticalScroll(scroll)
-        } else {
-            Modifier
-        },
+        modifier =
+            if (scroll != null) {
+                Modifier.verticalScroll(scroll)
+            } else {
+                Modifier
+            },
     ) {
         Popover(
             state = state,

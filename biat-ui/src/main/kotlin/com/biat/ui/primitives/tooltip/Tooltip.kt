@@ -59,21 +59,21 @@ fun Tooltip(
 
     Box {
         Box(
-            modifier = Modifier
-                .hoverable(hoverSource)
-                .tooltipAnchorSemantics(tip)
-                .onFocusChanged { focus ->
-                    if (focus.isFocused) state.show() else state.hide()
-                }
-                .then(
-                    if (enableLongPress) {
-                        Modifier.pointerInput(state) {
-                            detectTapGestures(onLongPress = { state.show() })
-                        }
-                    } else {
-                        Modifier
-                    },
-                ),
+            modifier =
+                Modifier
+                    .hoverable(hoverSource)
+                    .tooltipAnchorSemantics(tip)
+                    .onFocusChanged { focus ->
+                        if (focus.isFocused) state.show() else state.hide()
+                    }.then(
+                        if (enableLongPress) {
+                            Modifier.pointerInput(state) {
+                                detectTapGestures(onLongPress = { state.show() })
+                            }
+                        } else {
+                            Modifier
+                        },
+                    ),
         ) {
             trigger()
         }
@@ -81,13 +81,14 @@ fun Tooltip(
             // No focus return: the content is not focusable, so focus never
             // leaves the trigger while the tip is visible.
             Popup(
-                popupPositionProvider = rememberBiatPopupPosition(
-                    side = side,
-                    align = align,
-                    sideOffset = sideOffset,
-                    alignOffset = alignOffset,
-                    avoidCollisions = avoidCollisions,
-                ),
+                popupPositionProvider =
+                    rememberBiatPopupPosition(
+                        side = side,
+                        align = align,
+                        sideOffset = sideOffset,
+                        alignOffset = alignOffset,
+                        avoidCollisions = avoidCollisions,
+                    ),
                 onDismissRequest = { state.hide() },
                 properties = PopupProperties(focusable = false),
             ) {

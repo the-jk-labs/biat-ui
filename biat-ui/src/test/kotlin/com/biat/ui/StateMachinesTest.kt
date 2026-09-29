@@ -16,11 +16,13 @@ import com.biat.ui.core.state.SheetSettle
 import com.biat.ui.core.state.SheetState
 import com.biat.ui.core.state.SliderState
 import com.biat.ui.core.state.TabMove
+import com.biat.ui.core.state.TabsState
 import com.biat.ui.core.state.ToggleGroupState
 import com.biat.ui.core.state.ToggleGroupType
 import com.biat.ui.core.state.ToggleState
 import com.biat.ui.core.state.ToggleValue
 import com.biat.ui.core.state.ToolbarState
+import com.biat.ui.core.state.TooltipState
 import com.biat.ui.core.state.coerceAndSnap
 import com.biat.ui.core.state.fractionToValue
 import com.biat.ui.core.state.isOn
@@ -28,8 +30,6 @@ import com.biat.ui.core.state.next
 import com.biat.ui.core.state.resolveSheetSettle
 import com.biat.ui.core.state.resolveTabIndex
 import com.biat.ui.core.state.resolveToolbarIndex
-import com.biat.ui.core.state.TabsState
-import com.biat.ui.core.state.TooltipState
 import com.biat.ui.core.state.valueToFraction
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -37,7 +37,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class StateMachinesTest {
-
     @Test
     fun dialog_openCloseToggle() {
         val events = mutableListOf<Boolean>()
@@ -123,10 +122,11 @@ class StateMachinesTest {
     @Test
     fun dialog_controlled_notifiesWithoutMutating() {
         val events = mutableListOf<Boolean>()
-        val state = DialogState(
-            controlledOpen = false,
-            onOpenChange = { events.add(it) },
-        )
+        val state =
+            DialogState(
+                controlledOpen = false,
+                onOpenChange = { events.add(it) },
+            )
         state.open()
         assertFalse(state.isOpen) // caller owns the value; no mutation
         assertEquals(listOf(true), events)
@@ -148,11 +148,12 @@ class StateMachinesTest {
     @Test
     fun menu_controlled_closeResetsHighlightButNotifies() {
         val events = mutableListOf<Boolean>()
-        val state = MenuState(
-            itemCount = 3,
-            controlledOpen = true,
-            onOpenChange = { events.add(it) },
-        )
+        val state =
+            MenuState(
+                itemCount = 3,
+                controlledOpen = true,
+                onOpenChange = { events.add(it) },
+            )
         assertTrue(state.isOpen)
         state.highlight(2)
         state.close()
@@ -164,10 +165,11 @@ class StateMachinesTest {
     @Test
     fun tooltip_controlled_showHide() {
         val events = mutableListOf<Boolean>()
-        val state = TooltipState(
-            controlledVisible = false,
-            onVisibleChange = { events.add(it) },
-        )
+        val state =
+            TooltipState(
+                controlledVisible = false,
+                onVisibleChange = { events.add(it) },
+            )
         state.show()
         assertFalse(state.isVisible)
         assertEquals(listOf(true), events)
@@ -183,28 +185,31 @@ class StateMachinesTest {
     @Test
     fun popover_select_sheet_controlled_notifyOnly() {
         val popoverEvents = mutableListOf<Boolean>()
-        val popover = PopoverState(
-            controlledOpen = true,
-            onOpenChange = { popoverEvents.add(it) },
-        )
+        val popover =
+            PopoverState(
+                controlledOpen = true,
+                onOpenChange = { popoverEvents.add(it) },
+            )
         popover.close()
         assertTrue(popover.isOpen)
         assertEquals(listOf(false), popoverEvents)
 
         val selectEvents = mutableListOf<Boolean>()
-        val select = SelectState<String>(
-            controlledOpen = false,
-            onOpenChange = { selectEvents.add(it) },
-        )
+        val select =
+            SelectState<String>(
+                controlledOpen = false,
+                onOpenChange = { selectEvents.add(it) },
+            )
         select.toggle()
         assertFalse(select.isOpen)
         assertEquals(listOf(true), selectEvents)
 
         val sheetEvents = mutableListOf<Boolean>()
-        val sheet = SheetState(
-            controlledOpen = false,
-            onOpenChange = { sheetEvents.add(it) },
-        )
+        val sheet =
+            SheetState(
+                controlledOpen = false,
+                onOpenChange = { sheetEvents.add(it) },
+            )
         sheet.open(expanded = true)
         assertFalse(sheet.isOpen)
         assertTrue(sheet.isExpanded) // expansion stays internal
@@ -237,10 +242,11 @@ class StateMachinesTest {
     @Test
     fun select_controlledQuery_notifiesWithoutMutating() {
         val events = mutableListOf<String>()
-        val state = SelectState<String>(
-            controlledQuery = "a",
-            onQueryChange = { events.add(it) },
-        )
+        val state =
+            SelectState<String>(
+                controlledQuery = "a",
+                onQueryChange = { events.add(it) },
+            )
         state.setQuery("ab")
         assertEquals("a", state.query)
         assertEquals(listOf("ab"), events)
@@ -377,7 +383,13 @@ class StateMachinesTest {
         )
         assertEquals(
             SheetSettle.Snap(SheetDetent.Peek),
-            resolveSheetSettle(SheetDetent.Peek, enabled = setOf(SheetDetent.Peek), dragPx = 0f, sheetHeightPx = 1000f, velocityPxPerSec = 0f),
+            resolveSheetSettle(
+                SheetDetent.Peek,
+                enabled = setOf(SheetDetent.Peek),
+                dragPx = 0f,
+                sheetHeightPx = 1000f,
+                velocityPxPerSec = 0f,
+            ),
         )
     }
 
@@ -423,10 +435,11 @@ class StateMachinesTest {
     @Test
     fun collapsible_controlledNotifiesWithoutMutating() {
         val events = mutableListOf<Boolean>()
-        val state = CollapsibleState(
-            controlledExpanded = false,
-            onExpandedChange = { events.add(it) },
-        )
+        val state =
+            CollapsibleState(
+                controlledExpanded = false,
+                onExpandedChange = { events.add(it) },
+            )
         state.expand()
         assertFalse(state.isExpanded)
         assertEquals(listOf(true), events)
@@ -470,10 +483,11 @@ class StateMachinesTest {
     @Test
     fun toggle_triStateAndDisabled() {
         val events = mutableListOf<ToggleValue>()
-        val state = ToggleState(
-            initialValue = ToggleValue.Indeterminate,
-            onValueChange = { events.add(it) },
-        )
+        val state =
+            ToggleState(
+                initialValue = ToggleValue.Indeterminate,
+                onValueChange = { events.add(it) },
+            )
         assertFalse(state.isOn)
         assertTrue(state.isIndeterminate)
         assertEquals(ToggleValue.On, ToggleValue.Indeterminate.next())
@@ -490,10 +504,11 @@ class StateMachinesTest {
     @Test
     fun toggle_controlledNotifiesWithoutMutating() {
         val events = mutableListOf<ToggleValue>()
-        val state = ToggleState(
-            controlledValue = ToggleValue.Off,
-            onValueChange = { events.add(it) },
-        )
+        val state =
+            ToggleState(
+                controlledValue = ToggleValue.Off,
+                onValueChange = { events.add(it) },
+            )
         state.toggle()
         assertFalse(state.isOn)
         assertEquals(listOf(ToggleValue.On), events)
@@ -502,10 +517,11 @@ class StateMachinesTest {
     @Test
     fun radioGroup_selectNoDeselect() {
         var last: Any? = "none"
-        val state = RadioGroupState(
-            initialSelected = "a",
-            onSelectedChange = { last = it },
-        )
+        val state =
+            RadioGroupState(
+                initialSelected = "a",
+                onSelectedChange = { last = it },
+            )
         assertTrue(state.isSelected("a"))
         state.select("a") // no-op, no duplicate event
         assertEquals("none", last)
@@ -520,12 +536,13 @@ class StateMachinesTest {
     @Test
     fun slider_clampsSnapsAndNotifies() {
         val events = mutableListOf<Float>()
-        val state = SliderState(
-            initialValue = 0f,
-            valueRange = 0f..10f,
-            step = 2f,
-            onValueChange = { events.add(it) },
-        )
+        val state =
+            SliderState(
+                initialValue = 0f,
+                valueRange = 0f..10f,
+                step = 2f,
+                onValueChange = { events.add(it) },
+            )
         state.setValue(3f) // snaps to 4
         assertEquals(4f, state.value)
         state.setValue(4f) // no-op, no duplicate event
@@ -543,12 +560,13 @@ class StateMachinesTest {
     @Test
     fun slider_controlledNotifiesWithoutMutating() {
         val events = mutableListOf<Float>()
-        val state = SliderState(
-            controlledValue = 2f,
-            valueRange = 0f..10f,
-            step = 1f,
-            onValueChange = { events.add(it) },
-        )
+        val state =
+            SliderState(
+                controlledValue = 2f,
+                valueRange = 0f..10f,
+                step = 1f,
+                onValueChange = { events.add(it) },
+            )
         state.increase()
         assertEquals(2f, state.value)
         assertEquals(listOf(3f), events)
@@ -669,10 +687,11 @@ class StateMachinesTest {
     @Test
     fun select_controlledQuery_leavesTransientAlone() {
         val events = mutableListOf<String>()
-        val state = SelectState<String>(
-            controlledQuery = "a",
-            onQueryChange = { events.add(it) },
-        )
+        val state =
+            SelectState<String>(
+                controlledQuery = "a",
+                onQueryChange = { events.add(it) },
+            )
         state.highlightedIndex = 1
         state.setQuery("ab") // owner has not accepted; transient stays
         assertEquals("a", state.query)
@@ -727,11 +746,12 @@ class StateMachinesTest {
 
     @Test
     fun slider_updateConfigResnapsUncontrolled() {
-        val state = SliderState(
-            initialValue = 8f,
-            valueRange = 0f..10f,
-            step = 1f,
-        )
+        val state =
+            SliderState(
+                initialValue = 8f,
+                valueRange = 0f..10f,
+                step = 1f,
+            )
         assertEquals(8f, state.value)
         state.updateConfig(0f..5f, 1f)
         assertEquals(5f, state.value)

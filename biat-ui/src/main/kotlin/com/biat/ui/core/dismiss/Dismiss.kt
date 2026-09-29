@@ -60,9 +60,10 @@ fun Modifier.consumeOverlayTaps(): Modifier =
         awaitEachGesture {
             awaitFirstDown(requireUnconsumed = false)
             val up = waitForUpOrCancellation()
-            val inside = up != null &&
-                up.position.x in 0f..size.width.toFloat() &&
-                up.position.y in 0f..size.height.toFloat()
+            val inside =
+                up != null &&
+                    up.position.x in 0f..size.width.toFloat() &&
+                    up.position.y in 0f..size.height.toFloat()
             if (inside) up.consume()
         }
     }

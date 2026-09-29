@@ -21,7 +21,10 @@ import androidx.compose.ui.focus.FocusRequester
 fun rememberFocusReturnRequester(): FocusRequester = remember { FocusRequester() }
 
 @Composable
-fun FocusReturnEffect(isOpen: Boolean, returnRequester: FocusRequester) {
+fun FocusReturnEffect(
+    isOpen: Boolean,
+    returnRequester: FocusRequester,
+) {
     var wasOpen by remember { mutableStateOf(isOpen) }
     LaunchedEffect(isOpen) {
         if (shouldReturnFocus(wasOpen, isOpen)) {
@@ -36,17 +39,20 @@ fun FocusReturnEffect(isOpen: Boolean, returnRequester: FocusRequester) {
 }
 
 /** Open-to-close transition predicate. Extracted for unit testing. */
-internal fun shouldReturnFocus(wasOpen: Boolean, isOpen: Boolean): Boolean =
-    wasOpen && !isOpen
+internal fun shouldReturnFocus(
+    wasOpen: Boolean,
+    isOpen: Boolean,
+): Boolean = wasOpen && !isOpen
 
 /**
  * Requests focus, ignoring detached nodes. Roving containers (Menu / Tabs /
  * Toolbar / Select lists) call this on key paths that can run before layout.
  * Returns true when the request was issued.
  */
-fun FocusRequester.safeRequestFocus(): Boolean = try {
-    requestFocus()
-    true
-} catch (_: IllegalStateException) {
-    false
-}
+fun FocusRequester.safeRequestFocus(): Boolean =
+    try {
+        requestFocus()
+        true
+    } catch (_: IllegalStateException) {
+        false
+    }

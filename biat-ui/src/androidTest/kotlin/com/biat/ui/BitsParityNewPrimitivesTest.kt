@@ -15,8 +15,8 @@ import com.biat.ui.primitives.avatar.Avatar
 import com.biat.ui.primitives.label.Label
 import com.biat.ui.primitives.separator.Separator
 import com.biat.ui.primitives.slider.Slider
-import com.biat.ui.primitives.togglegroup.ToggleGroupValue
 import com.biat.ui.primitives.togglegroup.ToggleGroup
+import com.biat.ui.primitives.togglegroup.ToggleGroupValue
 import com.biat.ui.primitives.toolbar.Toolbar
 import com.biat.ui.primitives.toolbar.ToolbarValue
 import org.junit.Rule
@@ -29,7 +29,6 @@ import org.junit.Test
  * render caller visuals.
  */
 class BitsParityNewPrimitivesTest {
-
     @get:Rule
     val rule = createComposeRule()
 
@@ -52,10 +51,11 @@ class BitsParityNewPrimitivesTest {
         rule.setContent {
             ToggleGroup(
                 state = rememberToggleGroupState(type = ToggleGroupType.Multiple),
-                items = listOf(
-                    ToggleGroupValue("a", "Bold"),
-                    ToggleGroupValue("b", "Italic"),
-                ),
+                items =
+                    listOf(
+                        ToggleGroupValue("a", "Bold"),
+                        ToggleGroupValue("b", "Italic"),
+                    ),
                 item = { entry, pressed ->
                     BasicText((if (pressed) "[x] " else "[ ] ") + entry.label)
                 },
@@ -71,10 +71,11 @@ class BitsParityNewPrimitivesTest {
         rule.setContent {
             Toolbar(
                 state = rememberToolbarState(itemCount = 2),
-                items = listOf(
-                    ToolbarValue("cut", "Cut"),
-                    ToolbarValue("copy", "Copy"),
-                ),
+                items =
+                    listOf(
+                        ToolbarValue("cut", "Cut"),
+                        ToolbarValue("copy", "Copy"),
+                    ),
                 label = "Editor",
                 onActivate = { activated = it as String },
                 item = { entry, _ -> BasicText(entry.label) },

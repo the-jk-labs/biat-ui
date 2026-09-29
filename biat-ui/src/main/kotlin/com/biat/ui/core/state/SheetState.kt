@@ -49,15 +49,18 @@ class SheetState(
     /** True when [detent] is [SheetDetent.Full]. */
     val isExpanded: Boolean get() = detent == SheetDetent.Full
 
-    fun open(expanded: Boolean = false) = open(
-        if (expanded) SheetDetent.Full else SheetDetent.Half,
-    )
+    fun open(expanded: Boolean = false) =
+        open(
+            if (expanded) SheetDetent.Full else SheetDetent.Half,
+        )
 
     fun open(detent: SheetDetent) {
         snapTo(detent)
         setOpen(true)
     }
+
     fun close() = setOpen(false)
+
     fun toggle() = setOpen(!isOpen)
 
     @JvmName("setOpenState")
@@ -72,6 +75,7 @@ class SheetState(
     }
 
     fun expand() = snapTo(SheetDetent.Full)
+
     fun collapse() = snapTo(SheetDetent.Half)
 
     /**
@@ -90,7 +94,10 @@ enum class SheetDetent { Peek, Half, Full }
 /** Drag-release outcome: dismiss the sheet or snap to a stop. */
 sealed interface SheetSettle {
     data object Dismiss : SheetSettle
-    data class Snap(val detent: SheetDetent) : SheetSettle
+
+    data class Snap(
+        val detent: SheetDetent,
+    ) : SheetSettle
 }
 
 /**
@@ -117,17 +124,23 @@ fun resolveSheetSettle(
 ): SheetSettle {
     val ordered = SheetDetent.entries.filter { it in enabled }
     if (ordered.isEmpty() || sheetHeightPx <= 0f) return SheetSettle.Snap(from)
-    val index = ordered.indexOf(from).takeIf { it >= 0 } ?: ordered.indexOf(
-        SheetDetent.Half,
-    ).takeIf { it >= 0 } ?: 0
-    fun lower(): SheetSettle = if (index > 0) {
-        SheetSettle.Snap(ordered[index - 1])
-    } else {
-        SheetSettle.Dismiss
-    }
-    fun higher(): SheetSettle = SheetSettle.Snap(
-        ordered[(index + 1).coerceAtMost(ordered.lastIndex)],
-    )
+    val index =
+        ordered.indexOf(from).takeIf { it >= 0 } ?: ordered
+            .indexOf(
+                SheetDetent.Half,
+            ).takeIf { it >= 0 } ?: 0
+
+    fun lower(): SheetSettle =
+        if (index > 0) {
+            SheetSettle.Snap(ordered[index - 1])
+        } else {
+            SheetSettle.Dismiss
+        }
+
+    fun higher(): SheetSettle =
+        SheetSettle.Snap(
+            ordered[(index + 1).coerceAtMost(ordered.lastIndex)],
+        )
     if (velocityPxPerSec <= -flingVelocityPxPerSec) return higher()
     if (velocityPxPerSec >= flingVelocityPxPerSec) return lower()
     val progress = dragPx / sheetHeightPx
@@ -146,10 +159,11 @@ fun rememberSheetState(
     controlledOpen: Boolean? = null,
     onOpenChange: ((Boolean) -> Unit)? = null,
     onDetentChange: ((SheetDetent) -> Unit)? = null,
-): SheetState = remember {
-    SheetState(initialOpen = initialOpen, initialDetent = initialDetent)
-}.apply {
-    this.controlledOpen = controlledOpen
-    this.onOpenChange = onOpenChange
-    this.onDetentChange = onDetentChange
-}
+): SheetState =
+    remember {
+        SheetState(initialOpen = initialOpen, initialDetent = initialDetent)
+    }.apply {
+        this.controlledOpen = controlledOpen
+        this.onOpenChange = onOpenChange
+        this.onDetentChange = onDetentChange
+    }
