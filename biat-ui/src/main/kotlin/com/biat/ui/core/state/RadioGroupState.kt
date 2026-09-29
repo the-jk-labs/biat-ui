@@ -19,7 +19,7 @@ import androidx.compose.runtime.setValue
 class RadioGroupState(
     initialSelected: Any? = null,
     var enabled: Boolean = true,
-    val onSelectedChange: ((Any?) -> Unit)? = null,
+    var onSelectedChange: ((Any?) -> Unit)? = null,
 ) {
     var selectedValue: Any? by mutableStateOf(initialSelected)
         private set
@@ -48,4 +48,5 @@ fun rememberRadioGroupState(
     RadioGroupState(initialSelected = initialSelected, enabled = enabled)
 }.apply {
     this.enabled = enabled
+    this.onSelectedChange = onSelectedChange
 }

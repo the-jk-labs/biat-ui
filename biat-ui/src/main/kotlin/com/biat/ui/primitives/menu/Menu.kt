@@ -28,8 +28,10 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.biat.ui.core.accessibility.menuItemSemantics
 import com.biat.ui.core.accessibility.menuSemantics
+import com.biat.ui.core.accessibility.overlayTriggerSemantics
 import com.biat.ui.core.focus.FocusReturnEffect
 import com.biat.ui.core.focus.rememberFocusReturnRequester
+import com.biat.ui.core.focus.safeRequestFocus
 import com.biat.ui.core.positioning.PopupAlign
 import com.biat.ui.core.positioning.PopupSide
 import com.biat.ui.core.positioning.rememberBiatPopupPosition
@@ -39,12 +41,17 @@ import com.biat.ui.core.state.rememberMenuState
 /**
  * Headless dropdown Menu. Behavior only.
  *
- * Keyboard: Enter/Space on trigger opens; Up/Down cycle highlight;
- * Enter activates; Esc closes. Roving highlight lives in [MenuState].
+ * Keyboard: Enter/Space/Down on trigger opens; Up/Down cycle highlight,
+ * Home/End jump; Esc closes. Roving highlight lives in [MenuState].
+ * Activating the highlighted entry is caller-owned: focus a [MenuItem]
+ * (clickable, so Enter/Space fires its [onSelect]) or observe
+ * [MenuState.highlightedIndex]. Unhandled Enter inside the menu falls
+ * through to the caller.
  * Placement follows [side]/[align] with [sideOffset]/[alignOffset] gaps;
  * [avoidCollisions] flips to the opposite side when it overflows less and
  * shifts the menu to stay on-screen.
- * [label] is exposed as the menu content description for screen readers.
+ * [label] is exposed as the menu content description for screen readers
+ * and names the trigger while collapsed/expanded.
  * Focus returns to the trigger whenever the menu closes.
  */
 @Composable
@@ -72,6 +79,7 @@ fun Menu(
         Box(
             modifier = Modifier
                 .focusRequester(triggerRequester)
+                .overlayTriggerSemantics(expanded = state.isOpen, label = label)
                 .clickable(
                     interactionSource = triggerSource,
                     indication = null,
@@ -313,7 +321,7 @@ fun MenuSub(
         }
 
         if (state.isOpen) {
-            LaunchedEffect(Unit) { subFocus.requestFocus() }
+            LaunchedEffect(Unit) { subFocus.safeRequestFocus() }
             Popup(
                 popupPositionProvider = rememberBiatPopupPosition(
                     side = side,

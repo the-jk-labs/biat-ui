@@ -21,11 +21,26 @@ enum class ToolbarOrientation { Horizontal, Vertical }
  */
 @Stable
 class ToolbarState(
-    val itemCount: Int,
+    itemCount: Int,
     initialFocused: Int = 0,
-    val loop: Boolean = true,
+    loop: Boolean = true,
     disabledIndices: Set<Int> = emptySet(),
 ) {
+    /** Item count. Managed by [rememberToolbarState]; assign only to reflect the caller's value. */
+    private var itemCountState = mutableIntStateOf(itemCount)
+    var itemCount: Int
+        get() = itemCountState.intValue
+        set(value) {
+            itemCountState.intValue = value
+            if (value == 0) {
+                // Nothing focusable; keep index stable until items return.
+            } else if (focusedIndex >= value) {
+                focus(value - 1)
+            }
+        }
+
+    /** Wrap-around. Managed by [rememberToolbarState]; assign only to reflect the caller's value. */
+    var loop: Boolean by mutableStateOf(loop)
     var focusedIndex: Int by mutableIntStateOf(
         initialFocused.coerceIn(0, (itemCount - 1).coerceAtLeast(0)),
     )
@@ -72,9 +87,11 @@ fun rememberToolbarState(
     initialFocused: Int = 0,
     loop: Boolean = true,
     disabledIndices: Set<Int> = emptySet(),
-): ToolbarState = remember(itemCount, loop) {
+): ToolbarState = remember {
     ToolbarState(itemCount = itemCount, initialFocused = initialFocused, loop = loop)
 }.apply {
+    this.itemCount = itemCount
+    this.loop = loop
     this.disabledIndices = disabledIndices
 }
 

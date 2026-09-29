@@ -28,8 +28,8 @@ import kotlin.math.roundToInt
 class SliderState(
     initialValue: Float = 0f,
     controlledValue: Float? = null,
-    val valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    val step: Float = 0f,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+    step: Float = 0f,
     var enabled: Boolean = true,
     var onValueChange: ((Float) -> Unit)? = null,
 ) {
@@ -42,6 +42,12 @@ class SliderState(
      * assign only to reflect the caller's value.
      */
     var controlledValue: Float? by mutableStateOf(controlledValue)
+
+    /** Range config. Managed by [rememberSliderState]; assign only to reflect the caller's value. */
+    var valueRange: ClosedFloatingPointRange<Float> by mutableStateOf(valueRange)
+
+    /** Step config. Managed by [rememberSliderState]; assign only to reflect the caller's value. */
+    var step: Float by mutableStateOf(step)
 
     val value: Float get() = controlledValue ?: internalValue
 
@@ -77,6 +83,22 @@ class SliderState(
     fun toMin() = setValue(valueRange.start)
 
     fun toMax() = setValue(valueRange.endInclusive)
+
+    /**
+     * Reflects caller config without notifying: updates [valueRange]/[step]
+     * and silently re-snaps the uncontrolled value so it never renders
+     * outside the new range. Used by [rememberSliderState].
+     */
+    internal fun updateConfig(
+        valueRange: ClosedFloatingPointRange<Float>,
+        step: Float,
+    ) {
+        this.valueRange = valueRange
+        this.step = step
+        if (controlledValue == null) {
+            internalValue = coerceAndSnap(internalValue, valueRange, step)
+        }
+    }
 }
 
 @Composable
@@ -90,11 +112,10 @@ fun rememberSliderState(
 ): SliderState = remember {
     SliderState(
         initialValue = initialValue,
-        valueRange = valueRange,
-        step = step,
         enabled = enabled,
     )
 }.apply {
+    updateConfig(valueRange, step)
     this.controlledValue = controlledValue
     this.enabled = enabled
     this.onValueChange = onValueChange

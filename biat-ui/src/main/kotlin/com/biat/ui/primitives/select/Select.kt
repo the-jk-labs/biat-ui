@@ -18,13 +18,12 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.biat.ui.core.accessibility.selectOptionSemantics
+import com.biat.ui.core.accessibility.selectTriggerSemantics
 import com.biat.ui.core.focus.FocusReturnEffect
 import com.biat.ui.core.focus.rememberFocusReturnRequester
 import com.biat.ui.core.positioning.PopupAlign
@@ -42,6 +41,13 @@ import com.biat.ui.core.state.rememberSelectState
  * gaps; [avoidCollisions] flips to the opposite side when it overflows
  * less and shifts the listbox to stay on-screen.
  * Focus returns to the trigger whenever the listbox closes.
+ * [label] names the trigger for screen readers; each option announces
+ * its selection and highlight state.
+ *
+ * Keyboard: Enter/Space/Down on a closed trigger opens; Up/Down move
+ * highlight (Up from none lands on the last option), Home/End jump;
+ * Enter commits the highlighted option and falls through when nothing is
+ * highlighted; Esc closes.
  *
  * Combobox filtering: bind a text field inside [trigger] to
  * [SelectState.query] via [SelectState.setQuery]; the listbox renders
@@ -60,6 +66,7 @@ fun <T> Select(
     options: List<T>,
     dismissOnOutsideClick: Boolean = true,
     dismissOnEscape: Boolean = true,
+    label: String? = null,
     side: PopupSide = PopupSide.Bottom,
     align: PopupAlign = PopupAlign.Start,
     sideOffset: Dp = 0.dp,
@@ -86,7 +93,7 @@ fun <T> Select(
         Box(
             modifier = Modifier
                 .focusRequester(returnRequester)
-                .semantics(mergeDescendants = false) { role = Role.DropdownList }
+                .selectTriggerSemantics(expanded = state.isOpen, label = label)
                 .clickable(
                     interactionSource = source,
                     indication = null,
@@ -140,23 +147,33 @@ fun <T> Select(
                         when (event.key) {
                             Key.DirectionDown -> {
                                 if (visible.isEmpty()) return@onPreviewKeyEvent false
-                                state.highlightedIndex =
-                                    ((state.highlightedIndex + 1).mod(visible.size))
+                                state.moveHighlight(1, visible.size)
                                 true
                             }
                             Key.DirectionUp -> {
                                 if (visible.isEmpty()) return@onPreviewKeyEvent false
-                                state.highlightedIndex =
-                                    ((state.highlightedIndex - 1).mod(visible.size))
+                                state.moveHighlight(-1, visible.size)
+                                true
+                            }
+                            Key.MoveHome -> {
+                                if (visible.isEmpty()) return@onPreviewKeyEvent false
+                                state.highlightFirst(visible.size)
+                                true
+                            }
+                            Key.MoveEnd -> {
+                                if (visible.isEmpty()) return@onPreviewKeyEvent false
+                                state.highlightLast(visible.size)
                                 true
                             }
                             Key.Enter, Key.NumPadEnter -> {
-                                val value = visible.getOrNull(state.highlightedIndex)
+                                val value = state.commitValue(visible)
                                 if (value != null) {
                                     state.select(value)
                                     onSelected?.invoke(value)
+                                    true
+                                } else {
+                                    false
                                 }
-                                true
                             }
                             Key.Escape -> {
                                 if (dismissOnEscape) { state.close(); true } else false
@@ -184,7 +201,12 @@ fun <T> Select(
                         else -> visible.forEachIndexed { index, value ->
                         val itemSource = remember { MutableInteractionSource() }
                         Box(
-                            modifier = Modifier.clickable(
+                            modifier = Modifier
+                                .selectOptionSemantics(
+                                    selected = state.selected == value,
+                                    highlighted = state.highlightedIndex == index,
+                                )
+                                .clickable(
                                 interactionSource = itemSource,
                                 indication = null,
                                 onClick = {

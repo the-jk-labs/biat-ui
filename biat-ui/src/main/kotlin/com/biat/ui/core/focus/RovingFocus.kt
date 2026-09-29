@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,15 +22,41 @@ import androidx.compose.ui.input.key.type
  */
 @Stable
 class RovingFocusState(
-    val itemCount: Int,
+    itemCount: Int,
     initialIndex: Int = 0,
-    val loop: Boolean = true,
-    val orientation: Orientation = Orientation.Vertical,
+    loop: Boolean = true,
+    orientation: Orientation = Orientation.Vertical,
 ) {
-    var currentIndex by mutableIntStateOf(initialIndex.coerceIn(0, (itemCount - 1).coerceAtLeast(0)))
-        private set
+    /** Item count. Managed by [rememberRovingFocusState]; assign only to reflect the caller's value. */
+    private var itemCountState = mutableIntStateOf(itemCount)
+    var itemCount: Int
+        get() = itemCountState.intValue
+        set(value) {
+            itemCountState.intValue = value
+            if (value != 0 && currentIndex >= value) {
+                currentIndex = (value - 1).coerceAtLeast(0)
+            }
+        }
 
-    val requesters: List<FocusRequester> = List(itemCount) { FocusRequester() }
+    /** Wrap-around. Managed by [rememberRovingFocusState]; assign only to reflect the caller's value. */
+    var loop: Boolean by mutableStateOf(loop)
+
+    /** Axis. Managed by [rememberRovingFocusState]; assign only to reflect the caller's value. */
+    var orientation: Orientation by mutableStateOf(orientation)
+
+    var currentIndex by mutableIntStateOf(initialIndex.coerceIn(0, (itemCount - 1).coerceAtLeast(0)))
+        internal set
+
+    private val backingRequesters = mutableListOf<FocusRequester>()
+
+    /** Focus requesters, grown on demand so item-count changes never lose focus. */
+    val requesters: List<FocusRequester>
+        get() {
+            while (backingRequesters.size < itemCount) {
+                backingRequesters.add(FocusRequester())
+            }
+            return backingRequesters
+        }
 
     fun move(delta: Int) {
         if (itemCount == 0) return
@@ -39,17 +66,17 @@ class RovingFocusState(
         } else {
             next.coerceIn(0, itemCount - 1)
         }
-        requesters.getOrNull(currentIndex)?.requestFocus()
+        requesters.getOrNull(currentIndex)?.safeRequestFocus()
     }
 
     fun moveTo(index: Int) {
         if (itemCount == 0) return
         currentIndex = index.coerceIn(0, itemCount - 1)
-        requesters.getOrNull(currentIndex)?.requestFocus()
+        requesters.getOrNull(currentIndex)?.safeRequestFocus()
     }
 
     fun focusCurrent() {
-        requesters.getOrNull(currentIndex)?.requestFocus()
+        requesters.getOrNull(currentIndex)?.safeRequestFocus()
     }
 
     enum class Orientation { Vertical, Horizontal, Both }
@@ -61,8 +88,12 @@ fun rememberRovingFocusState(
     initialIndex: Int = 0,
     loop: Boolean = true,
     orientation: RovingFocusState.Orientation = RovingFocusState.Orientation.Vertical,
-): RovingFocusState = remember(itemCount, loop, orientation) {
+): RovingFocusState = remember {
     RovingFocusState(itemCount, initialIndex, loop, orientation)
+}.apply {
+    this.itemCount = itemCount
+    this.loop = loop
+    this.orientation = orientation
 }
 
 /**

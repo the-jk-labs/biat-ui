@@ -215,3 +215,40 @@ fun Modifier.avatarSemantics(label: String? = null): Modifier =
         role = Role.Image
         if (label != null) contentDescription = label
     }
+
+/**
+ * Semantics for a select trigger. Announces the dropdown role plus
+ * expanded/collapsed state so screen readers know the listbox is open.
+ */
+fun Modifier.selectTriggerSemantics(expanded: Boolean, label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.DropdownList
+        stateDescription = if (expanded) "Expanded" else "Collapsed"
+        if (label != null) contentDescription = label
+    }
+
+/**
+ * Semantics for one select option. Announces button role with selection
+ * plus highlighted state for the keyboard-navigated row.
+ */
+fun Modifier.selectOptionSemantics(
+    selected: Boolean,
+    highlighted: Boolean = false,
+    label: String? = null,
+): Modifier = this.semantics(mergeDescendants = false) {
+    role = Role.Button
+    this.selected = selected
+    if (highlighted) stateDescription = "Highlighted"
+    if (label != null) contentDescription = label
+}
+
+/**
+ * Semantics for menu and popover triggers. Announces a button with the
+ * caller label plus expanded state while the overlay is open.
+ */
+fun Modifier.overlayTriggerSemantics(expanded: Boolean, label: String? = null): Modifier =
+    this.semantics(mergeDescendants = false) {
+        role = Role.Button
+        stateDescription = if (expanded) "Expanded" else "Collapsed"
+        if (label != null) contentDescription = label
+    }

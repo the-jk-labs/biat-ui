@@ -642,4 +642,98 @@ class StateMachinesTest {
         state.reset()
         assertEquals(AvatarStatus.Loading, state.status)
     }
+
+    @Test
+    fun menu_toggleCloseResetsHighlight() {
+        val state = MenuState(itemCount = 3)
+        state.open()
+        state.highlight(1)
+        state.toggle() // closing via toggle resets like close()
+        assertFalse(state.isOpen)
+        assertEquals(-1, state.highlightedIndex)
+        state.toggle() // reopening starts with no highlight
+        assertTrue(state.isOpen)
+        assertEquals(-1, state.highlightedIndex)
+    }
+
+    @Test
+    fun select_toggleCloseResetsHighlight() {
+        val state = SelectState<String>()
+        state.open()
+        state.highlightedIndex = 1
+        state.toggle()
+        assertFalse(state.isOpen)
+        assertEquals(-1, state.highlightedIndex)
+    }
+
+    @Test
+    fun select_controlledQuery_leavesTransientAlone() {
+        val events = mutableListOf<String>()
+        val state = SelectState<String>(
+            controlledQuery = "a",
+            onQueryChange = { events.add(it) },
+        )
+        state.highlightedIndex = 1
+        state.setQuery("ab") // owner has not accepted; transient stays
+        assertEquals("a", state.query)
+        assertEquals(1, state.highlightedIndex)
+        assertFalse(state.isOpen)
+        assertEquals(listOf("ab"), events)
+        state.controlledQuery = "ab"
+        assertEquals("ab", state.query)
+    }
+
+    @Test
+    fun select_moveHighlightFromNoneAndCommit() {
+        val state = SelectState<String>()
+        val options = listOf("a", "b", "c")
+        state.moveHighlight(-1, options.size) // Up from none lands last
+        assertEquals(2, state.highlightedIndex)
+        state.moveHighlight(-1, options.size)
+        assertEquals(1, state.highlightedIndex)
+        state.moveHighlight(1, options.size)
+        assertEquals(2, state.highlightedIndex)
+        state.moveHighlight(1, options.size) // wraps
+        assertEquals(0, state.highlightedIndex)
+        assertEquals("a", state.commitValue(options))
+        state.close()
+        assertEquals(null, state.commitValue(options))
+        state.highlightFirst(options.size)
+        assertEquals(0, state.highlightedIndex)
+        state.highlightLast(options.size)
+        assertEquals(2, state.highlightedIndex)
+        state.moveHighlight(1, 0) // empty list is a no-op
+        assertEquals(2, state.highlightedIndex)
+    }
+
+    @Test
+    fun menu_itemCountShrinkClampsHighlightKeepsOpen() {
+        val state = MenuState(itemCount = 3)
+        state.open()
+        state.highlight(2)
+        state.itemCount = 1 // async options shrink; menu stays open
+        assertTrue(state.isOpen)
+        assertEquals(-1, state.highlightedIndex)
+    }
+
+    @Test
+    fun toolbar_itemCountShrinkClampsFocus() {
+        val state = ToolbarState(itemCount = 3)
+        state.focus(2)
+        assertEquals(2, state.focusedIndex)
+        state.itemCount = 1
+        assertEquals(0, state.focusedIndex)
+    }
+
+    @Test
+    fun slider_updateConfigResnapsUncontrolled() {
+        val state = SliderState(
+            initialValue = 8f,
+            valueRange = 0f..10f,
+            step = 1f,
+        )
+        assertEquals(8f, state.value)
+        state.updateConfig(0f..5f, 1f)
+        assertEquals(5f, state.value)
+    }
 }

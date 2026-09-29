@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 @Stable
 class TabsState(
     initialSelected: Any? = null,
-    val onSelectedChange: ((Any?) -> Unit)? = null,
+    var onSelectedChange: ((Any?) -> Unit)? = null,
 ) {
     var selectedValue: Any? by mutableStateOf(initialSelected)
         private set
@@ -55,5 +55,7 @@ fun rememberTabsState(
     initialSelected: Any? = null,
     onSelectedChange: ((Any?) -> Unit)? = null,
 ): TabsState = remember {
-    TabsState(initialSelected, onSelectedChange)
+    TabsState(initialSelected)
+}.apply {
+    this.onSelectedChange = onSelectedChange
 }

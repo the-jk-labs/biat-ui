@@ -41,7 +41,7 @@ class SelectState<T>(
     controlledOpen: Boolean? = null,
     controlledQuery: String? = null,
     var onOpenChange: ((Boolean) -> Unit)? = null,
-    val onSelectedChange: ((T?) -> Unit)? = null,
+    var onSelectedChange: ((T?) -> Unit)? = null,
     var onQueryChange: ((String) -> Unit)? = null,
 ) {
     private var internalOpen by mutableStateOf(initialOpen)
@@ -69,7 +69,9 @@ class SelectState<T>(
         highlightedIndex = -1
         setOpen(false)
     }
-    fun toggle() = setOpen(!isOpen)
+    fun toggle() {
+        if (isOpen) close() else open()
+    }
 
     @JvmName("setOpenState")
     fun setOpen(open: Boolean) {
@@ -93,21 +95,54 @@ class SelectState<T>(
     /**
      * Sets the filter text. Non-empty input opens the listbox and resets
      * highlight so navigation starts from the top of the filtered list.
-     * In controlled-query mode this only notifies via [onQueryChange].
+     * In controlled-query mode this only notifies via [onQueryChange] and
+     * leaves transient state (highlight, openness) untouched until the
+     * owner reflects the new query back into [controlledQuery].
      */
     fun setQuery(value: String) {
         if (query == value) return
         if (controlledQuery != null) {
             onQueryChange?.invoke(value)
-        } else {
-            internalQuery = value
-            onQueryChange?.invoke(value)
+            return
         }
+        internalQuery = value
+        onQueryChange?.invoke(value)
         highlightedIndex = -1
         if (value.isNotEmpty() && !isOpen) open()
     }
 
     fun clearQuery() = setQuery("")
+
+    /**
+     * Moves highlight by [delta] within a visible list of [size], wrapping
+     * around. From no-highlight (-1) Down lands on the first option and Up
+     * on the last. No-op when [size] is not positive.
+     */
+    fun moveHighlight(delta: Int, size: Int) {
+        if (size <= 0) return
+        highlightedIndex = if (highlightedIndex < 0) {
+            if (delta > 0) 0 else size - 1
+        } else {
+            (highlightedIndex + delta).mod(size)
+        }
+    }
+
+    /** Jumps highlight to the first visible option. No-op when empty. */
+    fun highlightFirst(size: Int) {
+        if (size > 0) highlightedIndex = 0
+    }
+
+    /** Jumps highlight to the last visible option. No-op when empty. */
+    fun highlightLast(size: Int) {
+        if (size > 0) highlightedIndex = size - 1
+    }
+
+    /**
+     * Returns the highlighted value within [visible], or null when nothing
+     * is highlighted. Callers commit only on non-null so Enter with no
+     * highlight falls through instead of being swallowed.
+     */
+    fun commitValue(visible: List<T>): T? = visible.getOrNull(highlightedIndex)
 
     /**
      * Returns [options] filtered by the current [query] using [toDisplay]
@@ -164,11 +199,11 @@ fun <T> rememberSelectState(
         initialOpen = initialOpen,
         initialSelected = initialSelected,
         initialQuery = initialQuery,
-        onSelectedChange = onSelectedChange,
     )
 }.apply {
     this.controlledOpen = controlledOpen
     this.onOpenChange = onOpenChange
+    this.onSelectedChange = onSelectedChange
     this.controlledQuery = controlledQuery
     this.onQueryChange = onQueryChange
 }
