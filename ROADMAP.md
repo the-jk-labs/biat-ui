@@ -112,14 +112,29 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [x] Toolbar (roving tabindex, orientation + RTL arrows, disabled skip)
 - [x] Avatar (fallback behavior) / Separator / Label primitives
 - [x] Each ships with state + behavior + slots + tests + sample, per AGENTS.md
-- Certified on ALT-LX1 (API 14): 74/74 instrumented, 54/54 JVM green.
+- Certified on ALT-LX1 (API 14): 74/74 instrumented, 54/54 JVM green
+  (63/63 after the post-release 9-bug sweep + regression tests).
 
 ## v0.5.0: Polish for 1.0 candidacy
 
-- [ ] Public API review: naming consistency (`Trigger/Content/Close/Item` suffixes)
-- [ ] Binary-compatibility validation (binary-compatibility-validator plugin)
-- [ ] Dokka API docs + behavior-contract docs per primitive
-- [ ] Detekt/ktlint + API lint in CI
+- [x] Public API review: naming consistency (`Trigger/Content/Close/Item` suffixes).
+      Renamed `RadioValue` to `RadioGroupValue`, `RadioOption` to `RadioItem`
+      (plus `RadioGroupScope.Option` to `Item`), `Select(option:)` to `item:`,
+      `Tooltip(anchor:/overlay:)` to `trigger:/content:`, and the matching
+      `*OptionSemantics` helpers to `*ItemSemantics`. Domain slots kept
+      (`Tabs tab:/panel:`, `Slider track:/thumb:`, `Avatar fallback:`).
+- [ ] Binary-compatibility validation (binary-compatibility-validator plugin).
+      DEFERRED: the plugin only hooks the `kotlin-android` Gradle plugin,
+      which this repo deliberately does not apply (AGP built-in Kotlin per
+      AGENTS.md), so it registers no tasks. Revisit if the toolchain changes.
+- [x] Behavior-contract docs per primitive (KDoc on every public declaration,
+      audited 0 missing). Dokka HTML generation itself is toolchain-blocked
+      like binary-compat validation (Dokka Gradle plugin emits empty output
+      without the Kotlin Gradle plugin); KDoc stays the source of truth.
+- [x] ktlint + API lint in CI (`ktlintCheck`/`ktlintFormat` Gradle tasks backed
+      by ktlint-cli 1.8.0 + `.editorconfig` with `ktlint_official`, wired into
+      `check` and the CI Lint step; whole tree formatted clean). Detekt not
+      adopted; API-signature linting waits on the binary-compat item above.
 - [ ] Screenshot-free sample gallery (all styling in sample, themes switcher)
 
 ## v1.0.0: Stable
