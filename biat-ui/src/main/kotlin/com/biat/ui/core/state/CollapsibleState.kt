@@ -52,6 +52,11 @@ class CollapsibleState(
     }
 }
 
+/**
+ * Remembers [CollapsibleState] across recompositions. The instance survives;
+ * [controlledExpanded] and [onExpandedChange] are refreshed every
+ * recomposition. In controlled mode changes only notify.
+ */
 @Composable
 fun rememberCollapsibleState(
     initialExpanded: Boolean = false,

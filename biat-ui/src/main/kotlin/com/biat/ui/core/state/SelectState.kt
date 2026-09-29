@@ -194,6 +194,12 @@ class SelectState<T>(
     }
 }
 
+/**
+ * Remembers [SelectState] across recompositions. The instance survives;
+ * [controlledOpen], [controlledQuery], and all change callbacks are
+ * refreshed every recomposition. In controlled mode open/close/toggle and
+ * query changes only notify; the owner drives them.
+ */
 @Composable
 fun <T> rememberSelectState(
     initialOpen: Boolean = false,

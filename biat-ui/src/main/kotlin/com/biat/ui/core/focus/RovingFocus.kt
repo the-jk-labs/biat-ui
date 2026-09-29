@@ -83,6 +83,11 @@ class RovingFocusState(
     enum class Orientation { Vertical, Horizontal, Both }
 }
 
+/**
+ * Remembers [RovingFocusState] across recompositions. The instance survives;
+ * [itemCount], [loop], and [orientation] are reflected every recomposition
+ * (focus clamps instead of resetting when items shrink).
+ */
 @Composable
 fun rememberRovingFocusState(
     itemCount: Int,

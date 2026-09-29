@@ -101,6 +101,11 @@ class SliderState(
     }
 }
 
+/**
+ * Remembers [SliderState] across recompositions. [valueRange], [step],
+ * [enabled], and [onValueChange] are reflected every recomposition
+ * (uncontrolled values re-snap silently when the config changes).
+ */
 @Composable
 fun rememberSliderState(
     initialValue: Float = 0f,

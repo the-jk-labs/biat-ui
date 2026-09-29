@@ -20,6 +20,11 @@ import androidx.compose.ui.focus.FocusRequester
 @Composable
 fun rememberFocusReturnRequester(): FocusRequester = remember { FocusRequester() }
 
+/**
+ * Returns focus to [returnRequester] on open-to-close transitions of [isOpen].
+ * Attach the requester to the overlay trigger via Modifier.focusRequester.
+ * Missing or detached triggers are ignored instead of crashing.
+ */
 @Composable
 fun FocusReturnEffect(
     isOpen: Boolean,

@@ -131,6 +131,12 @@ class MenuState(
     }
 }
 
+/**
+ * Remembers [MenuState] across recompositions. The instance survives
+ * [itemCount] changes (openness is kept, highlight clamps); [controlledOpen]
+ * and [onOpenChange] are refreshed every recomposition. In controlled mode
+ * open/close/toggle only notify.
+ */
 @Composable
 fun rememberMenuState(
     initialOpen: Boolean = false,

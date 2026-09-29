@@ -39,6 +39,11 @@ class RadioGroupState(
     fun isSelected(value: Any?): Boolean = selectedValue == value
 }
 
+/**
+ * Remembers [RadioGroupState] across recompositions. [enabled] and
+ * [onSelectedChange] are refreshed every recomposition so handlers never
+ * go stale.
+ */
 @Composable
 fun rememberRadioGroupState(
     initialSelected: Any? = null,

@@ -41,12 +41,19 @@ class FocusTrapState {
     internal var focusInside by mutableStateOf(false)
 }
 
+/** Remembers [FocusTrapState] across recompositions. */
 @Composable
 fun rememberFocusTrapState(): FocusTrapState = remember { FocusTrapState() }
 
+/** Remembers the trigger [FocusRequester] focus returns to when the trap releases. */
 @Composable
 fun rememberFocusTrapRequester(): FocusRequester = remember { FocusRequester() }
 
+/**
+ * Traps Tab navigation inside this node while [active]: Tab/Shift+Tab wrap
+ * at the edges via [focusManager] instead of leaving. Returns this
+ * unmodified when inactive. Detached requesters are ignored safely.
+ */
 fun Modifier.focusTrap(
     active: Boolean,
     trapRequester: FocusRequester,
@@ -108,6 +115,10 @@ fun Modifier.focusTrap(
         }
 }
 
+/**
+ * Requests [trapRequester] when [active] turns true so Tab cycling starts
+ * inside the trap. Entry focus only; wrap behaviour lives in [focusTrap].
+ */
 @Composable
 fun FocusTrapEffect(
     active: Boolean,

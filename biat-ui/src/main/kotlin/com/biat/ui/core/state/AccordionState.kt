@@ -81,6 +81,11 @@ class AccordionState(
     }
 }
 
+/**
+ * Remembers [AccordionState] across recompositions. [type], [collapsible],
+ * and [onOpenChange] are refreshed every recomposition so handlers never
+ * go stale.
+ */
 @Composable
 fun rememberAccordionState(
     initialValues: List<Any?> = emptyList(),

@@ -84,6 +84,11 @@ class ToolbarState(
     }
 }
 
+/**
+ * Remembers [ToolbarState] across recompositions. The instance survives
+ * [itemCount] changes; counts and [disabledIndices] are reflected every
+ * recomposition with focus clamped to an enabled item.
+ */
 @Composable
 fun rememberToolbarState(
     itemCount: Int,

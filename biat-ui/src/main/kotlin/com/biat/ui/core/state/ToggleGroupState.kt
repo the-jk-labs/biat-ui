@@ -75,6 +75,11 @@ class ToggleGroupState(
     }
 }
 
+/**
+ * Remembers [ToggleGroupState] across recompositions. [type],
+ * [allowDeselect], [enabled], and [onPressedChange] are refreshed every
+ * recomposition so handlers never go stale.
+ */
 @Composable
 fun rememberToggleGroupState(
     initialPressed: List<Any?> = emptyList(),

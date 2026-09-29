@@ -29,6 +29,10 @@ import com.biat.ui.core.state.TabsState
 import com.biat.ui.core.state.rememberTabsState
 import com.biat.ui.core.state.resolveTabIndex
 
+/**
+ * Caller key for one tab. [value] drives [TabsState] selection;
+ * [label] is announced on the tab for screen readers.
+ */
 data class TabValue<T>(
     val value: T,
     val label: String,

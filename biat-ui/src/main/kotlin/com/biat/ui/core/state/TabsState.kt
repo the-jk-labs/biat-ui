@@ -7,6 +7,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
+/**
+ * Selection state for [Tabs][com.biat.ui.primitives.tabs.Tabs]. Selection is
+ * always uncontrolled: [select] updates [selectedValue] and notifies
+ * [onSelectedChange]. Focus is tracked separately by the Tabs composable
+ * (automatic vs manual activation).
+ */
 @Stable
 class TabsState(
     initialSelected: Any? = null,
@@ -54,6 +60,10 @@ fun resolveTabIndex(
     }
 }
 
+/**
+ * Remembers [TabsState] across recompositions. [onSelectedChange] is
+ * refreshed every recomposition so the handler never goes stale.
+ */
 @Composable
 fun rememberTabsState(
     initialSelected: Any? = null,

@@ -40,6 +40,10 @@ class AvatarState(
     }
 }
 
+/**
+ * Remembers [AvatarState] across recompositions. [onStatusChange] is
+ * refreshed every recomposition so the handler never goes stale.
+ */
 @Composable
 fun rememberAvatarState(
     initialStatus: AvatarStatus = AvatarStatus.Loading,

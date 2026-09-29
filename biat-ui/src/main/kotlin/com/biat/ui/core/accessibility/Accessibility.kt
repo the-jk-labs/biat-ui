@@ -45,6 +45,7 @@ fun Modifier.tabSemantics(
         if (label != null) contentDescription = label
     }
 
+/** Semantics for tab-list containers: exposes [label] without merging descendants. */
 fun Modifier.tabListSemantics(label: String? = null): Modifier =
     this.semantics(mergeDescendants = false) {
         if (label != null) contentDescription = label

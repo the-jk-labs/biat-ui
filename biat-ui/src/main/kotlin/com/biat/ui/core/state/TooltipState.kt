@@ -50,6 +50,11 @@ class TooltipState(
     }
 }
 
+/**
+ * Remembers [TooltipState] across recompositions. The instance survives;
+ * [controlledVisible] and [onVisibleChange] are refreshed every
+ * recomposition. In controlled mode visibility changes only notify.
+ */
 @Composable
 fun rememberTooltipState(
     initialVisible: Boolean = false,

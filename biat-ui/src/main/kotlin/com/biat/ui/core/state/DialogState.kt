@@ -56,6 +56,12 @@ class DialogState(
     }
 }
 
+/**
+ * Remembers [DialogState] across recompositions. The instance survives;
+ * [controlledOpen] and [onOpenChange] are refreshed every recomposition.
+ * In controlled mode (non-null [controlledOpen]) open/close/toggle only
+ * notify; the owner drives visibility.
+ */
 @Composable
 fun rememberDialogState(
     initialOpen: Boolean = false,

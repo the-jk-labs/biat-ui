@@ -152,6 +152,11 @@ fun resolveSheetSettle(
     }
 }
 
+/**
+ * Remembers [SheetState] across recompositions. The instance survives;
+ * [controlledOpen], [onOpenChange], and [onDetentChange] are refreshed every
+ * recomposition. In controlled mode open/close/toggle only notify.
+ */
 @Composable
 fun rememberSheetState(
     initialOpen: Boolean = false,

@@ -77,6 +77,11 @@ class ToggleState(
     }
 }
 
+/**
+ * Remembers [ToggleState] across recompositions. The instance survives;
+ * [controlledValue], [enabled], and [onValueChange] are refreshed every
+ * recomposition. In controlled mode changes only notify.
+ */
 @Composable
 fun rememberToggleState(
     initialValue: ToggleValue = ToggleValue.Off,
