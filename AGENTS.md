@@ -59,12 +59,23 @@ AGENTS.md | ROADMAP.md | README.md
 ./gradlew :biat-ui:testDebugUnitTest      # JVM state-machine tests
 ./gradlew :biat-ui:assembleRelease        # library AAR
 ./gradlew :sample:assembleDebug           # demo APK
+./gradlew ktlintCheck                     # style gate (ktlint-cli, .editorconfig)
+./gradlew :biat-ui:apiCheck               # public API vs biat-ui/api/current.txt
+./gradlew :biat-ui:dokkaHtml              # KDoc HTML into biat-ui/build/dokka
 ```
 
 Requirements: JDK 17, Android SDK (`sdk.dir` in `local.properties` or
 `ANDROID_HOME`/`ANDROID_SDK_ROOT`). Compile SDK 37, min SDK 24.
 Toolchain: Kotlin 2.4.20, AGP 9.4.1 (built-in Kotlin; do NOT apply
-`org.jetbrains.kotlin.android`), Gradle 9.8.0, Compose BOM 2026.09.00.
+`org.jetbrains.kotlin.android`, AGP 9 fails the build if you try),
+Gradle 9.8.0, Compose BOM 2026.09.00.
+
+Gradle plugins that hook the Kotlin Gradle plugin source sets do not work
+here (binary-compatibility-validator, Dokka Gradle plugin, ktlint Gradle
+plugin register zero tasks). Wire such tooling as CLI tasks instead, as
+done for `ktlintCheck`/`ktlintFormat` (ktlint-cli), `:biat-ui:dokkaHtml`
+(dokka-cli + generated JSON config), and `:biat-ui:apiDump`/`:biat-ui:apiCheck`
+(javap signature snapshot in `biat-ui/api/current.txt`, enforced by `check`).
 
 ## Code style
 
@@ -81,4 +92,5 @@ Toolchain: Kotlin 2.4.20, AGP 9.4.1 (built-in Kotlin; do NOT apply
 - [ ] Focus correct (trap for modal, roving for lists, return focus on close)
 - [ ] Semantics roles + labels present
 - [ ] Zero styling in library; sample demo shows custom visuals
+- [ ] `:biat-ui:apiDump` refreshed if public signatures changed (`apiCheck` enforces)
 - [ ] AGENTS.md / ROADMAP.md updated if scope changed

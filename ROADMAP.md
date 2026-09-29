@@ -123,14 +123,18 @@ Status as of v0.1.0 scaffold (2026-09-26).
       `Tooltip(anchor:/overlay:)` to `trigger:/content:`, and the matching
       `*OptionSemantics` helpers to `*ItemSemantics`. Domain slots kept
       (`Tabs tab:/panel:`, `Slider track:/thumb:`, `Avatar fallback:`).
-- [ ] Binary-compatibility validation (binary-compatibility-validator plugin).
-      DEFERRED: the plugin only hooks the `kotlin-android` Gradle plugin,
-      which this repo deliberately does not apply (AGP built-in Kotlin per
-      AGENTS.md), so it registers no tasks. Revisit if the toolchain changes.
+- [x] Binary-compatibility validation. The validator Gradle plugin cannot
+      run here (it hooks `org.jetbrains.kotlin.android`, which AGP 9 forbids),
+      and Metalava's Maven artifacts ship no runnable entry point, so API
+      stability is enforced with JDK `javap` instead: `:biat-ui:apiDump`
+      snapshots release-class signatures into `biat-ui/api/current.txt` and
+      `:biat-ui:apiCheck` (wired into `check` and CI) fails with a diff on
+      change. Verified with a negative test (temporary added function).
 - [x] Behavior-contract docs per primitive (KDoc on every public declaration,
-      audited 0 missing). Dokka HTML generation itself is toolchain-blocked
-      like binary-compat validation (Dokka Gradle plugin emits empty output
-      without the Kotlin Gradle plugin); KDoc stays the source of truth.
+      audited 0 missing) plus working Dokka HTML generation: `:biat-ui:dokkaHtml`
+      drives dokka-cli 2.0.0 with a generated JSON config (offline, PUBLIC
+      visibility, `reportUndocumented`), since the Dokka Gradle plugin emits
+      empty output without the Kotlin Gradle plugin.
 - [x] ktlint + API lint in CI (`ktlintCheck`/`ktlintFormat` Gradle tasks backed
       by ktlint-cli 1.8.0 + `.editorconfig` with `ktlint_official`, wired into
       `check` and the CI Lint step; whole tree formatted clean). Detekt not
