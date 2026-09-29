@@ -145,7 +145,69 @@ tasks.named("check") {
     dependsOn("apiCheck")
 }
 
+// Dokka HTML docs from KDoc, driven via dokka-cli (fat jar + JSON config).
+// The Dokka Gradle plugin emits empty output here because it hooks the
+// Kotlin Gradle plugin source sets, which AGP 9 forbids (built-in Kotlin).
+val dokkaCli = configurations.create("dokkaCli")
+val dokkaPlugins = configurations.create("dokkaPlugins")
+
+fun jsonString(value: String): String = "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+tasks.register<JavaExec>("dokkaHtml") {
+    group = "documentation"
+    description = "Generates HTML API docs from KDoc into build/dokka/html."
+    dependsOn("compileReleaseKotlin")
+    classpath = dokkaCli
+    mainClass.set("org.jetbrains.dokka.MainKt")
+    standardOutput = System.out
+    errorOutput = System.err
+    doFirst {
+        val outDir =
+            layout.buildDirectory
+                .dir("dokka/html")
+                .get()
+                .asFile
+        val configFile =
+            layout.buildDirectory
+                .file("dokka/config.json")
+                .get()
+                .asFile
+        outDir.mkdirs()
+        configFile.parentFile.mkdirs()
+        val classpathJson = apiClasspath().split(File.pathSeparator).joinToString(", ") { jsonString(it) }
+        val pluginsJson = dokkaPlugins.files.joinToString(", ") { jsonString(it.absolutePath) }
+        configFile.writeText(
+            """
+            {
+              "moduleName": "biat-ui",
+              "outputDir": ${jsonString(outDir.absolutePath)},
+              "offlineMode": true,
+              "reportUndocumented": true,
+              "sourceSets": [
+                {
+                  "sourceSetID": { "scopeId": "biat-ui", "sourceSetName": "main" },
+                  "displayName": "android",
+                  "analysisPlatform": "jvm",
+                  "sourceRoots": [${jsonString(
+                layout.projectDirectory
+                    .dir("src/main/kotlin")
+                    .asFile.absolutePath,
+            )}],
+                  "classpath": [$classpathJson]
+                }
+              ],
+              "pluginsClasspath": [$pluginsJson]
+            }
+            """.trimIndent(),
+        )
+        args = listOf(configFile.absolutePath)
+    }
+}
+
 dependencies {
+    dokkaCli(libs.dokka.cli)
+    dokkaPlugins(libs.dokka.base)
+    dokkaPlugins(libs.dokka.analysis)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)

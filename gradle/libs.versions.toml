@@ -6,6 +6,7 @@ coreKtx = "1.19.1"
 activityCompose = "1.13.0"
 coroutinesAndroid = "1.11.0"
 junit = "4.13.2"
+dokkaCli = "2.0.0"
 ktlintCli = "1.8.0"
 
 [libraries]
@@ -25,6 +26,9 @@ core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx"
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutinesAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ktlint-cli = { group = "com.pinterest.ktlint", name = "ktlint-cli", version.ref = "ktlintCli" }
+dokka-cli = { group = "org.jetbrains.dokka", name = "dokka-cli", version.ref = "dokkaCli" }
+dokka-base = { group = "org.jetbrains.dokka", name = "dokka-base", version.ref = "dokkaCli" }
+dokka-analysis = { group = "org.jetbrains.dokka", name = "analysis-kotlin-symbols", version.ref = "dokkaCli" }
 
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
