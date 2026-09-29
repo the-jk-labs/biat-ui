@@ -3,6 +3,8 @@ package com.biat.ui
 import com.biat.ui.core.focus.shouldReturnFocus
 import com.biat.ui.core.state.AccordionState
 import com.biat.ui.core.state.AccordionType
+import com.biat.ui.core.state.AvatarState
+import com.biat.ui.core.state.AvatarStatus
 import com.biat.ui.core.state.CollapsibleState
 import com.biat.ui.core.state.DialogState
 import com.biat.ui.core.state.MenuState
@@ -12,15 +14,23 @@ import com.biat.ui.core.state.SelectState
 import com.biat.ui.core.state.SheetDetent
 import com.biat.ui.core.state.SheetSettle
 import com.biat.ui.core.state.SheetState
+import com.biat.ui.core.state.SliderState
 import com.biat.ui.core.state.TabMove
+import com.biat.ui.core.state.ToggleGroupState
+import com.biat.ui.core.state.ToggleGroupType
 import com.biat.ui.core.state.ToggleState
 import com.biat.ui.core.state.ToggleValue
+import com.biat.ui.core.state.ToolbarState
+import com.biat.ui.core.state.coerceAndSnap
+import com.biat.ui.core.state.fractionToValue
 import com.biat.ui.core.state.isOn
 import com.biat.ui.core.state.next
 import com.biat.ui.core.state.resolveSheetSettle
 import com.biat.ui.core.state.resolveTabIndex
+import com.biat.ui.core.state.resolveToolbarIndex
 import com.biat.ui.core.state.TabsState
 import com.biat.ui.core.state.TooltipState
+import com.biat.ui.core.state.valueToFraction
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -505,5 +515,131 @@ class StateMachinesTest {
         state.enabled = false
         state.select("c")
         assertTrue(state.isSelected("b"))
+    }
+
+    @Test
+    fun slider_clampsSnapsAndNotifies() {
+        val events = mutableListOf<Float>()
+        val state = SliderState(
+            initialValue = 0f,
+            valueRange = 0f..10f,
+            step = 2f,
+            onValueChange = { events.add(it) },
+        )
+        state.setValue(3f) // snaps to 4
+        assertEquals(4f, state.value)
+        state.setValue(4f) // no-op, no duplicate event
+        state.setValue(99f) // clamps to max
+        assertEquals(10f, state.value)
+        state.increase()
+        assertEquals(10f, state.value) // already at max
+        state.toMin()
+        assertEquals(0f, state.value)
+        state.toMax()
+        assertEquals(10f, state.value)
+        assertEquals(listOf(4f, 10f, 0f, 10f), events)
+    }
+
+    @Test
+    fun slider_controlledNotifiesWithoutMutating() {
+        val events = mutableListOf<Float>()
+        val state = SliderState(
+            controlledValue = 2f,
+            valueRange = 0f..10f,
+            step = 1f,
+            onValueChange = { events.add(it) },
+        )
+        state.increase()
+        assertEquals(2f, state.value)
+        assertEquals(listOf(3f), events)
+        state.controlledValue = 3f
+        assertEquals(3f, state.value)
+    }
+
+    @Test
+    fun slider_fractionMathRoundTrips() {
+        assertEquals(0.5f, valueToFraction(5f, 0f..10f))
+        assertEquals(0f, valueToFraction(-5f, 0f..10f))
+        assertEquals(1f, valueToFraction(99f, 0f..10f))
+        assertEquals(5f, fractionToValue(0.5f, 0f..10f))
+        assertEquals(0f, fractionToValue(-1f, 0f..10f))
+        assertEquals(4f, coerceAndSnap(3f, 0f..10f, 2f))
+        assertEquals(3.5f, coerceAndSnap(3.5f, 0f..10f, 0f))
+    }
+
+    @Test
+    fun toggleGroup_singleDeselect() {
+        val events = mutableListOf<List<Any?>>()
+        val state = ToggleGroupState(onPressedChange = { events.add(it) })
+        state.toggle("a")
+        assertTrue(state.isPressed("a"))
+        state.toggle("b")
+        assertTrue(state.isPressed("b"))
+        assertEquals(listOf("b"), state.pressedValues)
+        state.toggle("b")
+        assertTrue(state.pressedValues.isEmpty())
+        assertEquals(
+            listOf(listOf("a"), listOf("b"), emptyList<Any>()),
+            events,
+        )
+    }
+
+    @Test
+    fun toggleGroup_singleNonDeselectableKeepsOne() {
+        val state = ToggleGroupState(allowDeselect = false)
+        state.toggle("a")
+        state.toggle("a")
+        assertTrue(state.isPressed("a"))
+    }
+
+    @Test
+    fun toggleGroup_multipleTogglesMembership() {
+        val state = ToggleGroupState(type = ToggleGroupType.Multiple)
+        state.toggle("a")
+        state.toggle("b")
+        assertTrue(state.isPressed("a"))
+        assertTrue(state.isPressed("b"))
+        state.toggle("a")
+        assertEquals(listOf("b"), state.pressedValues)
+        state.enabled = false
+        state.toggle("c")
+        assertEquals(listOf("b"), state.pressedValues)
+    }
+
+    @Test
+    fun toolbar_moveSkipsDisabledAndWraps() {
+        assertEquals(2, resolveToolbarIndex(0, 3, 1, disabled = setOf(1)))
+        assertEquals(0, resolveToolbarIndex(2, 3, 1))
+        assertEquals(2, resolveToolbarIndex(0, 3, -1))
+        assertEquals(-1, resolveToolbarIndex(0, 2, 1, disabled = setOf(0, 1)))
+        assertEquals(-1, resolveToolbarIndex(0, 0, 1))
+    }
+
+    @Test
+    fun toolbar_stateFocusMoves() {
+        val state = ToolbarState(itemCount = 3, disabledIndices = setOf(1))
+        state.move(1)
+        assertEquals(2, state.focusedIndex)
+        state.move(1)
+        assertEquals(0, state.focusedIndex)
+        state.moveToLast()
+        assertEquals(2, state.focusedIndex)
+        state.moveToFirst()
+        assertEquals(0, state.focusedIndex)
+    }
+
+    @Test
+    fun avatar_fallbackUntilLoaded() {
+        val events = mutableListOf<AvatarStatus>()
+        val state = AvatarState(onStatusChange = { events.add(it) })
+        assertTrue(state.showFallback)
+        state.markLoaded()
+        assertEquals(AvatarStatus.Loaded, state.status)
+        assertEquals(listOf(AvatarStatus.Loaded), events)
+        state.markLoaded() // no-op, no duplicate event
+        state.markError()
+        assertTrue(state.showFallback)
+        state.reset()
+        assertEquals(AvatarStatus.Loading, state.status)
     }
 }
