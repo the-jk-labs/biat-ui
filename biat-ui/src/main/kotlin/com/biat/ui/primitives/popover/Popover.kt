@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.biat.ui.core.dismiss.onEscape
+import com.biat.ui.core.accessibility.overlayTriggerSemantics
 import com.biat.ui.core.focus.FocusReturnEffect
 import com.biat.ui.core.focus.FocusTrapEffect
 import com.biat.ui.core.focus.focusTrap
@@ -37,17 +38,20 @@ import com.biat.ui.core.state.rememberPopoverState
  *   the popup root on open. Non-modal (the default) leaves focus alone.
  *   Either way callers render their own scrim; outside-click dismissal is
  *   still governed by [dismissOnOutsideClick].
+ * - [label] names the trigger for screen readers (announced with
+ *   expanded/collapsed state).
  *
- * Anchor-follow on scroll/resize comes from the platform: Popup re-resolves
- * the shared placement engine against fresh anchor bounds whenever the
- * anchor moves, so the popup tracks scrolling content with no extra API.
- */
+  * Anchor-follow on scroll/resize comes from the platform: Popup re-resolves
+  * the shared placement engine against fresh anchor bounds whenever the
+  * anchor moves, so the popup tracks scrolling content with no extra API.
+  */
 @Composable
 fun Popover(
     state: PopoverState = rememberPopoverState(),
     dismissOnOutsideClick: Boolean = true,
     dismissOnEscape: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    label: String? = null,
     side: PopupSide = PopupSide.Bottom,
     align: PopupAlign = PopupAlign.Start,
     sideOffset: Dp = 0.dp,
@@ -67,6 +71,7 @@ fun Popover(
         Box(
             modifier = Modifier
                 .focusRequester(returnRequester)
+                .overlayTriggerSemantics(expanded = state.isOpen, label = label)
                 .clickable(
                     interactionSource = source,
                     indication = null,

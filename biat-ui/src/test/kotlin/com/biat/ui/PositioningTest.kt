@@ -186,4 +186,31 @@ class PositioningTest {
             ),
         )
     }
+
+    @Test
+    fun rtl_alignOffset_mirrorsTowardEnd() {
+        assertEquals(
+            IntOffset(170, 260),
+            resolve(
+                anchor = IntRect(100, 200, 300, 260),
+                placement = PopupPlacement(alignOffsetPx = 10),
+                layoutDirection = LayoutDirection.Rtl,
+            ),
+        )
+    }
+
+    @Test
+    fun rtl_verticalAlignOffset_unaffected() {
+        assertEquals(
+            IntOffset(300, 210),
+            resolve(
+                anchor = IntRect(100, 200, 300, 260),
+                placement = PopupPlacement(
+                    side = PopupSide.End,
+                    alignOffsetPx = 10,
+                ),
+                layoutDirection = LayoutDirection.Rtl,
+            ),
+        )
+    }
 }

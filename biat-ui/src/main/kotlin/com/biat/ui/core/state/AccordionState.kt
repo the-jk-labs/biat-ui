@@ -32,7 +32,7 @@ class AccordionState(
     initialValues: List<Any?> = emptyList(),
     val type: AccordionType = AccordionType.Single,
     val collapsible: Boolean = true,
-    val onOpenChange: ((List<Any?>) -> Unit)? = null,
+    var onOpenChange: ((List<Any?>) -> Unit)? = null,
 ) {
     var openValues: List<Any?> by mutableStateOf(
         if (type == AccordionType.Single) initialValues.take(1) else initialValues.toList(),
@@ -91,6 +91,7 @@ fun rememberAccordionState(
         initialValues = initialValues,
         type = type,
         collapsible = collapsible,
-        onOpenChange = onOpenChange,
     )
+}.apply {
+    this.onOpenChange = onOpenChange
 }

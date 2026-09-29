@@ -105,13 +105,16 @@ private fun offsetFor(
     layoutDirection: LayoutDirection,
 ): IntOffset {
     val rtl = layoutDirection == LayoutDirection.Rtl
+    // Align offset points toward End on the horizontal axis, so it mirrors
+    // in RTL; the vertical axis always points toward Bottom.
+    val alignOffsetX = if (rtl) -alignOffsetPx else alignOffsetPx
     return when (side) {
         PopupSide.Bottom -> IntOffset(
-            x = alignX(anchorBounds, popupSize.width, align, rtl) + alignOffsetPx,
+            x = alignX(anchorBounds, popupSize.width, align, rtl) + alignOffsetX,
             y = anchorBounds.bottom + sideOffsetPx,
         )
         PopupSide.Top -> IntOffset(
-            x = alignX(anchorBounds, popupSize.width, align, rtl) + alignOffsetPx,
+            x = alignX(anchorBounds, popupSize.width, align, rtl) + alignOffsetX,
             y = anchorBounds.top - popupSize.height - sideOffsetPx,
         )
         PopupSide.End -> IntOffset(

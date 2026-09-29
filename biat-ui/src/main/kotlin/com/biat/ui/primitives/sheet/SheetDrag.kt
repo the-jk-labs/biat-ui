@@ -25,7 +25,13 @@ import kotlin.math.roundToInt
  * with zero visuals: the node follows the finger while held and the sheet
  * settles on release via [resolveSheetSettle].
  *
- * - Down past [dismissFraction] of the node height dismisses; down past
+ * Fractions ([dismissFraction]/[stepFraction]) are measured against
+ * [sheetHeightPx] when given, otherwise against the attached node's height.
+ * Pass the full sheet height when attaching to a small handle (a 48dp
+ * handle would otherwise dismiss on a ~24dp drag); attaching to the sheet
+ * root needs no override.
+ *
+ * - Down past [dismissFraction] of the sheet height dismisses; down past
  *   [stepFraction] steps one enabled stop down (dismissing from the lowest);
  *   up past [stepFraction] steps one stop up; flings move one stop in the
  *   fling direction. Anything less snaps back with no state change.
@@ -41,6 +47,7 @@ fun Modifier.sheetDrag(
     dismissFraction: Float = 0.5f,
     stepFraction: Float = 0.25f,
     flingVelocityPxPerSec: Float = 1500f,
+    sheetHeightPx: Float? = null,
 ): Modifier = composed {
     var offsetPx by remember { mutableFloatStateOf(0f) }
     var heightPx by remember { mutableIntStateOf(0) }
@@ -62,7 +69,7 @@ fun Modifier.sheetDrag(
                         from = state.detent,
                         enabled = detents,
                         dragPx = drag,
-                        sheetHeightPx = heightPx.toFloat(),
+                        sheetHeightPx = sheetHeightPx ?: heightPx.toFloat(),
                         velocityPxPerSec = velocity,
                         dismissFraction = dismissFraction,
                         stepFraction = stepFraction,

@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.biat.ui.core.accessibility.tabListSemantics
 import com.biat.ui.core.accessibility.tabSemantics
+import com.biat.ui.core.focus.safeRequestFocus
 import com.biat.ui.core.state.TabMove
 import com.biat.ui.core.state.TabsState
 import com.biat.ui.core.state.rememberTabsState
@@ -78,7 +79,7 @@ fun <T> Tabs(
 
     fun moveFocus(next: Int) {
         focusedIndex = next
-        requesters.getOrNull(next)?.requestFocus()
+        requesters.getOrNull(next)?.safeRequestFocus()
         if (activation == TabsActivation.Automatic) {
             state.select(tabs[next].value as Any?)
         }

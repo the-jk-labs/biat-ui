@@ -32,8 +32,8 @@ import androidx.compose.runtime.setValue
 @Stable
 class MenuState(
     initialOpen: Boolean = false,
-    val itemCount: Int = 0,
-    val disabledIndices: Set<Int> = emptySet(),
+    itemCount: Int = 0,
+    disabledIndices: Set<Int> = emptySet(),
     controlledOpen: Boolean? = null,
     var onOpenChange: ((Boolean) -> Unit)? = null,
 ) {
@@ -45,18 +45,32 @@ class MenuState(
      */
     var controlledOpen: Boolean? by mutableStateOf(controlledOpen)
 
+    /** Highlightable entry count. Managed by [rememberMenuState]; assign only to reflect the caller's value. */
+    private var itemCountState = mutableIntStateOf(itemCount)
+    var itemCount: Int
+        get() = itemCountState.intValue
+        set(value) {
+            itemCountState.intValue = value
+            if (highlightedIndex >= value) highlightedIndex = -1
+        }
+
+    /** Disabled indices. Managed by [rememberMenuState]; assign only to reflect the caller's value. */
+    var disabledIndices: Set<Int> by mutableStateOf(disabledIndices)
+
     val isOpen: Boolean get() = controlledOpen ?: internalOpen
 
     /** Index highlighted for keyboard / hover. -1 = none. */
     var highlightedIndex by mutableIntStateOf(-1)
-        private set
+        internal set
 
     fun open() = setOpen(true)
     fun close() {
         highlightedIndex = -1
         setOpen(false)
     }
-    fun toggle() = setOpen(!isOpen)
+    fun toggle() {
+        if (isOpen) close() else open()
+    }
 
     @JvmName("setOpenState")
     fun setOpen(open: Boolean) {
@@ -121,13 +135,15 @@ fun rememberMenuState(
     disabledIndices: Set<Int> = emptySet(),
     controlledOpen: Boolean? = null,
     onOpenChange: ((Boolean) -> Unit)? = null,
-): MenuState = remember(itemCount, disabledIndices) {
+): MenuState = remember {
     MenuState(
         initialOpen = initialOpen,
         itemCount = itemCount,
         disabledIndices = disabledIndices,
     )
 }.apply {
+    this.itemCount = itemCount
+    this.disabledIndices = disabledIndices
     this.controlledOpen = controlledOpen
     this.onOpenChange = onOpenChange
 }

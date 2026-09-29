@@ -20,7 +20,7 @@ enum class AvatarStatus { Loading, Loaded, Error }
 @Stable
 class AvatarState(
     initialStatus: AvatarStatus = AvatarStatus.Loading,
-    val onStatusChange: ((AvatarStatus) -> Unit)? = null,
+    var onStatusChange: ((AvatarStatus) -> Unit)? = null,
 ) {
     var status: AvatarStatus by mutableStateOf(initialStatus)
         private set
@@ -46,4 +46,6 @@ fun rememberAvatarState(
     onStatusChange: ((AvatarStatus) -> Unit)? = null,
 ): AvatarState = remember {
     AvatarState(initialStatus = initialStatus)
+}.apply {
+    this.onStatusChange = onStatusChange
 }

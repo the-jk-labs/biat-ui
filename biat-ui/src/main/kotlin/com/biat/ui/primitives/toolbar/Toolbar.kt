@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.biat.ui.core.accessibility.toolbarItemSemantics
 import com.biat.ui.core.accessibility.toolbarSemantics
+import com.biat.ui.core.focus.safeRequestFocus
 import com.biat.ui.core.state.ToolbarOrientation
 import com.biat.ui.core.state.ToolbarState
 import com.biat.ui.core.state.rememberToolbarState
@@ -69,18 +70,18 @@ fun <T> Toolbar(
                     if (orientation == ToolbarOrientation.Vertical) -1 else null
                 Key.MoveHome -> {
                     state.moveToFirst()
-                    requesters.getOrNull(state.focusedIndex)?.requestFocus()
+                    requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
                     return@onPreviewKeyEvent true
                 }
                 Key.MoveEnd -> {
                     state.moveToLast()
-                    requesters.getOrNull(state.focusedIndex)?.requestFocus()
+                    requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
                     return@onPreviewKeyEvent true
                 }
                 else -> null
             } ?: return@onPreviewKeyEvent false
             state.move(delta)
-            requesters.getOrNull(state.focusedIndex)?.requestFocus()
+            requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
             true
         }
 

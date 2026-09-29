@@ -29,7 +29,7 @@ class ToggleGroupState(
     val type: ToggleGroupType = ToggleGroupType.Single,
     val allowDeselect: Boolean = true,
     var enabled: Boolean = true,
-    val onPressedChange: ((List<Any?>) -> Unit)? = null,
+    var onPressedChange: ((List<Any?>) -> Unit)? = null,
 ) {
     var pressedValues: List<Any?> by mutableStateOf(
         if (type == ToggleGroupType.Single) initialPressed.take(1) else initialPressed.toList(),
@@ -90,4 +90,5 @@ fun rememberToggleGroupState(
     )
 }.apply {
     this.enabled = enabled
+    this.onPressedChange = onPressedChange
 }
