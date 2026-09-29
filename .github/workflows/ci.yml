@@ -30,4 +30,4 @@ jobs:
       - name: Lint
         run: ./gradlew ktlintCheck
       - name: Test and assemble
-        run: ./gradlew :biat-ui:testDebugUnitTest :biat-ui:assembleRelease :sample:assembleDebug
+        run: ./gradlew :biat-ui:testDebugUnitTest :biat-ui:assembleRelease :sample:assembleDebug :biat-ui:apiCheck

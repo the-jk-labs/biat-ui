@@ -33,6 +33,118 @@ android {
     }
 }
 
+// JVM-signature snapshot of the public API (javap over release classes).
+// javap ships with the JDK, so this needs no Kotlin Gradle plugin (which
+// AGP 9 forbids) and no runnable Metalava distribution. apiDump refreshes
+// the golden file; apiCheck (wired into check) fails with a diff on change.
+val apiGoldenFile = layout.projectDirectory.file("api/current.txt")
+
+fun apiOutputDirs(): List<File> =
+    listOf("compileReleaseKotlin", "compileReleaseJavaWithJavac")
+        .mapNotNull { tasks.findByName(it) }
+        .flatMap { it.outputs.files.files }
+        .filter { it.isDirectory }
+
+fun apiClassNames(): List<String> {
+    val names = mutableSetOf<String>()
+    apiOutputDirs().forEach { dir ->
+        dir
+            .walkTopDown()
+            .filter { it.isFile && it.extension == "class" }
+            .forEach { file ->
+                val name =
+                    file
+                        .relativeTo(dir)
+                        .path
+                        .removeSuffix(".class")
+                        .replace(File.separatorChar, '.')
+                if (name == "BuildConfig" || name == "R" || name.startsWith("R$") || name.contains(".R$")) return@forEach
+                names.add(name)
+            }
+    }
+    return names.sorted()
+}
+
+fun apiClasspath(): String {
+    val compileCp =
+        configurations
+            .named("releaseCompileClasspath")
+            .get()
+            .files
+            .map { it.absolutePath }
+    val outputs = apiOutputDirs().map { it.absolutePath }
+    return (outputs + compileCp).joinToString(File.pathSeparator)
+}
+
+fun registerApiDumpTask(
+    name: String,
+    outFile: File,
+): TaskProvider<Exec> =
+    tasks.register<Exec>(name) {
+        group = "verification"
+        val compileTasks = listOf("compileReleaseKotlin", "compileReleaseJavaWithJavac").mapNotNull { tasks.findByName(it) }
+        dependsOn(compileTasks)
+        doFirst {
+            outFile.parentFile.mkdirs()
+            val names = apiClassNames()
+            require(names.isNotEmpty()) { "No release classes found; compile tasks produced no output." }
+            commandLine = listOf("javap", "-classpath", apiClasspath()) + names
+            standardOutput = outFile.outputStream()
+        }
+    }
+
+registerApiDumpTask("apiDump", apiGoldenFile.asFile).configure {
+    description = "Regenerates biat-ui/api/current.txt from the release classes."
+}
+
+val apiDumpForCheck =
+    registerApiDumpTask(
+        "apiDumpForCheck",
+        layout.buildDirectory
+            .file("api/current.txt")
+            .get()
+            .asFile,
+    )
+apiDumpForCheck.configure {
+    description = "Dumps the current API signature for apiCheck (do not call directly)."
+}
+
+tasks.register("apiCheck") {
+    group = "verification"
+    description = "Fails if the public API differs from biat-ui/api/current.txt."
+    dependsOn(apiDumpForCheck)
+    doLast {
+        val golden = apiGoldenFile.asFile
+        require(golden.isFile) { "Missing ${golden.path}; run :biat-ui:apiDump to create the baseline." }
+        val current =
+            layout.buildDirectory
+                .file("api/current.txt")
+                .get()
+                .asFile
+                .readLines()
+        val expected = golden.readLines()
+        if (current != expected) {
+            val diff =
+                expected
+                    .zip(current)
+                    .mapIndexedNotNull { index, (a, b) -> if (a == b) null else "line ${index + 1}:\n- $a\n+ $b" }
+                    .take(20)
+                    .joinToString("\n")
+            val extra =
+                if (current.size != expected.size) {
+                    "\nline counts differ: golden=${expected.size}, current=${current.size}"
+                } else {
+                    ""
+                }
+            throw GradleException("Public API changed. Review the diff, then run :biat-ui:apiDump to accept.\n$diff$extra")
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn("apiCheck")
+}
+
 dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)

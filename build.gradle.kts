@@ -6,13 +6,12 @@ plugins {
 // Gradle lint plugins hook the Kotlin Gradle plugin source sets, and this
 // repo uses AGP built-in Kotlin (no org.jetbrains.kotlin.android applied).
 // Style rules come from .editorconfig (ktlint_official).
-val ktlint by configurations.creating {
-    attributes {
-        attribute(
-            Attribute.of("org.gradle.dependency.bundling", String::class.java),
-            "shadowed",
-        )
-    }
+val ktlint = configurations.create("ktlint")
+ktlint.attributes {
+    attribute(
+        Attribute.of("org.gradle.dependency.bundling", String::class.java),
+        "shadowed",
+    )
 }
 
 dependencies {
