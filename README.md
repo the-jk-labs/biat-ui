@@ -65,7 +65,7 @@ Requires JDK 17 and the Android SDK (compile SDK 37, min SDK 24).
 
 ## Versioning
 
-`com.biat:biat-ui` follows semantic versioning from 1.0.0. Behavior is the
+`io.github.the-jk-labs:biat-ui` follows semantic versioning from 1.0.0. Behavior is the
 product, so behavior-contract changes count as breaking too:
 
 - Patch: bug fixes with no signature or behavior-contract change.
@@ -76,6 +76,23 @@ product, so behavior-contract changes count as breaking too:
 Signatures are pinned by `biat-ui/api/current.txt`; `:biat-ui:apiCheck`
 fails CI on any drift. Accepting a change means refreshing the snapshot
 with `:biat-ui:apiDump` and bumping the version to match.
+
+## Publishing
+
+Releases are fully automatic. Pushing a `v*` tag runs CI (lint, tests,
+assembles, `apiCheck`) and then publishes `io.github.the-jk-labs:biat-ui`
+to Maven Central with auto-release; artifacts appear within 10 to 30 minutes.
+Dry-run locally without credentials via `./gradlew :biat-ui:publishToMavenLocal`.
+
+Maintainers must provide four GitHub Actions secrets once:
+
+| Secret | How to obtain |
+|---|---|
+| `CENTRAL_PORTAL_USERNAME` / `CENTRAL_PORTAL_PASSWORD` | Central Portal user token, not the login password (account menu, Generate User Token) |
+| `SIGNING_KEY` | `gpg --export-secret-keys --armor <key id>` (create the key with a password) |
+| `SIGNING_PASSWORD` | The key password |
+
+The public key must be distributed to a keyserver (`gpg --send-keys`).
 
 ## Docs
 

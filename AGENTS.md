@@ -62,6 +62,7 @@ AGENTS.md | ROADMAP.md | README.md
 ./gradlew ktlintCheck                     # style gate (ktlint-cli, .editorconfig)
 ./gradlew :biat-ui:apiCheck               # public API vs biat-ui/api/current.txt
 ./gradlew :biat-ui:dokkaHtml              # KDoc HTML into biat-ui/build/dokka
+./gradlew :biat-ui:publishToMavenLocal    # publish dry-run into ~/.m2
 ```
 
 Requirements: JDK 17, Android SDK (`sdk.dir` in `local.properties` or

@@ -1,12 +1,61 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
+import org.gradle.api.JavaVersion
+import java.io.File
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.vanniktech.publish)
 }
 
-// Maven Central coordinates (publish wiring lands next); the version is the
-// frozen 1.0 release line, see README "Versioning".
-group = "com.biat"
+// Maven Central coordinates (namespace io.github.the-jk-labs is registered
+// on the Central Portal); the version is the frozen 1.0 release line,
+// see README "Versioning".
+group = "io.github.the-jk-labs"
 version = "1.0.0-rc1"
+
+mavenPublishing {
+    // Uploads to the Portal and releases without manual clicks.
+    publishToMavenCentral(automaticRelease = true)
+    // Signing credentials only exist in CI; local builds publish unsigned.
+    if (findProperty("signingInMemoryKey") != null) {
+        signAllPublications()
+    }
+    coordinates("io.github.the-jk-labs", "biat-ui", version.toString())
+    pom {
+        name.set("biat-ui")
+        description.set("Headless UI primitives for Jetpack Compose.")
+        inceptionYear.set("2026")
+        url.set("https://github.com/the-jk-labs/biat-ui/")
+        licenses {
+            license {
+                name.set("Mozilla Public License Version 2.0")
+                url.set("https://www.mozilla.org/en-US/MPL/2.0/")
+            }
+        }
+        developers {
+            developer {
+                id.set("the-jk-labs")
+                name.set("JK Labs")
+                url.set("https://github.com/the-jk-labs/")
+            }
+        }
+        scm {
+            url.set("https://github.com/the-jk-labs/biat-ui/")
+            connection.set("scm:git:git://github.com/the-jk-labs/biat-ui.git")
+            developerConnection.set("scm:git:ssh://git@github.com/the-jk-labs/biat-ui.git")
+        }
+    }
+    configure(
+        AndroidSingleVariantLibrary(
+            javadocJar = JavadocJar.Dokka("dokkaHtml"),
+            sourcesJar = SourcesJar.Sources(),
+            variant = "release",
+        ),
+    )
+}
 
 android {
     namespace = "com.biat.ui"
@@ -162,16 +211,15 @@ tasks.register<JavaExec>("dokkaHtml") {
     group = "documentation"
     description = "Generates HTML API docs from KDoc into build/dokka/html."
     dependsOn("compileReleaseKotlin")
+    // Declared so downstream tasks (the published javadoc jar) can consume it.
+    val docsOutDir = layout.buildDirectory.dir("dokka/html")
+    outputs.dir(docsOutDir)
     classpath = dokkaCli
     mainClass.set("org.jetbrains.dokka.MainKt")
     standardOutput = System.out
     errorOutput = System.err
     doFirst {
-        val outDir =
-            layout.buildDirectory
-                .dir("dokka/html")
-                .get()
-                .asFile
+        val outDir = docsOutDir.get().asFile
         val configFile =
             layout.buildDirectory
                 .file("dokka/config.json")

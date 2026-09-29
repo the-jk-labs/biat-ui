@@ -149,9 +149,17 @@ Status as of v0.1.0 scaffold (2026-09-26).
       at `1.0.0-rc1` (`group`/`version` on `:biat-ui`), policy in
       README "Versioning" (behavior-contract changes are major), signatures
       pinned by `biat-ui/api/current.txt` and enforced by `:biat-ui:apiCheck`.
+      NOTE: group has since moved to `io.github.the-jk-labs` to match the
+      registered Central Portal namespace.
+- [x] Maven Central publish (`io.github.the-jk-labs:biat-ui`): vanniktech
+      publish plugin 0.37.0, release AAR + POM + sources + Dokka javadoc jar,
+      in-memory GPG signing in CI only, `publishToMavenCentral` with
+      auto-release on `v*` tags (gated on the green build job). First
+      auto-release fires on the next tag push; required secrets are listed
+      in README "Publishing". SBOM deferred.
 
 - [ ] Frozen public API, semantic versioning commitment
-- [ ] Maven Central publish (`com.biat:biat-ui`), signing, SBOM
+- [ ] SBOM for release artifacts (publish wiring itself is done above)
 - [ ] Migration + cookbook docs (Material → headless, common recipes)
 - [ ] TalkBack + keyboard certification matrix (devices/API levels)
 - [ ] GitHub Actions CI: build, unit + instrumented tests, lint, publish
