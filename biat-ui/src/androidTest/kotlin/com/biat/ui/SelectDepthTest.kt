@@ -35,7 +35,7 @@ class SelectDepthTest {
                 loading = { BasicText("Loading...") },
                 empty = { BasicText("No matches") },
                 trigger = { selected -> BasicText(selected ?: "Pick language") },
-                option = { value, _, _ -> BasicText(value) },
+                item = { value, _, _ -> BasicText(value) },
             )
         }
     }
@@ -94,7 +94,7 @@ class SelectDepthTest {
                 options = listOf("Kotlin", "Java", "Rust"),
                 empty = { BasicText("No matches") },
                 trigger = { selected -> BasicText(selected ?: "Pick") },
-                option = { value, _, _ -> BasicText(value) },
+                item = { value, _, _ -> BasicText(value) },
             )
             androidx.compose.runtime.LaunchedEffect(Unit) { state.open() }
         }

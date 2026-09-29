@@ -25,11 +25,11 @@ import com.biat.ui.core.state.rememberTooltipState
 import kotlinx.coroutines.delay
 
 /**
- * Headless Tooltip. Shows [overlay] on hover / focus after [showDelayMs],
+ * Headless Tooltip. Shows [content] on hover / focus after [showDelayMs],
  * or on touch long-press when [enableLongPress]. Placement follows
  * [side]/[align] with [sideOffset]/[alignOffset] gaps; [avoidCollisions]
  * flips to the opposite side when it overflows less and shifts the tip to
- * stay on-screen. Zero styling; caller owns overlay visuals.
+ * stay on-screen. Zero styling; caller owns content visuals.
  */
 @Composable
 fun Tooltip(
@@ -42,8 +42,8 @@ fun Tooltip(
     alignOffset: Dp = 0.dp,
     avoidCollisions: Boolean = true,
     enableLongPress: Boolean = true,
-    overlay: @Composable () -> Unit,
-    anchor: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+    trigger: @Composable () -> Unit,
 ) {
     val hoverSource = remember { MutableInteractionSource() }
     val isHovered by hoverSource.collectIsHoveredAsState()
@@ -75,11 +75,11 @@ fun Tooltip(
                     },
                 ),
         ) {
-            anchor()
+            trigger()
         }
         if (state.isVisible) {
-            // No focus return: the overlay is not focusable, so focus never
-            // leaves the anchor while the tip is visible.
+            // No focus return: the content is not focusable, so focus never
+            // leaves the trigger while the tip is visible.
             Popup(
                 popupPositionProvider = rememberBiatPopupPosition(
                     side = side,
@@ -91,7 +91,7 @@ fun Tooltip(
                 onDismissRequest = { state.hide() },
                 properties = PopupProperties(focusable = false),
             ) {
-                overlay()
+                content()
             }
         }
     }

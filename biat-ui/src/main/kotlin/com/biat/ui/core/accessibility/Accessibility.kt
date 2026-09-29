@@ -125,7 +125,7 @@ fun Modifier.radioGroupSemantics(label: String? = null): Modifier =
 /**
  * Semantics for one radio option. Selection is the caller's [selected].
  */
-fun Modifier.radioOptionSemantics(
+fun Modifier.radioItemSemantics(
     selected: Boolean,
     enabled: Boolean = true,
     label: String? = null,
@@ -231,7 +231,7 @@ fun Modifier.selectTriggerSemantics(expanded: Boolean, label: String? = null): M
  * Semantics for one select option. Announces button role with selection
  * plus highlighted state for the keyboard-navigated row.
  */
-fun Modifier.selectOptionSemantics(
+fun Modifier.selectItemSemantics(
     selected: Boolean,
     highlighted: Boolean = false,
     label: String? = null,

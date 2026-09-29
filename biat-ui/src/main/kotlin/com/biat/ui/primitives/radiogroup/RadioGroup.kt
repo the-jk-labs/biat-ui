@@ -9,15 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.biat.ui.core.accessibility.radioGroupSemantics
-import com.biat.ui.core.accessibility.radioOptionSemantics
+import com.biat.ui.core.accessibility.radioItemSemantics
 import com.biat.ui.core.state.RadioGroupState
 import com.biat.ui.core.state.rememberRadioGroupState
 
 /**
- * Caller key for one radio option. [value] drives [RadioGroupState] selection;
- * [label] is announced on the option for screen readers.
+ * Caller key for one radio item. [value] drives [RadioGroupState] selection;
+ * [label] is announced on the item for screen readers.
  */
-data class RadioValue<T>(val value: T, val label: String)
+data class RadioGroupValue<T>(val value: T, val label: String)
 
 /**
  * Headless RadioGroup. Behavior only, zero styling.
@@ -29,21 +29,21 @@ data class RadioValue<T>(val value: T, val label: String)
 @Composable
 fun <T> RadioGroup(
     state: RadioGroupState = rememberRadioGroupState(),
-    options: List<RadioValue<T>>,
+    options: List<RadioGroupValue<T>>,
     label: String? = null,
     enabled: Boolean = true,
     disabledValues: Set<T> = emptySet(),
-    option: @Composable (item: RadioValue<T>, selected: Boolean) -> Unit,
+    item: @Composable (item: RadioGroupValue<T>, selected: Boolean) -> Unit,
 ) {
     Column(modifier = Modifier.radioGroupSemantics(label)) {
         options.forEach { item ->
-            RadioOption(
+            RadioItem(
                 selected = state.isSelected(item.value as Any?),
                 enabled = enabled && item.value !in disabledValues,
                 label = item.label,
                 onSelect = { state.select(item.value as Any?) },
             ) {
-                option(item, state.isSelected(item.value as Any?))
+                item(item, state.isSelected(item.value as Any?))
             }
         }
     }
@@ -54,7 +54,7 @@ fun <T> RadioGroup(
  * for custom layouts instead of [RadioGroup].
  */
 @Composable
-fun RadioOption(
+fun RadioItem(
     selected: Boolean,
     enabled: Boolean = true,
     label: String? = null,
@@ -64,7 +64,7 @@ fun RadioOption(
     val source = remember { MutableInteractionSource() }
     Box(
         modifier = Modifier
-            .radioOptionSemantics(selected = selected, enabled = enabled, label = label)
+            .radioItemSemantics(selected = selected, enabled = enabled, label = label)
             .clickable(
                 interactionSource = source,
                 indication = null,
@@ -77,18 +77,18 @@ fun RadioOption(
 }
 
 /**
- * Scope for [RadioGroupContent]: option rows bound to a shared [state].
+ * Scope for [RadioGroupContent]: item rows bound to a shared [state].
  * Prefer [RadioGroup] for flat lists; use this only for custom layouts.
  */
 class RadioGroupScope internal constructor(private val state: RadioGroupState) {
     @Composable
-    fun <T> Option(
-        item: RadioValue<T>,
+    fun <T> Item(
+        item: RadioGroupValue<T>,
         enabled: Boolean = true,
         content: @Composable (selected: Boolean) -> Unit,
     ) {
         val selected = state.isSelected(item.value as Any?)
-        RadioOption(
+        RadioItem(
             selected = selected,
             enabled = enabled,
             label = item.label,
@@ -100,7 +100,7 @@ class RadioGroupScope internal constructor(private val state: RadioGroupState) {
 }
 
 /**
- * Custom-layout radio group: caller arranges [RadioGroupScope.Option] rows
+ * Custom-layout radio group: caller arranges [RadioGroupScope.Item] rows
  * inside [content]. Selection still lives in [state].
  */
 @Composable

@@ -8,7 +8,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import com.biat.ui.core.state.rememberRadioGroupState
 import com.biat.ui.primitives.radiogroup.RadioGroup
-import com.biat.ui.primitives.radiogroup.RadioValue
+import com.biat.ui.primitives.radiogroup.RadioGroupValue
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,8 +26,8 @@ class BitsParityRadioGroupTest {
         rule.setContent {
             RadioGroup(
                 state = rememberRadioGroupState(initialSelected = "a"),
-                options = listOf(RadioValue("a", "Alpha"), RadioValue("b", "Beta")),
-                option = { item, _ -> BasicText(item.label) },
+                options = listOf(RadioGroupValue("a", "Alpha"), RadioGroupValue("b", "Beta")),
+                item = { item, _ -> BasicText(item.label) },
             )
         }
         val beta = rule.onNodeWithContentDescription("Beta", useUnmergedTree = true)

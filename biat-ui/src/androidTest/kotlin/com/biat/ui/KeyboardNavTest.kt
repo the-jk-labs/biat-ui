@@ -261,8 +261,8 @@ class KeyboardNavTest {
         rule.setContent {
             Tooltip(
                 tip = "tip",
-                anchor = { FocusableTag("anchor") },
-                overlay = {
+                trigger = { FocusableTag("anchor") },
+                content = {
                     Box(Modifier.testTag("tip")) { BasicText("tip") }
                 },
             )
@@ -313,7 +313,7 @@ private fun SelectHarness(
         state = state,
         options = listOf("a", "b", "c"),
         trigger = { FocusableTag("trigger", request = !state.isOpen) },
-        option = { value, _, _ ->
+        item = { value, _, _ ->
             if (value == "a") {
                 FocusableTag("list-focus")
             }

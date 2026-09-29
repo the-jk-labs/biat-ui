@@ -160,10 +160,10 @@ class SemanticsTest {
         rule.setContent {
             Tooltip(
                 tip = "Save changes",
-                anchor = {
+                trigger = {
                     Box(Modifier.testTag("anchor")) { BasicText("Save") }
                 },
-                overlay = { BasicText("Save changes") },
+                content = { BasicText("Save changes") },
             )
         }
         val tipConfig = findNode(contentDescription = "Save changes").config
@@ -188,7 +188,7 @@ class SemanticsTest {
                 trigger = {
                     Box(Modifier.testTag("trigger")) { BasicText("pick") }
                 },
-                option = { value, _, _ -> BasicText(value) },
+                item = { value, _, _ -> BasicText(value) },
             )
         }
         val triggerConfig = findNode(Role.DropdownList).config

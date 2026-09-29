@@ -83,7 +83,7 @@ private fun TooltipDepthHarness(
             tip = "depth tip",
             side = side.value,
             enableLongPress = enableLongPress,
-            overlay = {
+            content = {
                 Box(
                     Modifier
                         .testTag("ttip")
@@ -93,7 +93,7 @@ private fun TooltipDepthHarness(
                     BasicText("tip")
                 }
             },
-            anchor = {
+            trigger = {
                 Box(Modifier.testTag("tanchor")) {
                     BasicText("anchor")
                 }

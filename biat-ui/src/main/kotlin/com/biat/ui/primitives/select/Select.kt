@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import com.biat.ui.core.accessibility.selectOptionSemantics
+import com.biat.ui.core.accessibility.selectItemSemantics
 import com.biat.ui.core.accessibility.selectTriggerSemantics
 import com.biat.ui.core.focus.FocusReturnEffect
 import com.biat.ui.core.focus.rememberFocusReturnRequester
@@ -77,7 +77,7 @@ fun <T> Select(
     loading: @Composable () -> Unit = {},
     empty: @Composable () -> Unit = {},
     trigger: @Composable (selected: T?) -> Unit,
-    option: @Composable ColumnScope.(value: T, highlighted: Boolean, selected: Boolean) -> Unit,
+    item: @Composable ColumnScope.(value: T, highlighted: Boolean, selected: Boolean) -> Unit,
     onSelected: ((T?) -> Unit)? = null,
 ) {
     val visible = state.filteredOptions(options, queryToString)
@@ -202,7 +202,7 @@ fun <T> Select(
                         val itemSource = remember { MutableInteractionSource() }
                         Box(
                             modifier = Modifier
-                                .selectOptionSemantics(
+                                .selectItemSemantics(
                                     selected = state.selected == value,
                                     highlighted = state.highlightedIndex == index,
                                 )
@@ -216,7 +216,7 @@ fun <T> Select(
                             ),
                         ) {
                             Column {
-                                option(
+                                item(
                                     value,
                                     state.highlightedIndex == index,
                                     state.selected == value,

@@ -69,7 +69,7 @@ import com.biat.ui.primitives.menu.MenuSeparator
 import com.biat.ui.primitives.menu.MenuSub
 import com.biat.ui.primitives.popover.Popover
 import com.biat.ui.primitives.radiogroup.RadioGroup
-import com.biat.ui.primitives.radiogroup.RadioValue
+import com.biat.ui.primitives.radiogroup.RadioGroupValue
 import com.biat.ui.primitives.select.Select
 import com.biat.ui.primitives.separator.Separator
 import com.biat.ui.primitives.sheet.Sheet
@@ -421,7 +421,7 @@ private fun TooltipDemo() {
         Tooltip(
             state = state,
             tip = "Save document",
-            overlay = {
+            content = {
                 Box(Modifier.background(Color.Black).padding(8.dp)) {
                     BasicText(
                         "Save document",
@@ -429,7 +429,7 @@ private fun TooltipDemo() {
                     )
                 }
             },
-            anchor = { DemoButton("Hover / focus me") },
+            trigger = { DemoButton("Hover / focus me") },
         )
     }
 }
@@ -442,7 +442,7 @@ private fun TooltipDepthDemo() {
             state = state,
             tip = "Delete item",
             side = PopupSide.End,
-            overlay = {
+            content = {
                 Box(Modifier.background(Color.Black).padding(8.dp)) {
                     BasicText(
                         "Delete item",
@@ -450,7 +450,7 @@ private fun TooltipDepthDemo() {
                     )
                 }
             },
-            anchor = { DemoButton("Hover, focus, or long-press me") },
+            trigger = { DemoButton("Hover, focus, or long-press me") },
         )
     }
 }
@@ -464,7 +464,7 @@ private fun SelectDemo() {
             state = state,
             options = options,
             trigger = { selected -> DemoButton(selected ?: "Pick language") },
-            option = { value, highlighted, selected ->
+            item = { value, highlighted, selected ->
                 Box(
                     Modifier
                         .fillMaxWidth()
@@ -512,7 +512,7 @@ private fun ComboboxDemo() {
                     }
                 }
             },
-            option = { value, highlighted, selected ->
+            item = { value, highlighted, selected ->
                 Box(
                     Modifier
                         .fillMaxWidth()
@@ -768,10 +768,10 @@ private fun RadioGroupDemo() {
         RadioGroup(
             state = state,
             options = listOf(
-                RadioValue("a", "Alpha"),
-                RadioValue("b", "Beta"),
+                RadioGroupValue("a", "Alpha"),
+                RadioGroupValue("b", "Beta"),
             ),
-            option = { item, selected ->
+            item = { item, selected ->
                 Box(
                     Modifier
                         .background(if (selected) Color.Black else Color.Gray)
