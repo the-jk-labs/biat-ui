@@ -32,15 +32,15 @@ Dialog(
 | Dialog | `DialogState` / `rememberDialogState` | `trigger`, `content`, `DialogTrigger`, `DialogClose` |
 | Popover | `PopoverState` | `trigger`, `content` |
 | Menu | `MenuState` / `MenuItem` | `trigger`, `content` |
-| Tooltip | `TooltipState` | `anchor`, `overlay` |
-| Select | `SelectState<T>` | `trigger`, `option` |
+| Tooltip | `TooltipState` | `trigger`, `content` |
+| Select | `SelectState<T>` | `trigger`, `item` |
 | Tabs | `TabsState` / `TabValue` | `tab`, `panel` |
 | Sheet | `SheetState` | `scrim`, `content` |
 | Collapsible | `CollapsibleState` | `trigger`, `content` |
 | Accordion | `AccordionState` / `AccordionValue` | `trigger`, `content` |
 | Checkbox / Switch / ToggleButton | `ToggleState` | `content` |
 | ToggleGroup | `ToggleGroupState` / `ToggleGroupValue` | `item` |
-| RadioGroup | `RadioGroupState` / `RadioValue` | `option` |
+| RadioGroup | `RadioGroupState` / `RadioGroupValue` | `item` |
 | Slider | `SliderState` | `track`, `thumb` |
 | Toolbar | `ToolbarState` / `ToolbarValue` | `item` |
 | Separator | stateless | `content` |
@@ -62,6 +62,20 @@ Requires JDK 17 and the Android SDK (compile SDK 37, min SDK 24).
 ./gradlew :biat-ui:assembleRelease     # AAR
 ./gradlew :sample:assembleDebug        # demo app
 ```
+
+## Versioning
+
+`com.biat:biat-ui` follows semantic versioning from 1.0.0. Behavior is the
+product, so behavior-contract changes count as breaking too:
+
+- Patch: bug fixes with no signature or behavior-contract change.
+- Minor: new primitives, new optional parameters or slots, new state helpers.
+- Major: renames, removals, new required parameters, behavior-contract
+  changes (dismiss, focus, keyboard, semantics).
+
+Signatures are pinned by `biat-ui/api/current.txt`; `:biat-ui:apiCheck`
+fails CI on any drift. Accepting a change means refreshing the snapshot
+with `:biat-ui:apiDump` and bumping the version to match.
 
 ## Docs
 

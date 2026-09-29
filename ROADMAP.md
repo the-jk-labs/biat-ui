@@ -139,9 +139,16 @@ Status as of v0.1.0 scaffold (2026-09-26).
       by ktlint-cli 1.8.0 + `.editorconfig` with `ktlint_official`, wired into
       `check` and the CI Lint step; whole tree formatted clean). Detekt not
       adopted; API-signature linting waits on the binary-compat item above.
-- [ ] Screenshot-free sample gallery (all styling in sample, themes switcher)
+- [ ] Screenshot-free sample gallery (all styling in sample, themes switcher).
+      DEFERRED by maintainer decision: the single-file sample already proves
+      arbitrary styling; a navigable gallery returns as a post-1.0 item.
 
-## v1.0.0: Stable
+## v1.0.0: Stable (in progress)
+
+- [x] Frozen public API, semantic versioning commitment: `com.biat:biat-ui`
+      at `1.0.0-rc1` (`group`/`version` on `:biat-ui`), policy in
+      README "Versioning" (behavior-contract changes are major), signatures
+      pinned by `biat-ui/api/current.txt` and enforced by `:biat-ui:apiCheck`.
 
 - [ ] Frozen public API, semantic versioning commitment
 - [ ] Maven Central publish (`com.biat:biat-ui`), signing, SBOM

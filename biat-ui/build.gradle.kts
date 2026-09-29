@@ -3,6 +3,11 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+// Maven Central coordinates (publish wiring lands next); the version is the
+// frozen 1.0 release line, see README "Versioning".
+group = "com.biat"
+version = "1.0.0-rc1"
+
 android {
     namespace = "com.biat.ui"
     compileSdk = 37
