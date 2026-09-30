@@ -30,7 +30,7 @@ import androidx.compose.runtime.setValue
  *   caller owns the text and [setQuery] only notifies. Reflect back into
  *   [controlledQuery] ([rememberSelectState] does this every recomposition).
  * - Filtering itself is caller-visible via [filteredOptions]; the composable
- *   renders the filtered list. Async options work by passing a new [options]
+ *   renders the filtered list. Async options work by passing a new `options`
  *   list whenever data arrives; highlight clamps to the visible range.
  */
 @Stable

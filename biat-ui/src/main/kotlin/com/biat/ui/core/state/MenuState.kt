@@ -27,7 +27,7 @@ import androidx.compose.runtime.setValue
  * checkbox/radio items, submenu triggers). Separators are caller-drawn and
  * excluded. Indices in [disabledIndices] are skipped by [moveHighlight] and
  * snapped past by [highlight]; when every item is disabled highlight stays
- * -1. [MenuItem] with enabled=false must sit at a disabled index.
+ * -1. [MenuItem][com.biat.ui.primitives.menu.MenuItem] with enabled=false must sit at a disabled index.
  */
 @Stable
 class MenuState(

@@ -216,6 +216,9 @@ tasks.register<JavaExec>("dokkaHtml") {
     dependsOn("compileReleaseKotlin")
     // Declared so downstream tasks (the published javadoc jar) can consume it.
     val docsOutDir = layout.buildDirectory.dir("dokka/html")
+    inputs.dir(layout.projectDirectory.dir("src/main/kotlin"))
+    inputs.files(configurations.named("releaseCompileClasspath"))
+    inputs.files(dokkaPlugins)
     outputs.dir(docsOutDir)
     classpath = dokkaCli
     mainClass.set("org.jetbrains.dokka.MainKt")

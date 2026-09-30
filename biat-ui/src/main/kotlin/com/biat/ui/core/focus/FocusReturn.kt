@@ -17,9 +17,9 @@ import kotlin.coroutines.resume
 /**
  * Focus return for overlays (Dialog / Sheet / Popover / Menu / Select).
  *
- * [FocusReturnEffect] restores focus to [returnRequester] on open-to-close
+ * [FocusReturnEffect] restores focus to `returnRequester` on open-to-close
  * transitions only, regardless of how the overlay was dismissed (ESC, item,
- * outside tap, back press). Attach [returnRequester] to the trigger or anchor
+ * outside tap, back press). Attach `returnRequester` to the trigger or anchor
  * via Modifier.focusRequester. Missing or detached anchors are ignored.
  * Style-free: behavior only, no visuals.
  */

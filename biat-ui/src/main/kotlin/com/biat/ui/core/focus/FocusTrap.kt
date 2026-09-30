@@ -25,16 +25,16 @@ import androidx.compose.ui.platform.LocalView
 /**
  * Focus trap for modal overlays (Dialog / Sheet).
  *
- * - [FocusTrapEffect] auto-focuses [trapRequester] while active.
+ * - [FocusTrapEffect] auto-focuses `trapRequester` while active.
  * - Tab / Shift+Tab cycles focus within the trap: after each move, the trap
- *   checks [FocusTrapState.focusInside]. On boundary ([FocusManager.moveFocus]
+ *   checks [FocusTrapState.focusInside]. On boundary (`FocusManager.moveFocus`
  *   returns false) or escape (focus left the trap), focus pulls back to the
  *   trap root, which lands on the first item. Forward wrap stops there;
  *   backward wrap then walks forward to the last item, pulling back again if
  *   the walk itself escapes. Tab is always consumed while active. Pass
- *   [trapState] (from [rememberFocusTrapState]) for escape detection and
+ *   `trapState` (from [rememberFocusTrapState]) for escape detection and
  *   backward wrap; without it only forward boundary wrap applies.
- * - Escape is forwarded to [onEscape] (usually dismiss).
+ * - Escape is forwarded to `onEscape` (usually dismiss).
  * - Style-free: behavior only, no visuals.
  */
 @Stable
@@ -47,7 +47,7 @@ class FocusTrapState {
 @Composable
 fun rememberFocusTrapState(): FocusTrapState = remember { FocusTrapState() }
 
-/** Remembers the trigger [FocusRequester] focus returns to when the trap releases. */
+/** Remembers the entry `FocusRequester` attached to the modal trap root. */
 @Composable
 fun rememberFocusTrapRequester(): FocusRequester = remember { FocusRequester() }
 

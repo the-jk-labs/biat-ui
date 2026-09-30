@@ -43,7 +43,7 @@ import com.biat.ui.core.state.rememberSheetState
  * - [content] height sizes the outside-click dismiss boundary: keep it
  *   wrap-content. Full-height content disables scrim dismissal.
  * - [label] is exposed as the sheet content description for screen readers.
- * - Detents ([SheetDetent] Peek/Half/Full) live in [SheetState.detent];
+ * - Detents ([SheetDetent][com.biat.ui.core.state.SheetDetent] Peek/Half/Full) live in [SheetState.detent];
  *   render content per detent and attach [sheetDrag] to the caller's drag
  *   handle for finger-following drags with settle-on-release.
  */
@@ -82,9 +82,7 @@ fun Sheet(
     val trapRequester = rememberFocusTrapRequester()
     val trapState = rememberFocusTrapState()
 
-    // Dismiss boundary follows the content bounds: taps inside the sheet
-    // are ignored even when they reach the scrim area. The scrim box shares
-    // the outer box origin, so boundsInParent compares directly.
+    // Dismiss boundary follows caller-positioned content bounds in the portal root.
     var contentBounds by remember { mutableStateOf<Rect?>(null) }
 
     BiatPortal(

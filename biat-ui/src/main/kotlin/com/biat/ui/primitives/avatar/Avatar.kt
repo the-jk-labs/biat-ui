@@ -12,7 +12,7 @@ import com.biat.ui.core.state.rememberAvatarState
  *
  * Renders [content] (the loaded image) when [AvatarState.status] is Loaded;
  * otherwise renders [fallback] (initials, generic icon, caller-owned).
- * The caller drives [AvatarState.markLoaded]/[markError] from its image
+ * The caller drives [AvatarState.markLoaded]/[AvatarState.markError] from its image
  * loader; [label] names the avatar for screen readers.
  */
 @Composable

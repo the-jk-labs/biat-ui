@@ -9,11 +9,11 @@ import androidx.compose.runtime.setValue
 
 /**
  * Tri-state for Checkbox: [Off], [On], or [Indeterminate] (partial).
- * [toggle] maps Indeterminate to On, matching platform convention.
+ * [ToggleState.toggle] maps Indeterminate to On, matching platform convention.
  */
 enum class ToggleValue { Off, On, Indeterminate }
 
-/** True when [value] is [ToggleValue.On]. */
+/** True when the receiver is [ToggleValue.On]. */
 fun ToggleValue.isOn(): Boolean = this == ToggleValue.On
 
 /**

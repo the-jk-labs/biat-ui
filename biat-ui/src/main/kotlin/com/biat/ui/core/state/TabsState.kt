@@ -42,7 +42,7 @@ enum class TabMove {
 }
 
 /**
- * Pure tab-index math: [Next]/[Previous] wrap around, [First]/[Last] jump.
+ * Pure tab-index math: [TabMove.Next]/[TabMove.Previous] wrap around, [TabMove.First]/[TabMove.Last] jump.
  * Out-of-range [current] is clamped. [size] must be positive.
  */
 fun resolveTabIndex(

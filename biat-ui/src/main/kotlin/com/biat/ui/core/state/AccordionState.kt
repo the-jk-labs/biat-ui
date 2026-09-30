@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
  * Which values an Accordion keeps open.
  *
  * - [Single]: at most one item open. Selecting the open item closes it when
- *   [collapsible] is true, otherwise it stays open.
+ *   [AccordionState.collapsible] is true, otherwise it stays open.
  * - [Multiple]: any subset open. Selecting toggles membership.
  */
 enum class AccordionType { Single, Multiple }

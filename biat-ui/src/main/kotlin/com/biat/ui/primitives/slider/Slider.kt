@@ -23,7 +23,7 @@ import com.biat.ui.core.state.rememberSliderState
 /**
  * Headless Slider. Behavior only, zero styling.
  *
- * - [track] renders the bar with the current 0..1 [fraction]; [thumb] renders
+ * - [track] renders the bar with the current 0..1 fraction; [thumb] renders
  *   the handle. Both are caller visuals entirely.
  * - Horizontal drag maps pointer distance to [SliderState.setFraction] using
  *   the measured track width; keyboard Left/Down decrements, Right/Up

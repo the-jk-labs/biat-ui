@@ -8,6 +8,10 @@
 Headless UI primitives for Jetpack Compose. State, focus, keyboard, and
 accessibility behavior without styling.
 
+Current development version: **1.0.0-rc2**. Required layout slots change
+rc1 signatures; see the [migration guide](docs/MIGRATION.md). The stable API
+freeze and first stable publication remain pending.
+
 ## Example
 
 ```kotlin
@@ -107,9 +111,12 @@ The public key must be distributed to a keyserver (`gpg --send-keys`).
 
 ## Docs
 
-- `AGENTS.md`: contributor rules
-- `ROADMAP.md`: release plan
-- `docs/CERTIFICATION.md`: automated coverage and manual certification status
+- [Contributor rules](AGENTS.md)
+- [Release plan](ROADMAP.md)
+- [Migration guide](docs/MIGRATION.md): rc1 to rc2 and Material to headless
+- [Cookbook](docs/COOKBOOK.md): controlled dialogs, groups, tabs, sliders and sheets
+- [Certification](docs/CERTIFICATION.md): automated coverage and manual status
+- `./gradlew :biat-ui:dokkaHtml`: generates KDoc HTML in `biat-ui/build/dokka/html`
 
 ## License
 

@@ -1,7 +1,7 @@
 # ROADMAP.md: biat-ui
 
 Headless UI primitives for Jetpack Compose. Behavior-first, zero styling.
-Status as of v0.1.0 scaffold (2026-09-26).
+Current development version: 1.0.0-rc2 (2026-09-30). Earlier sections record completed milestones.
 
 ## v0.1.0: Foundation (this init)
 
@@ -37,7 +37,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
       Tooltip anchor content/state description, Select DropdownList role.
       New `label` params on Dialog/Sheet/Menu/Tabs close the gap where
       helpers accepted labels the primitives never exposed. Certified on
-      ALT-LX1 (API 14): 32/32 instrumented, 24/24 JVM green.
+      ALT-LX1 (Android 14 / API 34): 32/32 instrumented, 24/24 JVM green.
 
 ## v0.3.0: Primitive depth
 
@@ -50,7 +50,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
       arrive, jumps highlight on single-key typeahead, and clears via
       Backspace/Delete on a closed trigger. Sample ComboboxDemo binds
       BasicTextField to query with simulated async reload. Certified on
-      ALT-LX1 (API 14): 37/37 instrumented, 28/28 JVM green.
+      ALT-LX1 (Android 14 / API 34): 37/37 instrumented, 28/28 JVM green.
 - [x] Menu: submenus, checkbox/radio items, separators, disabled items:
       disabled indices live in MenuState (moveHighlight skips, highlight
       snaps to enabled, all-disabled stays -1, unit-tested); MenuItem gains
@@ -60,7 +60,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
       selectable radio semantics and closes; MenuSub anchors a nested menu
       to its trigger (click/ArrowRight opens, Esc/ArrowLeft closes only the
       submenu, focus returns to trigger, parent stays open). Sample
-      MenuDepthDemo wires all five. Certified on ALT-LX1 (API 14):
+      MenuDepthDemo wires all five. Certified on ALT-LX1 (Android 14 / API 34):
       43/43 instrumented, 31/31 JVM green.
 - [x] Dialog: nested dialogs, alert vs plain variants, initial-focus target:
       nesting layers naturally (own state + window per level, Esc/tap hits
@@ -69,7 +69,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
       explicit-action dialogs (explicit param still wins); new
       initialFocusRequester focuses a caller node at first layout with trap
       root fallback (composition-time requests race the portal window).
-      Sample DialogDepthDemo wires all three. Certified on ALT-LX1 (API 14):
+      Sample DialogDepthDemo wires all three. Certified on ALT-LX1 (Android 14 / API 34):
       47/47 instrumented, 31/31 JVM green.
 - [x] Sheet: drag-to-dismiss + detents (peek/half/full), swipe velocity:
       detent lives in SheetState with onDetentChange (expand/collapse map to
@@ -80,7 +80,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
       offset and settle-on-release. Fixed consumeOverlayTaps to contain
       taps on release instead of gobbling down/move, which had starved
       inner draggables. Sample SheetDepthDemo drives heights from detent.
-      Certified on ALT-LX1 (API 14): 52/52 instrumented, 35/35 JVM green.
+      Certified on ALT-LX1 (Android 14 / API 34): 52/52 instrumented, 35/35 JVM green.
 - [x] Tabs: automatic vs manual activation modes, vertical orientation, RTL arrows:
       TabsActivation Automatic (arrows select, the default) vs Manual
       (arrows move focus only, Enter/Space or click activates via the
@@ -88,7 +88,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
       Vertical (Up/Down, Left/Right ignored); focus follows arrows via
       per-tab requesters; pure resolveTabIndex (wrap, clamp) unit-tested.
       Sample TabsDepthDemo shows manual + vertical. Certified on ALT-LX1
-      (API 14): 58/58 instrumented, 37/37 JVM green.
+      (Android 14 / API 34): 58/58 instrumented, 37/37 JVM green.
 - [x] Tooltip: placement + collision avoidance, touch long-press trigger:
       side/align/offsets wired to the shared placement engine (default Top
       Center, avoidCollisions flips + clamps); long-press shows on touch
@@ -112,7 +112,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [x] Toolbar (roving tabindex, orientation + RTL arrows, disabled skip)
 - [x] Avatar (fallback behavior) / Separator / Label primitives
 - [x] Each ships with state + behavior + slots + tests + sample, per AGENTS.md
-- Certified on ALT-LX1 (API 14): 74/74 instrumented, 54/54 JVM green
+- Certified on ALT-LX1 (Android 14 / API 34): 74/74 instrumented, 54/54 JVM green
   (63/63 after the post-release 9-bug sweep + regression tests).
 
 ## v0.5.0: Polish for 1.0 candidacy
@@ -130,10 +130,8 @@ Status as of v0.1.0 scaffold (2026-09-26).
       snapshots release-class signatures into `biat-ui/api/current.txt` and
       `:biat-ui:apiCheck` (wired into `check` and CI) fails with a diff on
       change. Verified with a negative test (temporary added function).
-- [x] Behavior-contract docs per primitive (KDoc on every public declaration,
-      audited 0 missing) plus working Dokka HTML generation: `:biat-ui:dokkaHtml`
-      drives dokka-cli 2.0.0 with a generated JSON config (offline, PUBLIC
-      visibility, `reportUndocumented`), since the Dokka Gradle plugin emits
+- [x] Behavior-contract docs per primitive (KDoc behavior contracts) plus working Dokka HTML generation: `:biat-ui:dokkaHtml`
+      drives dokka-cli 2.0.0 with a generated JSON config (offline HTML), since the Dokka Gradle plugin emits
       empty output without the Kotlin Gradle plugin.
 - [x] ktlint + API lint in CI (`ktlintCheck`/`ktlintFormat` Gradle tasks backed
       by ktlint-cli 1.8.0 + `.editorconfig` with `ktlint_official`, wired into
@@ -145,24 +143,20 @@ Status as of v0.1.0 scaffold (2026-09-26).
 
 ## v1.0.0: Stable (in progress)
 
-- [x] Frozen public API, semantic versioning commitment: `com.biat:biat-ui`
-      at `1.0.0-rc1` (`group`/`version` on `:biat-ui`), policy in
-      README "Versioning" (behavior-contract changes are major), signatures
-      pinned by `biat-ui/api/current.txt` and enforced by `:biat-ui:apiCheck`.
-      NOTE: group has since moved to `io.github.the-jk-labs` to match the
-      registered Central Portal namespace.
-- [x] Maven Central publish (`io.github.the-jk-labs:biat-ui`): vanniktech
-      publish plugin 0.37.0, release AAR + POM + sources + Dokka javadoc jar,
-      in-memory GPG signing in CI only, `publishToMavenCentral` with
-      auto-release on `v*` tags (gated on the green build job). First
-      auto-release fires on the next tag push; required secrets are listed
-      in README "Publishing". SBOM deferred.
-
-- [ ] Frozen public API, semantic versioning commitment
-- [ ] SBOM for release artifacts (publish wiring itself is done above)
-- [ ] Migration + cookbook docs (Material → headless, common recipes)
-- [ ] TalkBack + keyboard certification matrix (devices/API levels)
-- [x] GitHub Actions CI: build, unit + instrumented tests, lint, publish
+- [x] Semantic versioning policy: behavior-contract changes are breaking;
+      publication coordinates are `io.github.the-jk-labs:biat-ui`.
+- [x] Maven Central publication wiring: release AAR, POM, sources and Dokka
+      javadoc jar, in-memory GPG signing in CI, automatic release on matching
+      tags after build/lint/API and API 24/36 device gates. Required secrets
+      are listed in README "Publishing".
+- [ ] Freeze the stable public API after release-candidate validation.
+      rc2 intentionally changes required layout slots before that freeze.
+- [ ] Publish and verify the first stable 1.0.0 artifacts on Maven Central.
+- [ ] SBOM for release artifacts.
+- [x] Migration + cookbook docs (Material to headless, rc1 to rc2, common recipes).
+- [ ] Manual TalkBack + physical keyboard certification matrix.
+      Automated coverage is recorded separately in docs/CERTIFICATION.md.
+- [x] GitHub Actions CI: build, JVM + instrumented tests, lint, API check and publishing.
 
 ## 1.0.0-rc2: Behavior hardening
 
@@ -180,7 +174,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [x] Public/protected JVM API snapshot excludes generated implementation classes
       and synthetic accessors; fixture tests preserve named nested types and default ABI.
 - [x] Exact release tag/version validation before Maven Central uploads.
-- [ ] Migration/cookbook documentation.
+- [x] Migration/cookbook documentation, compiler-checked recipes and repaired KDoc links.
 
 ## Non-goals (never)
 

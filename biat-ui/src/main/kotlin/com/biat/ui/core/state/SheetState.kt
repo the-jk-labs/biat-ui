@@ -105,7 +105,7 @@ sealed interface SheetSettle {
  * positive downward. Only [enabled] stops participate; neighbors are the
  * adjacent enabled stops around [from].
  *
- * - Fast fling (|[velocity]| >= [flingVelocityPxPerSec]): one stop in the
+ * - Fast fling (|[velocityPxPerSec]| >= [flingVelocityPxPerSec]): one stop in the
  *   fling direction; flinging down from the lowest enabled stop dismisses.
  * - Otherwise positional against [sheetHeightPx]: down past
  *   [dismissFraction] dismisses; down past [stepFraction] steps one stop

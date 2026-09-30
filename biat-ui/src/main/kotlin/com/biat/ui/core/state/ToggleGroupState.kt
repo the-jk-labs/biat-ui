@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
  * Selection model for a headless toggle group.
  *
  * - [Single]: at most one value pressed. Pressing the pressed value clears it
- *   when [allowDeselect] is true, otherwise it stays.
+ *   when [ToggleGroupState.allowDeselect] is true, otherwise it stays.
  * - [Multiple]: any subset pressed. Pressing toggles membership.
  */
 enum class ToggleGroupType { Single, Multiple }

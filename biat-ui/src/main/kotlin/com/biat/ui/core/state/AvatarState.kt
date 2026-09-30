@@ -14,7 +14,7 @@ enum class AvatarStatus { Loading, Loaded, Error }
  * Logic-only state for a headless Avatar. No UI, no styling.
  *
  * The caller drives [markLoaded]/[markError] from its image loader; the
- * primitive renders [content] when [status] is Loaded and the caller fallback
+ * primitive renders `content` when [status] is Loaded and the caller fallback
  * otherwise. Every transition is mirrored to [onStatusChange].
  */
 @Stable

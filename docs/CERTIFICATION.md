@@ -7,13 +7,15 @@ human keyboard interaction on every device.
 | Target | Coverage | Status |
 |---|---|---|
 | HONOR ALT-LX1, Android 14 / API 34 | Full instrumented suite, including focus, keys, dismiss, semantics and accessibility actions | 89 tests passed on 2026-09-30 during the rc2 layout hardening |
-| Google APIs x86_64 emulator, API 24 | Full instrumented suite at the library minimum SDK | Required CI job; see the run for each commit |
-| Google APIs x86_64 emulator, API 36 | Full instrumented suite on a recent Android API | Required CI job; see the run for each commit |
+| Google APIs x86_64 emulator, API 24 | Full instrumented suite at the library minimum SDK | 89 tests passed in [CI for 81b5381](https://github.com/the-jk-labs/biat-ui/actions/runs/36741473524) on 2026-09-30; required for each commit |
+| Google APIs x86_64 emulator, API 36 | Full instrumented suite on a recent Android API | 89 tests passed in [CI for 81b5381](https://github.com/the-jk-labs/biat-ui/actions/runs/36741473524) on 2026-09-30; required for each commit |
 | Manual TalkBack, API 34 | Spoken labels, values, state, traversal and activation | Pending; automated semantics checks are not manual certification |
 | Physical keyboard, API 34 | Tab/Shift+Tab, arrows, Enter/Space, Home/End, Escape and trigger focus return | Automated key injection passed; human pass pending |
 
 CI keeps per-API reports and emulator startup logs as workflow artifacts.
-Publishing waits for both emulator jobs and the build/lint/API job.
+Publishing waits for both emulator jobs and the build/lint/API job, and the
+release tag must match the module version. Manual certification remains a
+maintainer release-readiness task; automated CI cannot establish spoken output.
 
 ## Local verification
 

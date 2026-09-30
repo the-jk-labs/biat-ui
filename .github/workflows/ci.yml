@@ -38,7 +38,7 @@ jobs:
       - name: Lint
         run: ./gradlew ktlintCheck apiSnapshotTest
       - name: Test and assemble
-        run: ./gradlew :biat-ui:testDebugUnitTest :biat-ui:assembleRelease :sample:assembleDebug :biat-ui:apiCheck
+        run: ./gradlew :biat-ui:testDebugUnitTest :biat-ui:assembleRelease :sample:assembleDebug :biat-ui:apiCheck :biat-ui:dokkaHtml
 
   instrumented:
     runs-on: ubuntu-latest

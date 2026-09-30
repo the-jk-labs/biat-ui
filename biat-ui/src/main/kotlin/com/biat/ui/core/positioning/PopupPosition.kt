@@ -206,7 +206,7 @@ private fun clampToWindow(
     )
 
 /**
- * [PopupPositionProvider] driven by [PopupPlacement]. Passed to
+ * `PopupPositionProvider` driven by [PopupPlacement]. Passed to
  * `androidx.compose.ui.window.Popup` so anchored primitives share one
  * placement engine. The caller still owns every pixel inside the popup.
  */
