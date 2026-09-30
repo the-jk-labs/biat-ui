@@ -57,7 +57,7 @@ slot has a `BoxScope` receiver for caller-owned sizing and positioning. All visu
 
 ## Build
 
-Requires JDK 17 and the Android SDK (compile SDK 37, min SDK 24).
+Requires JDK 17, Python 3 (stdlib API tooling), and the Android SDK (compile SDK 37, min SDK 24).
 
 ```bash
 ./gradlew :biat-ui:testDebugUnitTest   # unit tests
@@ -77,7 +77,13 @@ product, so behavior-contract changes count as breaking too:
 
 Signatures are pinned by `biat-ui/api/current.txt`; `:biat-ui:apiCheck`
 fails CI on any drift. Accepting a change means refreshing the snapshot
-with `:biat-ui:apiDump` and bumping the version to match.
+with `:biat-ui:apiDump` and bumping the version to match. The snapshot tracks
+public/protected JVM signatures, including Kotlin default-argument methods
+and named nested types. It excludes non-public/synthetic classes, Compose
+singleton holders, and private implementation accessors. JVM-public Kotlin
+`internal` declarations can still appear; Kotlin metadata, parameter names,
+and behavior contracts require source review. Run `./gradlew apiSnapshotTest`
+to verify filtering and change detection.
 
 ## Publishing
 

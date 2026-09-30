@@ -28,5 +28,8 @@ captures/
 .kotlin/
 *.kotlin_module
 
+# Python tooling
+__pycache__/
+
 # OS
 Thumbs.db

@@ -177,7 +177,8 @@ Status as of v0.1.0 scaffold (2026-09-26).
       device/API results and manual certification gaps in docs/CERTIFICATION.md.
 - [x] Caller-owned group and sheet layouts before the stable API freeze;
       layout slots replace fixed Row/Column and bottom/full-width placement.
-- [ ] Public API snapshot excludes generated implementation classes.
+- [x] Public/protected JVM API snapshot excludes generated implementation classes
+      and synthetic accessors; fixture tests preserve named nested types and default ABI.
 - [ ] Release tag/version validation and migration/cookbook documentation.
 
 ## Non-goals (never)

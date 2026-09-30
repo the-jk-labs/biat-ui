@@ -87,8 +87,8 @@ android {
     }
 }
 
-// JVM-signature snapshot of the public API (javap over release classes).
-// javap ships with the JDK, so this needs no Kotlin Gradle plugin (which
+// Public/protected JVM signatures, excluding generated implementation classes.
+// A Python stdlib filter drives JDK javap, without a Kotlin Gradle plugin (which
 // AGP 9 forbids) and no runnable Metalava distribution. apiDump refreshes
 // the golden file; apiCheck (wired into check) fails with a diff on change.
 val apiGoldenFile = layout.projectDirectory.file("api/current.txt")
@@ -98,26 +98,6 @@ fun apiOutputDirs(): List<File> =
         .mapNotNull { tasks.findByName(it) }
         .flatMap { it.outputs.files.files }
         .filter { it.isDirectory }
-
-fun apiClassNames(): List<String> {
-    val names = mutableSetOf<String>()
-    apiOutputDirs().forEach { dir ->
-        dir
-            .walkTopDown()
-            .filter { it.isFile && it.extension == "class" }
-            .forEach { file ->
-                val name =
-                    file
-                        .relativeTo(dir)
-                        .path
-                        .removeSuffix(".class")
-                        .replace(File.separatorChar, '.')
-                if (name == "BuildConfig" || name == "R" || name.startsWith("R$") || name.contains(".R$")) return@forEach
-                names.add(name)
-            }
-    }
-    return names.sorted()
-}
 
 fun apiClasspath(): String {
     val compileCp =
@@ -139,11 +119,15 @@ fun registerApiDumpTask(
         val compileTasks = listOf("compileReleaseKotlin", "compileReleaseJavaWithJavac").mapNotNull { tasks.findByName(it) }
         dependsOn(compileTasks)
         doFirst {
-            outFile.parentFile.mkdirs()
-            val names = apiClassNames()
-            require(names.isNotEmpty()) { "No release classes found; compile tasks produced no output." }
-            commandLine = listOf("javap", "-classpath", apiClasspath()) + names
-            standardOutput = outFile.outputStream()
+            commandLine =
+                listOf(
+                    "python3",
+                    rootProject.file("scripts/api_snapshot.py").absolutePath,
+                    "--classpath",
+                    apiClasspath(),
+                    "--out",
+                    outFile.absolutePath,
+                ) + apiOutputDirs().map { it.absolutePath }
         }
     }
 

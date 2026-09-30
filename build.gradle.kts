@@ -48,6 +48,12 @@ tasks.register<JavaExec>("ktlintFormat") {
     args = listOf("--format") + ktlintPatterns
 }
 
+tasks.register<Exec>("apiSnapshotTest") {
+    group = "verification"
+    description = "Tests API filtering and change detection with real JVM class files."
+    commandLine("python3", "scripts/test_api_snapshot.py")
+}
+
 tasks.named("check") {
-    dependsOn("ktlintCheck")
+    dependsOn("ktlintCheck", "apiSnapshotTest")
 }

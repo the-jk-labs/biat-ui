@@ -31,7 +31,7 @@ jobs:
           set -o pipefail
           sdkmanager "platforms;android-37.0"
       - name: Lint
-        run: ./gradlew ktlintCheck
+        run: ./gradlew ktlintCheck apiSnapshotTest
       - name: Test and assemble
         run: ./gradlew :biat-ui:testDebugUnitTest :biat-ui:assembleRelease :sample:assembleDebug :biat-ui:apiCheck
 
