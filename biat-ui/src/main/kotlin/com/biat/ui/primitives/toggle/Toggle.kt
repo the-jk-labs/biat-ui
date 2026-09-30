@@ -4,10 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
 import com.biat.ui.core.accessibility.checkboxSemantics
 import com.biat.ui.core.accessibility.switchSemantics
 import com.biat.ui.core.accessibility.toggleSemantics
@@ -23,6 +25,7 @@ import com.biat.ui.core.state.rememberToggleState
 private fun ToggleBox(
     onToggle: () -> Unit,
     modifier: Modifier,
+    enabled: Boolean,
     content: @Composable () -> Unit,
 ) {
     val source = remember { MutableInteractionSource() }
@@ -32,6 +35,7 @@ private fun ToggleBox(
                 interactionSource = source,
                 indication = null,
                 onClick = onToggle,
+                enabled = enabled,
             ),
     ) {
         content()
@@ -52,15 +56,29 @@ fun Checkbox(
     label: String? = null,
     content: @Composable (value: ToggleValue) -> Unit,
 ) {
-    ToggleBox(
-        onToggle = { if (enabled) state.toggle() },
+    val effectiveEnabled = enabled && state.enabled
+    val source = remember { MutableInteractionSource() }
+    Box(
         modifier =
-            Modifier.checkboxSemantics(
-                checked = state.isOn,
-                indeterminate = state.isIndeterminate,
-                enabled = enabled,
-                label = label,
-            ),
+            Modifier
+                .checkboxSemantics(
+                    checked = state.isOn,
+                    indeterminate = state.isIndeterminate,
+                    enabled = effectiveEnabled,
+                    label = label,
+                ).triStateToggleable(
+                    state =
+                        when (state.value) {
+                            ToggleValue.Off -> ToggleableState.Off
+                            ToggleValue.On -> ToggleableState.On
+                            ToggleValue.Indeterminate -> ToggleableState.Indeterminate
+                        },
+                    interactionSource = source,
+                    indication = null,
+                    enabled = effectiveEnabled,
+                    role = Role.Checkbox,
+                    onClick = { state.toggle() },
+                ),
     ) {
         content(state.value)
     }
@@ -81,12 +99,12 @@ fun Switch(
     Box(
         modifier =
             Modifier
-                .switchSemantics(checked = state.isOn, enabled = enabled, label = label)
+                .switchSemantics(checked = state.isOn, enabled = enabled && state.enabled, label = label)
                 .toggleable(
                     value = state.isOn,
                     interactionSource = source,
                     indication = null,
-                    enabled = enabled,
+                    enabled = enabled && state.enabled,
                     role = Role.Switch,
                     onValueChange = { state.setValue(if (it) ToggleValue.On else ToggleValue.Off) },
                 ),
@@ -110,11 +128,12 @@ fun ToggleButton(
     content: @Composable (pressed: Boolean) -> Unit,
 ) {
     ToggleBox(
-        onToggle = { if (enabled) state.toggle() },
+        onToggle = { state.toggle() },
+        enabled = enabled && state.enabled,
         modifier =
             Modifier.toggleSemantics(
                 pressed = state.isOn,
-                enabled = enabled,
+                enabled = enabled && state.enabled,
                 label = label,
             ),
     ) {

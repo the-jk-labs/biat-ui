@@ -30,7 +30,8 @@ import com.biat.ui.core.state.rememberSliderState
  *   increments by [SliderState.step] (or 5 percent continuous), Home/End jump
  *   to min/max, PageUp/PageDown move 10 percent.
  * - [label] names the slider for screen readers; [valueText] announces the
- *   value (defaults to the raw float).
+ *   value (defaults to the raw float). Range information and a snapped
+ *   SetProgress accessibility action are exposed while enabled.
  */
 @Composable
 fun Slider(
@@ -50,6 +51,9 @@ fun Slider(
                     valueText = valueText,
                     enabled = enabled && state.enabled,
                     label = label,
+                    valueRange = state.valueRange,
+                    step = state.step,
+                    onValueChange = { state.setValue(it) },
                 ).onSizeChanged { trackWidthPx = it.width.toFloat() }
                 .focusable(enabled = enabled && state.enabled)
                 .pointerInput(enabled, state) {

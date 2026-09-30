@@ -171,7 +171,8 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [x] Shared slot-based focus groups: actual menu focus and activation,
       radio/toggle arrows, disabled skipping, single Tab stops for groups,
       and trigger focus restoration after the overlay window closes.
-- [ ] Slider accessibility actions and decorative separator exclusion.
+- [x] Slider accessibility actions, native tri-state/disabled toggle semantics,
+      and decorative separator exclusion, pinned by device tests.
 - [ ] Instrumented tests in CI, including a device/API certification record.
 - [ ] Caller-owned group and sheet layouts before the stable API freeze.
 - [ ] Public API snapshot excludes generated implementation classes.

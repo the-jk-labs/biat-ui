@@ -1,13 +1,18 @@
 package com.biat.ui.core.accessibility
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.progressBarRangeInfo
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.semantics.stateDescription
+import com.biat.ui.core.state.coerceAndSnap
 
 /** Semantics for overlay dialogs. Headless: label comes from caller. */
 fun Modifier.dialogSemantics(label: String? = null): Modifier =
@@ -166,18 +171,40 @@ fun Modifier.toggleSemantics(
     }
 
 /**
- * Semantics for a headless slider. Announces value text plus caller label.
+ * Slider semantics expose the value range and an accessibility adjustment
+ * action through [onValueChange]. Disabled and unchanged requests return false.
+ * Values are clamped and snapped to [step] before notifying the caller.
  */
 fun Modifier.sliderSemantics(
     value: Float,
     valueText: String? = null,
     enabled: Boolean = true,
     label: String? = null,
+    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+    step: Float = 0f,
+    onValueChange: ((Float) -> Unit)? = null,
 ): Modifier =
     this.semantics(mergeDescendants = false) {
         stateDescription = valueText ?: value.toString()
+        progressBarRangeInfo =
+            ProgressBarRangeInfo(
+                current = value.coerceIn(valueRange.start, valueRange.endInclusive),
+                range = valueRange,
+                steps = if (step > 0f) (((valueRange.endInclusive - valueRange.start) / step).toInt() - 1).coerceAtLeast(0) else 0,
+            )
         if (!enabled) disabled()
         if (label != null) contentDescription = label
+        if (enabled && onValueChange != null) {
+            setProgress { requested ->
+                val next = coerceAndSnap(requested, valueRange, step)
+                if (next == value) {
+                    false
+                } else {
+                    onValueChange(next)
+                    true
+                }
+            }
+        }
     }
 
 /** Semantics for a toolbar container. */
@@ -212,14 +239,11 @@ fun Modifier.separatorSemantics(
     vertical: Boolean = false,
 ): Modifier =
     this.semantics(mergeDescendants = false) {
-        stateDescription =
-            if (decorative) {
-                "Separator"
-            } else if (vertical) {
-                "Vertical separator"
-            } else {
-                "Horizontal separator"
-            }
+        if (decorative) {
+            hideFromAccessibility()
+        } else {
+            stateDescription = if (vertical) "Vertical separator" else "Horizontal separator"
+        }
     }
 
 /** Semantics for a field label naming [controlLabel] for screen readers. */
