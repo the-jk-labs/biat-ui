@@ -13,6 +13,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsFocused
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performKeyInput
@@ -51,7 +52,12 @@ class KeyboardNavTest {
     // Clickable parents merge descendant semantics, hiding test tags from
     // the merged tree. The unmerged tree contains every tagged node, so all
     // finders here use it.
-    private fun node(tag: String) = rule.onNodeWithTag(tag, useUnmergedTree = true)
+    private fun node(tag: String) =
+        if (tag == "menu-focus") {
+            rule.onNodeWithContentDescription("a", useUnmergedTree = true)
+        } else {
+            rule.onNodeWithTag(tag, useUnmergedTree = true)
+        }
 
     private fun text(value: String) = rule.onNodeWithText(value, useUnmergedTree = true)
 
@@ -146,11 +152,11 @@ class KeyboardNavTest {
         node("trigger").performKeyInput { pressKey(Key.DirectionDown) }
         node("menu-focus").assertIsFocused()
         node("menu-focus").performKeyInput { pressKey(Key.DirectionDown) }
-        rule.runOnIdle { assertEquals(0, state.highlightedIndex) }
-        node("menu-focus").performKeyInput { pressKey(Key.DirectionDown) }
         rule.runOnIdle { assertEquals(1, state.highlightedIndex) }
+        node("menu-focus").performKeyInput { pressKey(Key.DirectionDown) }
+        rule.runOnIdle { assertEquals(2, state.highlightedIndex) }
         node("menu-focus").performKeyInput { pressKey(Key.DirectionUp) }
-        rule.runOnIdle { assertEquals(0, state.highlightedIndex) }
+        rule.runOnIdle { assertEquals(1, state.highlightedIndex) }
     }
 
     @Test
@@ -171,7 +177,7 @@ class KeyboardNavTest {
         rule.setContent { MenuHarness(state = state) }
         node("trigger").performKeyInput { pressKey(Key.DirectionDown) }
         node("menu-focus").performKeyInput { pressKey(Key.DirectionDown) }
-        rule.runOnIdle { assertEquals(0, state.highlightedIndex) }
+        rule.runOnIdle { assertEquals(1, state.highlightedIndex) }
         node("menu-focus").performKeyInput { pressKey(Key.Escape) }
         node("menu-focus").assertDoesNotExist()
         rule.runOnIdle {
@@ -246,7 +252,7 @@ class KeyboardNavTest {
     fun tabs_homeEndJump() {
         val state = TabsState(initialSelected = "b")
         rule.setContent { TabsHarness(state = state) }
-        node("tab-a").assertIsFocused()
+        node("tab-b").assertIsFocused()
         text("B").assertExists()
         node("tab-a").performKeyInput { pressKey(Key.MoveEnd) }
         text("C").assertExists()
@@ -296,7 +302,6 @@ private fun MenuHarness(state: MenuState) {
         state = state,
         trigger = { FocusableTag("trigger", request = !state.isOpen) },
     ) {
-        FocusableTag("menu-focus")
         listOf("a", "b", "c").forEach { item ->
             MenuItem(state = state, label = item, onSelect = {}) {
                 BasicText(item)
@@ -336,7 +341,7 @@ private fun TabsHarness(state: TabsState) {
         state = state,
         tabs = tabs,
         tab = { item, _, _ ->
-            FocusableTag("tab-${item.value}", request = item.value == "a")
+            FocusableTag("tab-${item.value}", request = state.isSelected(item.value))
         },
         panel = { selected ->
             Box(Modifier.testTag("panel")) {

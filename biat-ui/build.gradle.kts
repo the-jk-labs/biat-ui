@@ -14,7 +14,7 @@ plugins {
 // on the Central Portal); the version is the frozen 1.0 release line,
 // see README "Versioning".
 group = "io.github.the-jk-labs"
-version = "1.0.0-rc1"
+version = "1.0.0-rc2"
 
 mavenPublishing {
     // Uploads to the Portal and releases without manual clicks.

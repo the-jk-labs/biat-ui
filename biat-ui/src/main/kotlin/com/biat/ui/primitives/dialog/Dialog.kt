@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInParent
@@ -163,7 +164,7 @@ fun DialogTrigger(
         modifier =
             Modifier
                 .let { m ->
-                    if (returnFocusRequester != null) m.focusRequester(returnFocusRequester) else m
+                    if (returnFocusRequester != null) m.focusRequester(returnFocusRequester).focusProperties { canFocus = true } else m
                 }.clickable(
                     interactionSource = source,
                     indication = null,

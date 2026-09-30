@@ -6,20 +6,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.biat.ui.core.accessibility.toolbarItemSemantics
 import com.biat.ui.core.accessibility.toolbarSemantics
-import com.biat.ui.core.focus.safeRequestFocus
+import com.biat.ui.core.focus.FocusGroup
+import com.biat.ui.core.focus.FocusGroupEffect
+import com.biat.ui.core.focus.LocalFocusGroup
+import com.biat.ui.core.focus.focusGroupItem
+import com.biat.ui.core.focus.focusGroupKeys
 import com.biat.ui.core.state.ToolbarOrientation
 import com.biat.ui.core.state.ToolbarState
 import com.biat.ui.core.state.rememberToolbarState
@@ -50,78 +50,39 @@ fun <T> Toolbar(
     onActivate: (T) -> Unit = {},
     item: @Composable (item: ToolbarValue<T>, focused: Boolean) -> Unit,
 ) {
-    if (items.isEmpty()) return
-    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val requesters = remember(items.size) { List(items.size) { FocusRequester() } }
-
+    val group = remember { FocusGroup() }
+    group.onMove = { state.focus(it) }
+    group.onFocused = { if (it >= 0) state.focus(it) }
+    group.loop = state.loop
+    group.initialIndex = state.focusedIndex
+    FocusGroupEffect(group)
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val container =
-        Modifier
-            .toolbarSemantics(label)
-            .onPreviewKeyEvent { event ->
-                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                val delta: Int =
-                    when (event.key) {
-                        Key.DirectionRight -> {
-                            if (orientation == ToolbarOrientation.Horizontal) {
-                                if (isRtl) -1 else 1
-                            } else {
-                                null
-                            }
-                        }
-
-                        Key.DirectionLeft -> {
-                            if (orientation == ToolbarOrientation.Horizontal) {
-                                if (isRtl) 1 else -1
-                            } else {
-                                null
-                            }
-                        }
-
-                        Key.DirectionDown -> {
-                            if (orientation == ToolbarOrientation.Vertical) 1 else null
-                        }
-
-                        Key.DirectionUp -> {
-                            if (orientation == ToolbarOrientation.Vertical) -1 else null
-                        }
-
-                        Key.MoveHome -> {
-                            state.moveToFirst()
-                            requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
-                            return@onPreviewKeyEvent true
-                        }
-
-                        Key.MoveEnd -> {
-                            state.moveToLast()
-                            requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
-                            return@onPreviewKeyEvent true
-                        }
-
-                        else -> {
-                            null
-                        }
-                    } ?: return@onPreviewKeyEvent false
-                state.move(delta)
-                requesters.getOrNull(state.focusedIndex)?.safeRequestFocus()
-                true
-            }
-
+        Modifier.toolbarSemantics(label).focusGroupKeys(
+            group,
+            horizontal = orientation == ToolbarOrientation.Horizontal,
+            rtl = rtl,
+        )
     val rows: @Composable () -> Unit = {
         items.forEachIndexed { index, entry ->
             ToolbarItem(
-                requester = requesters[index],
                 enabled = state.isEnabled(index),
                 label = entry.label,
-                onActivate = { onActivate(entry.value) },
+                onActivate = {
+                    state.focus(index)
+                    onActivate(entry.value)
+                },
             ) {
                 item(entry, state.focusedIndex == index)
             }
         }
     }
-    if (orientation == ToolbarOrientation.Horizontal) {
-        Row(modifier = container) { rows() }
-    } else {
-        Column(modifier = container) { rows() }
+    CompositionLocalProvider(LocalFocusGroup provides group) {
+        if (orientation == ToolbarOrientation.Horizontal) {
+            Row(modifier = container) { rows() }
+        } else {
+            Column(modifier = container) { rows() }
+        }
     }
 }
 
@@ -138,7 +99,7 @@ fun ToolbarItem(
     content: @Composable () -> Unit,
 ) {
     val source = remember { MutableInteractionSource() }
-    var modifier = Modifier.toolbarItemSemantics(enabled = enabled, label = label)
+    var modifier = focusGroupItem(enabled).toolbarItemSemantics(enabled = enabled, label = label)
     if (requester != null) modifier = modifier.focusRequester(requester)
     Box(
         modifier =

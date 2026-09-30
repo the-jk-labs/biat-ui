@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -94,6 +95,7 @@ fun <T> Select(
             modifier =
                 Modifier
                     .focusRequester(returnRequester)
+                    .focusProperties { canFocus = true }
                     .selectTriggerSemantics(expanded = state.isOpen, label = label)
                     .clickable(
                         interactionSource = source,

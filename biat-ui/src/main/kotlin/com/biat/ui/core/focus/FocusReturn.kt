@@ -1,12 +1,18 @@
 package com.biat.ui.core.focus
 
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalView
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 /**
  * Focus return for overlays (Dialog / Sheet / Popover / Menu / Select).
@@ -30,9 +36,12 @@ fun FocusReturnEffect(
     isOpen: Boolean,
     returnRequester: FocusRequester,
 ) {
+    val view = LocalView.current
     var wasOpen by remember { mutableStateOf(isOpen) }
     LaunchedEffect(isOpen) {
         if (shouldReturnFocus(wasOpen, isOpen)) {
+            awaitWindowFocus(view)
+            withFrameNanos { }
             try {
                 returnRequester.requestFocus()
             } catch (_: IllegalStateException) {
@@ -52,12 +61,35 @@ internal fun shouldReturnFocus(
 /**
  * Requests focus, ignoring detached nodes. Roving containers (Menu / Tabs /
  * Toolbar / Select lists) call this on key paths that can run before layout.
- * Returns true when the request was issued.
+ * Returns true when the target accepts focus.
  */
 fun FocusRequester.safeRequestFocus(): Boolean =
     try {
         requestFocus()
-        true
     } catch (_: IllegalStateException) {
         false
     }
+
+/** Waits for the host window to regain focus after a popup or dialog is removed. */
+private suspend fun awaitWindowFocus(view: View) {
+    if (view.hasWindowFocus()) return
+    suspendCancellableCoroutine<Unit> { continuation ->
+        val observer = view.viewTreeObserver
+        lateinit var listener: ViewTreeObserver.OnWindowFocusChangeListener
+        listener =
+            ViewTreeObserver.OnWindowFocusChangeListener { focused ->
+                if (focused && continuation.isActive) {
+                    if (observer.isAlive) observer.removeOnWindowFocusChangeListener(listener)
+                    continuation.resume(Unit)
+                }
+            }
+        observer.addOnWindowFocusChangeListener(listener)
+        continuation.invokeOnCancellation {
+            if (observer.isAlive) observer.removeOnWindowFocusChangeListener(listener)
+        }
+        if (view.hasWindowFocus() && continuation.isActive) {
+            observer.removeOnWindowFocusChangeListener(listener)
+            continuation.resume(Unit)
+        }
+    }
+}

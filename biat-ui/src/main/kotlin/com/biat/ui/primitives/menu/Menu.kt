@@ -1,7 +1,6 @@
 package com.biat.ui.primitives.menu
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,29 +8,35 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.biat.ui.core.accessibility.menuItemSemantics
 import com.biat.ui.core.accessibility.menuSemantics
 import com.biat.ui.core.accessibility.overlayTriggerSemantics
+import com.biat.ui.core.focus.FocusGroup
+import com.biat.ui.core.focus.FocusGroupEffect
 import com.biat.ui.core.focus.FocusReturnEffect
+import com.biat.ui.core.focus.LocalFocusGroup
+import com.biat.ui.core.focus.focusGroupItem
+import com.biat.ui.core.focus.focusGroupKeys
 import com.biat.ui.core.focus.rememberFocusReturnRequester
-import com.biat.ui.core.focus.safeRequestFocus
 import com.biat.ui.core.positioning.PopupAlign
 import com.biat.ui.core.positioning.PopupSide
 import com.biat.ui.core.positioning.rememberBiatPopupPosition
@@ -43,10 +48,9 @@ import com.biat.ui.core.state.rememberMenuState
  *
  * Keyboard: Enter/Space/Down on trigger opens; Up/Down cycle highlight,
  * Home/End jump; Esc closes. Roving highlight lives in [MenuState].
- * Activating the highlighted entry is caller-owned: focus a [MenuItem]
- * (clickable, so Enter/Space fires its [onSelect]) or observe
- * [MenuState.highlightedIndex]. Unhandled Enter inside the menu falls
- * through to the caller.
+ * Opening focuses the first enabled entry; arrows move actual item focus
+ * and highlight together. Enter/Space activates the focused item's handler.
+ * Tab leaves the group, and closing restores trigger focus.
  * Placement follows [side]/[align] with [sideOffset]/[alignOffset] gaps;
  * [avoidCollisions] flips to the opposite side when it overflows less and
  * shifts the menu to stay on-screen.
@@ -80,6 +84,7 @@ fun Menu(
             modifier =
                 Modifier
                     .focusRequester(triggerRequester)
+                    .focusProperties { canFocus = true }
                     .overlayTriggerSemantics(expanded = state.isOpen, label = label)
                     .clickable(
                         interactionSource = triggerSource,
@@ -124,51 +129,38 @@ fun Menu(
                         dismissOnClickOutside = dismissOnOutsideClick,
                     ),
             ) {
-                Column(
-                    modifier =
-                        Modifier
-                            .menuSemantics(label)
-                            .onPreviewKeyEvent { event ->
-                                if (event.type != KeyEventType.KeyDown) {
-                                    return@onPreviewKeyEvent false
-                                }
-                                when (event.key) {
-                                    Key.DirectionDown -> {
-                                        state.moveHighlight(1)
-                                        true
+                val focusGroup = remember { FocusGroup() }
+                focusGroup.onMove = { state.highlight(it) }
+                focusGroup.onFocused = { if (it >= 0) state.highlight(it) }
+                FocusGroupEffect(focusGroup, initialFocus = true)
+                CompositionLocalProvider(LocalFocusGroup provides focusGroup) {
+                    Column(
+                        modifier =
+                            Modifier
+                                .focusGroupKeys(focusGroup, horizontal = false)
+                                .menuSemantics(label)
+                                .onPreviewKeyEvent { event ->
+                                    if (event.type != KeyEventType.KeyDown) {
+                                        return@onPreviewKeyEvent false
                                     }
+                                    when (event.key) {
+                                        Key.Escape -> {
+                                            if (dismissOnEscape) {
+                                                state.close()
+                                                true
+                                            } else {
+                                                false
+                                            }
+                                        }
 
-                                    Key.DirectionUp -> {
-                                        state.moveHighlight(-1)
-                                        true
-                                    }
-
-                                    Key.MoveHome -> {
-                                        state.highlight(0)
-                                        true
-                                    }
-
-                                    Key.MoveEnd -> {
-                                        state.highlight(state.itemCount - 1)
-                                        true
-                                    }
-
-                                    Key.Escape -> {
-                                        if (dismissOnEscape) {
-                                            state.close()
-                                            true
-                                        } else {
+                                        else -> {
                                             false
                                         }
                                     }
-
-                                    else -> {
-                                        false
-                                    }
-                                }
-                            },
-                    content = content,
-                )
+                                },
+                        content = content,
+                    )
+                }
             }
         }
     }
@@ -192,7 +184,7 @@ fun MenuItem(
 ) {
     val source = remember { MutableInteractionSource() }
     val semantics =
-        Modifier.menuItemSemantics(
+        focusGroupItem(enabled).menuItemSemantics(
             label = label,
             selected = selected,
             enabled = enabled,
@@ -246,7 +238,7 @@ fun MenuCheckboxItem(
     val source = remember { MutableInteractionSource() }
     Box(
         modifier =
-            Modifier
+            focusGroupItem(enabled)
                 .semantics(mergeDescendants = false) {
                     if (label != null) contentDescription = label
                 }.toggleable(
@@ -279,7 +271,7 @@ fun MenuRadioItem(
     val source = remember { MutableInteractionSource() }
     Box(
         modifier =
-            Modifier
+            focusGroupItem(enabled)
                 .semantics(mergeDescendants = false) {
                     if (label != null) contentDescription = label
                 }.selectable(
@@ -302,7 +294,8 @@ fun MenuRadioItem(
  * Headless submenu: a trigger item opening a nested menu anchored to the
  * trigger's trailing edge ([side]) and top ([align]).
  *
- * Click or ArrowRight on the trigger opens; Esc or ArrowLeft inside closes
+ * Click or the forward arrow (Right in LTR, Left in RTL) opens; Esc or the
+ * backward arrow inside closes
  * only this submenu and returns focus to its trigger. The parent menu stays
  * open underneath in both cases. Counts as one highlightable entry in the
  * parent [MenuState.itemCount]; its own [state] needs its own count.
@@ -321,16 +314,19 @@ fun MenuSub(
     trigger: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val openKey = if (rtl) Key.DirectionLeft else Key.DirectionRight
+    val closeKey = if (rtl) Key.DirectionRight else Key.DirectionLeft
     val triggerRequester = rememberFocusReturnRequester()
-    val subFocus = remember { FocusRequester() }
     FocusReturnEffect(isOpen = state.isOpen, returnRequester = triggerRequester)
 
     Box {
         val source = remember { MutableInteractionSource() }
         Box(
             modifier =
-                Modifier
+                focusGroupItem()
                     .focusRequester(triggerRequester)
+                    .focusProperties { canFocus = true }
                     .menuItemSemantics(label = label)
                     .clickable(
                         interactionSource = source,
@@ -338,7 +334,7 @@ fun MenuSub(
                         onClick = { state.open() },
                     ).onPreviewKeyEvent { event ->
                         if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                        if (event.key == Key.DirectionRight && !state.isOpen) {
+                        if (event.key == openKey && !state.isOpen) {
                             state.open()
                             true
                         } else {
@@ -350,7 +346,6 @@ fun MenuSub(
         }
 
         if (state.isOpen) {
-            LaunchedEffect(Unit) { subFocus.safeRequestFocus() }
             Popup(
                 popupPositionProvider =
                     rememberBiatPopupPosition(
@@ -368,53 +363,38 @@ fun MenuSub(
                         dismissOnClickOutside = dismissOnOutsideClick,
                     ),
             ) {
-                Column(
-                    modifier =
-                        Modifier
-                            .menuSemantics(label)
-                            .focusRequester(subFocus)
-                            .focusable()
-                            .onPreviewKeyEvent { event ->
-                                if (event.type != KeyEventType.KeyDown) {
-                                    return@onPreviewKeyEvent false
-                                }
-                                when (event.key) {
-                                    Key.DirectionDown -> {
-                                        state.moveHighlight(1)
-                                        true
+                val focusGroup = remember { FocusGroup() }
+                focusGroup.onMove = { state.highlight(it) }
+                focusGroup.onFocused = { if (it >= 0) state.highlight(it) }
+                FocusGroupEffect(focusGroup, initialFocus = true)
+                CompositionLocalProvider(LocalFocusGroup provides focusGroup) {
+                    Column(
+                        modifier =
+                            Modifier
+                                .focusGroupKeys(focusGroup, horizontal = false)
+                                .menuSemantics(label)
+                                .onPreviewKeyEvent { event ->
+                                    if (event.type != KeyEventType.KeyDown) {
+                                        return@onPreviewKeyEvent false
                                     }
+                                    when (event.key) {
+                                        Key.Escape, closeKey -> {
+                                            if (dismissOnEscape) {
+                                                state.close()
+                                                true
+                                            } else {
+                                                false
+                                            }
+                                        }
 
-                                    Key.DirectionUp -> {
-                                        state.moveHighlight(-1)
-                                        true
-                                    }
-
-                                    Key.MoveHome -> {
-                                        state.highlight(0)
-                                        true
-                                    }
-
-                                    Key.MoveEnd -> {
-                                        state.highlight(state.itemCount - 1)
-                                        true
-                                    }
-
-                                    Key.Escape, Key.DirectionLeft -> {
-                                        if (dismissOnEscape) {
-                                            state.close()
-                                            true
-                                        } else {
+                                        else -> {
                                             false
                                         }
                                     }
-
-                                    else -> {
-                                        false
-                                    }
-                                }
-                            },
-                    content = content,
-                )
+                                },
+                        content = content,
+                    )
+                }
             }
         }
     }

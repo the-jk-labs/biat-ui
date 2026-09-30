@@ -8,7 +8,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onRoot
 import com.biat.ui.core.state.DialogState
@@ -108,7 +110,7 @@ class SemanticsTest {
                 }
             }
         }
-        rule.onNodeWithContentDescription("Actions").assertExists()
+        rule.onAllNodesWithContentDescription("Actions").assertCountEquals(2)
     }
 
     @Test

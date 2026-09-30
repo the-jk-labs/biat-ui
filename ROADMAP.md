@@ -164,6 +164,19 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [ ] TalkBack + keyboard certification matrix (devices/API levels)
 - [ ] GitHub Actions CI: build, unit + instrumented tests, lint, publish
 
+## 1.0.0-rc2: Behavior hardening
+
+- [x] Slider state factory preserves initial values in custom ranges, with
+      positive and negative range device regressions.
+- [x] Shared slot-based focus groups: actual menu focus and activation,
+      radio/toggle arrows, disabled skipping, single Tab stops for groups,
+      and trigger focus restoration after the overlay window closes.
+- [ ] Slider accessibility actions and decorative separator exclusion.
+- [ ] Instrumented tests in CI, including a device/API certification record.
+- [ ] Caller-owned group and sheet layouts before the stable API freeze.
+- [ ] Public API snapshot excludes generated implementation classes.
+- [ ] Release tag/version validation and migration/cookbook documentation.
+
 ## Non-goals (never)
 
 Material components, themes, colors, typography, opinionated layouts,

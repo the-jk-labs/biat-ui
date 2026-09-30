@@ -7,10 +7,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import com.biat.ui.core.accessibility.toggleGroupSemantics
 import com.biat.ui.core.accessibility.toggleSemantics
+import com.biat.ui.core.focus.FocusGroup
+import com.biat.ui.core.focus.FocusGroupEffect
+import com.biat.ui.core.focus.LocalFocusGroup
+import com.biat.ui.core.focus.focusGroupItem
+import com.biat.ui.core.focus.focusGroupKeys
 import com.biat.ui.core.state.ToggleGroupState
 import com.biat.ui.core.state.ToggleGroupType
 import com.biat.ui.core.state.rememberToggleGroupState
@@ -40,12 +48,15 @@ fun <T> ToggleGroup(
     horizontal: Boolean = true,
     item: @Composable (item: ToggleGroupValue<T>, pressed: Boolean) -> Unit,
 ) {
-    val container = Modifier.toggleGroupSemantics(label)
+    val group = remember { FocusGroup() }
+    FocusGroupEffect(group)
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val container = Modifier.toggleGroupSemantics(label).focusGroupKeys(group, horizontal = horizontal, rtl = rtl)
     val rows: @Composable () -> Unit = {
         items.forEach { entry ->
             ToggleGroupItem(
                 pressed = state.isPressed(entry.value as Any?),
-                enabled = enabled,
+                enabled = enabled && state.enabled,
                 label = entry.label,
                 onToggle = { state.toggle(entry.value as Any?) },
             ) {
@@ -53,10 +64,12 @@ fun <T> ToggleGroup(
             }
         }
     }
-    if (horizontal) {
-        Row(modifier = container) { rows() }
-    } else {
-        Column(modifier = container) { rows() }
+    CompositionLocalProvider(LocalFocusGroup provides group) {
+        if (horizontal) {
+            Row(modifier = container) { rows() }
+        } else {
+            Column(modifier = container) { rows() }
+        }
     }
 }
 
@@ -75,7 +88,7 @@ fun ToggleGroupItem(
     val source = remember { MutableInteractionSource() }
     Box(
         modifier =
-            Modifier
+            focusGroupItem(enabled, preferred = pressed)
                 .toggleSemantics(pressed = pressed, enabled = enabled, label = label)
                 .clickable(
                     interactionSource = source,
@@ -104,7 +117,7 @@ class ToggleGroupScope internal constructor(
         val pressed = state.isPressed(item.value as Any?)
         ToggleGroupItem(
             pressed = pressed,
-            enabled = enabled,
+            enabled = enabled && state.enabled,
             label = item.label,
             onToggle = { state.toggle(item.value as Any?) },
         ) {
@@ -126,7 +139,12 @@ fun ToggleGroupContent(
     label: String? = null,
     content: @Composable ColumnScope.(scope: ToggleGroupScope) -> Unit,
 ) {
-    Column(modifier = Modifier.toggleGroupSemantics(label)) {
-        content(ToggleGroupScope(state))
+    val group = remember { FocusGroup() }
+    FocusGroupEffect(group)
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    CompositionLocalProvider(LocalFocusGroup provides group) {
+        Column(modifier = Modifier.toggleGroupSemantics(label).focusGroupKeys(group, rtl = rtl)) {
+            content(ToggleGroupScope(state))
+        }
     }
 }

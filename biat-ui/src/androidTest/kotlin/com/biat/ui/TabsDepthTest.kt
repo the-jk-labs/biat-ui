@@ -128,7 +128,7 @@ private fun TabsDepthHarness(
         orientation = orientation,
         activation = activation,
         tab = { item, _, _ ->
-            FocusableInnerTag("dtab-${item.value}", request = item.value == "a")
+            FocusableInnerTag("dtab-${item.value}", request = state.isSelected(item.value))
         },
         panel = { selected ->
             Box(Modifier.testTag("dpanel")) {

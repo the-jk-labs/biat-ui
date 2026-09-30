@@ -6,10 +6,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import com.biat.ui.core.accessibility.radioGroupSemantics
 import com.biat.ui.core.accessibility.radioItemSemantics
+import com.biat.ui.core.focus.FocusGroup
+import com.biat.ui.core.focus.FocusGroupEffect
+import com.biat.ui.core.focus.LocalFocusGroup
+import com.biat.ui.core.focus.focusGroupItem
+import com.biat.ui.core.focus.focusGroupKeys
 import com.biat.ui.core.state.RadioGroupState
 import com.biat.ui.core.state.rememberRadioGroupState
 
@@ -38,15 +46,20 @@ fun <T> RadioGroup(
     disabledValues: Set<T> = emptySet(),
     item: @Composable (item: RadioGroupValue<T>, selected: Boolean) -> Unit,
 ) {
-    Column(modifier = Modifier.radioGroupSemantics(label)) {
-        options.forEach { item ->
-            RadioItem(
-                selected = state.isSelected(item.value as Any?),
-                enabled = enabled && item.value !in disabledValues,
-                label = item.label,
-                onSelect = { state.select(item.value as Any?) },
-            ) {
-                item(item, state.isSelected(item.value as Any?))
+    val group = remember { FocusGroup() }
+    FocusGroupEffect(group)
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    CompositionLocalProvider(LocalFocusGroup provides group) {
+        Column(modifier = Modifier.radioGroupSemantics(label).focusGroupKeys(group, rtl = rtl)) {
+            options.forEach { item ->
+                RadioItem(
+                    selected = state.isSelected(item.value as Any?),
+                    enabled = enabled && state.enabled && item.value !in disabledValues,
+                    label = item.label,
+                    onSelect = { state.select(item.value as Any?) },
+                ) {
+                    item(item, state.isSelected(item.value as Any?))
+                }
             }
         }
     }
@@ -67,7 +80,7 @@ fun RadioItem(
     val source = remember { MutableInteractionSource() }
     Box(
         modifier =
-            Modifier
+            focusGroupItem(enabled, preferred = selected, onNavigate = onSelect)
                 .radioItemSemantics(selected = selected, enabled = enabled, label = label)
                 .clickable(
                     interactionSource = source,
@@ -96,7 +109,7 @@ class RadioGroupScope internal constructor(
         val selected = state.isSelected(item.value as Any?)
         RadioItem(
             selected = selected,
-            enabled = enabled,
+            enabled = enabled && state.enabled,
             label = item.label,
             onSelect = { state.select(item.value as Any?) },
         ) {
@@ -115,7 +128,12 @@ fun RadioGroupContent(
     label: String? = null,
     content: @Composable ColumnScope.(scope: RadioGroupScope) -> Unit,
 ) {
-    Column(modifier = Modifier.radioGroupSemantics(label)) {
-        content(RadioGroupScope(state))
+    val group = remember { FocusGroup() }
+    FocusGroupEffect(group)
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    CompositionLocalProvider(LocalFocusGroup provides group) {
+        Column(modifier = Modifier.radioGroupSemantics(label).focusGroupKeys(group, rtl = rtl)) {
+            content(RadioGroupScope(state))
+        }
     }
 }

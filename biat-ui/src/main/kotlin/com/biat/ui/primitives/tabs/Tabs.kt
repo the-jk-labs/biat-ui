@@ -7,27 +7,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import com.biat.ui.core.accessibility.tabListSemantics
 import com.biat.ui.core.accessibility.tabSemantics
-import com.biat.ui.core.focus.safeRequestFocus
-import com.biat.ui.core.state.TabMove
+import com.biat.ui.core.focus.FocusGroup
+import com.biat.ui.core.focus.FocusGroupEffect
+import com.biat.ui.core.focus.LocalFocusGroup
+import com.biat.ui.core.focus.focusGroupItem
+import com.biat.ui.core.focus.focusGroupKeys
 import com.biat.ui.core.state.TabsState
 import com.biat.ui.core.state.rememberTabsState
-import com.biat.ui.core.state.resolveTabIndex
 
 /**
  * Caller key for one tab. [value] drives [TabsState] selection;
@@ -72,90 +65,26 @@ fun <T> Tabs(
     tab: @Composable RowScope.(tab: TabValue<T>, selected: Boolean, onSelect: () -> Unit) -> Unit,
     panel: @Composable (selected: TabValue<T>?) -> Unit,
 ) {
-    if (tabs.isEmpty()) {
-        panel(null)
-        return
+    val group = remember { FocusGroup() }
+    group.onMove = { index ->
+        if (activation == TabsActivation.Automatic) tabs.getOrNull(index)?.let { state.select(it.value) }
     }
-    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val requesters = remember(tabs.size) { List(tabs.size) { FocusRequester() } }
-    var focusedIndex by remember(tabs.size) {
-        mutableStateOf(
-            tabs.indexOfFirst { state.isSelected(it.value) }.let { if (it < 0) 0 else it },
-        )
-    }
-
-    fun moveFocus(next: Int) {
-        focusedIndex = next
-        requesters.getOrNull(next)?.safeRequestFocus()
-        if (activation == TabsActivation.Automatic) {
-            state.select(tabs[next].value as Any?)
-        }
-    }
-
+    FocusGroupEffect(group)
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val listModifier =
-        Modifier
-            .tabListSemantics(label)
-            .onPreviewKeyEvent { event ->
-                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                val move: TabMove =
-                    when (event.key) {
-                        Key.DirectionRight -> {
-                            if (orientation == TabsOrientation.Horizontal) {
-                                if (isRtl) TabMove.Previous else TabMove.Next
-                            } else {
-                                return@onPreviewKeyEvent false
-                            }
-                        }
-
-                        Key.DirectionLeft -> {
-                            if (orientation == TabsOrientation.Horizontal) {
-                                if (isRtl) TabMove.Next else TabMove.Previous
-                            } else {
-                                return@onPreviewKeyEvent false
-                            }
-                        }
-
-                        Key.DirectionUp -> {
-                            if (orientation == TabsOrientation.Vertical) {
-                                TabMove.Previous
-                            } else {
-                                return@onPreviewKeyEvent false
-                            }
-                        }
-
-                        Key.DirectionDown -> {
-                            if (orientation == TabsOrientation.Vertical) {
-                                TabMove.Next
-                            } else {
-                                return@onPreviewKeyEvent false
-                            }
-                        }
-
-                        Key.MoveHome -> {
-                            TabMove.First
-                        }
-
-                        Key.MoveEnd -> {
-                            TabMove.Last
-                        }
-
-                        else -> {
-                            return@onPreviewKeyEvent false
-                        }
-                    }
-                moveFocus(resolveTabIndex(focusedIndex, tabs.size, move))
-                true
+        Modifier.tabListSemantics(label).focusGroupKeys(
+            group,
+            horizontal = orientation == TabsOrientation.Horizontal,
+            rtl = rtl,
+        )
+    CompositionLocalProvider(LocalFocusGroup provides group) {
+        if (orientation == TabsOrientation.Horizontal) {
+            Row(modifier = listModifier) {
+                tabs.forEach { item -> TabCell(state, item, tab) }
             }
-    if (orientation == TabsOrientation.Horizontal) {
-        Row(modifier = listModifier) {
-            tabs.forEachIndexed { index, item ->
-                TabCell(requesters[index], state, item, tab) { focusedIndex = index }
-            }
-        }
-    } else {
-        Column(modifier = listModifier) {
-            tabs.forEachIndexed { index, item ->
-                TabCell(requesters[index], state, item, tab) { focusedIndex = index }
+        } else {
+            Column(modifier = listModifier) {
+                tabs.forEach { item -> TabCell(state, item, tab) }
             }
         }
     }
@@ -164,35 +93,18 @@ fun <T> Tabs(
 
 @Composable
 private fun <T> TabCell(
-    requester: FocusRequester,
     state: TabsState,
     item: TabValue<T>,
     tab: @Composable RowScope.(tab: TabValue<T>, selected: Boolean, onSelect: () -> Unit) -> Unit,
-    onFocused: () -> Unit,
 ) {
     val selected = state.isSelected(item.value)
     val source = remember(item.value) { MutableInteractionSource() }
-    // Wrap caller tab UI with headless click + semantics. Clickable also
-    // turns Enter/Space on the focused tab into activation for manual mode.
     Box(
         modifier =
-            Modifier
-                .focusRequester(requester)
+            focusGroupItem(preferred = selected)
                 .tabSemantics(selected = selected, label = item.label)
-                .clickable(
-                    interactionSource = source,
-                    indication = null,
-                    onClick = {
-                        onFocused()
-                        state.select(item.value as Any?)
-                    },
-                ),
+                .clickable(interactionSource = source, indication = null, onClick = { state.select(item.value) }),
     ) {
-        Row {
-            tab(item, selected) {
-                onFocused()
-                state.select(item.value as Any?)
-            }
-        }
+        Row { tab(item, selected) { state.select(item.value) } }
     }
 }

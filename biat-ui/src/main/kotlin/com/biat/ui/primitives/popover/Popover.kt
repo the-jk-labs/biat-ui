@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
@@ -72,6 +73,7 @@ fun Popover(
             modifier =
                 Modifier
                     .focusRequester(returnRequester)
+                    .focusProperties { canFocus = true }
                     .overlayTriggerSemantics(expanded = state.isOpen, label = label)
                     .clickable(
                         interactionSource = source,
