@@ -118,6 +118,9 @@ fun rememberSliderState(
     remember {
         SliderState(
             initialValue = initialValue,
+            controlledValue = controlledValue,
+            valueRange = valueRange,
+            step = step,
             enabled = enabled,
         )
     }.apply {

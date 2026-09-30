@@ -43,7 +43,17 @@ class BitsParityNewPrimitivesTest {
             )
         }
         rule.onNodeWithContentDescription("Volume", useUnmergedTree = true).assertIsDisplayed()
+        rule.onNodeWithText("Track 0.5", useUnmergedTree = true).assertIsDisplayed()
         rule.onNodeWithText("Thumb", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun slider_initialValueSnapsWithinNegativeRange() {
+        rule.setContent {
+            val state = rememberSliderState(initialValue = -7f, valueRange = -10f..0f, step = 2f)
+            BasicText("Value ${state.value}")
+        }
+        rule.onNodeWithText("Value -6.0").assertIsDisplayed()
     }
 
     @Test
