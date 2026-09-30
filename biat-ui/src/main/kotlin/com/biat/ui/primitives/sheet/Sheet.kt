@@ -81,8 +81,6 @@ fun Sheet(
 
     val trapRequester = rememberFocusTrapRequester()
     val trapState = rememberFocusTrapState()
-    val focusManager = LocalFocusManager.current
-    FocusTrapEffect(active = true, trapRequester = trapRequester)
 
     // Dismiss boundary follows the content bounds: taps inside the sheet
     // are ignored even when they reach the scrim area. The scrim box shares
@@ -94,6 +92,8 @@ fun Sheet(
         dismissOnBackPress = dismissOnBackPress,
         dismissOnClickOutside = false,
     ) {
+        val focusManager = LocalFocusManager.current
+        FocusTrapEffect(active = true, trapRequester = trapRequester)
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier =

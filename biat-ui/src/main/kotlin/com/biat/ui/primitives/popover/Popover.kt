@@ -36,7 +36,7 @@ import com.biat.ui.core.state.rememberPopoverState
  * whenever the popover closes.
  *
  * - [modal]: traps Tab focus inside the popup and moves initial focus to
- *   the popup root on open. Non-modal (the default) leaves focus alone.
+ *   the first focusable content node on open. Non-modal (the default) leaves focus alone.
  *   Either way callers render their own scrim; outside-click dismissal is
  *   still governed by [dismissOnOutsideClick].
  * - [label] names the trigger for screen readers (announced with
@@ -68,7 +68,6 @@ fun Popover(
         val trapRequester = rememberFocusTrapRequester()
         val trapState = rememberFocusTrapState()
         FocusReturnEffect(isOpen = state.isOpen, returnRequester = returnRequester)
-        FocusTrapEffect(active = modal && state.isOpen, trapRequester = trapRequester)
         Box(
             modifier =
                 Modifier
@@ -105,18 +104,20 @@ fun Popover(
                 // owns focus separately, so the main window manager cannot
                 // move focus between popup items.
                 val popupFocusManager = LocalFocusManager.current
+                FocusTrapEffect(active = modal, trapRequester = trapRequester)
                 Box(
                     modifier =
                         Modifier.let { m ->
                             var acc = if (dismissOnEscape) m.onEscape { state.close() } else m
                             if (modal) {
                                 acc =
-                                    acc.focusTrap(
-                                        active = true,
-                                        trapRequester = trapRequester,
-                                        focusManager = popupFocusManager,
-                                        trapState = trapState,
-                                    )
+                                    acc
+                                        .focusTrap(
+                                            active = true,
+                                            trapRequester = trapRequester,
+                                            focusManager = popupFocusManager,
+                                            trapState = trapState,
+                                        )
                             }
                             acc
                         },

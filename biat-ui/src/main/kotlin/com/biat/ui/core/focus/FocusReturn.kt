@@ -71,7 +71,7 @@ fun FocusRequester.safeRequestFocus(): Boolean =
     }
 
 /** Waits for the host window to regain focus after a popup or dialog is removed. */
-private suspend fun awaitWindowFocus(view: View) {
+internal suspend fun awaitWindowFocus(view: View) {
     if (view.hasWindowFocus()) return
     suspendCancellableCoroutine<Unit> { continuation ->
         val observer = view.viewTreeObserver

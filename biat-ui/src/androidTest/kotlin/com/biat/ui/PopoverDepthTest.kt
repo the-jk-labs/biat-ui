@@ -46,20 +46,24 @@ class PopoverDepthTest {
         val state = PopoverState()
         rule.setContent { PopoverDepthHarness(state = state, modal = true) }
         rule.runOnIdle { state.open() }
-        // Tab rides in through the plain content node so every press tunnels
-        // through the trap preview; assertions read the focusable items.
-        // Entry focus landed in the popup: first Tab reaches item A.
-        node("pcontent").performKeyInput { pressKey(Key.Tab) }
+        // Entry focus requires no preparatory key and both directions wrap.
         node("pitem-a").assertIsFocused()
-        node("pcontent").performKeyInput { pressKey(Key.Tab) }
+        node("pitem-a").performKeyInput { pressKey(Key.Tab) }
         node("pitem-b").assertIsFocused()
-        // Third Tab wraps around to the first item (focus is zero-sum, so
-        // the outside trigger cannot hold it while an item is focused).
-        node("pcontent").performKeyInput { pressKey(Key.Tab) }
+        node("pitem-b").performKeyInput { pressKey(Key.Tab) }
         node("pitem-a").assertIsFocused()
-        // Cycling continues after the wrap.
-        node("pcontent").performKeyInput { pressKey(Key.Tab) }
+        node("pitem-a").performKeyInput {
+            keyDown(Key.ShiftLeft)
+            pressKey(Key.Tab)
+            keyUp(Key.ShiftLeft)
+        }
         node("pitem-b").assertIsFocused()
+        node("pitem-b").performKeyInput {
+            keyDown(Key.ShiftLeft)
+            pressKey(Key.Tab)
+            keyUp(Key.ShiftLeft)
+        }
+        node("pitem-a").assertIsFocused()
     }
 
     @Test
@@ -68,9 +72,6 @@ class PopoverDepthTest {
         rule.setContent { PopoverDepthHarness(state = state, modal = true) }
         rule.runOnIdle { state.open() }
         node("pcontent").assertExists()
-        // Escape must ride on the focused item: popup-window injection only
-        // tunnels when target and focus coincide.
-        node("pcontent").performKeyInput { pressKey(Key.Tab) }
         node("pitem-a").assertIsFocused()
         node("pitem-a").performKeyInput { pressKey(Key.Escape) }
         node("pcontent").assertDoesNotExist()

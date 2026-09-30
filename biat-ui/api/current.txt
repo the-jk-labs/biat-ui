@@ -193,8 +193,8 @@ public final class com.biat.ui.core.focus.FocusReturnKt {
   public static final void FocusReturnEffect(boolean, androidx.compose.ui.focus.FocusRequester, androidx.compose.runtime.Composer, int);
   public static final boolean shouldReturnFocus(boolean, boolean);
   public static final boolean safeRequestFocus(androidx.compose.ui.focus.FocusRequester);
+  public static final java.lang.Object awaitWindowFocus(android.view.View, kotlin.coroutines.Continuation<? super kotlin.Unit>);
   public static final boolean access$FocusReturnEffect$lambda$1(androidx.compose.runtime.MutableState);
-  public static final java.lang.Object access$awaitWindowFocus(android.view.View, kotlin.coroutines.Continuation);
   public static final void access$FocusReturnEffect$lambda$2(androidx.compose.runtime.MutableState, boolean);
 }
 Compiled from "FocusReturn.kt"
@@ -246,8 +246,9 @@ Compiled from "FocusTrap.kt"
 final class com.biat.ui.core.focus.FocusTrapKt$FocusTrapEffect$1$1 extends kotlin.coroutines.jvm.internal.SuspendLambda implements kotlin.jvm.functions.Function2<kotlinx.coroutines.CoroutineScope, kotlin.coroutines.Continuation<? super kotlin.Unit>, java.lang.Object> {
   int label;
   final boolean $active;
+  final android.view.View $view;
   final androidx.compose.ui.focus.FocusRequester $trapRequester;
-  com.biat.ui.core.focus.FocusTrapKt$FocusTrapEffect$1$1(boolean, androidx.compose.ui.focus.FocusRequester, kotlin.coroutines.Continuation<? super com.biat.ui.core.focus.FocusTrapKt$FocusTrapEffect$1$1>);
+  com.biat.ui.core.focus.FocusTrapKt$FocusTrapEffect$1$1(boolean, android.view.View, androidx.compose.ui.focus.FocusRequester, kotlin.coroutines.Continuation<? super com.biat.ui.core.focus.FocusTrapKt$FocusTrapEffect$1$1>);
   public final java.lang.Object invokeSuspend(java.lang.Object);
   public final kotlin.coroutines.Continuation<kotlin.Unit> create(java.lang.Object, kotlin.coroutines.Continuation<?>);
   public final java.lang.Object invoke(kotlinx.coroutines.CoroutineScope, kotlin.coroutines.Continuation<? super kotlin.Unit>);

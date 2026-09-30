@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
@@ -19,6 +20,7 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalView
 
 /**
  * Focus trap for modal overlays (Dialog / Sheet).
@@ -118,14 +120,19 @@ fun Modifier.focusTrap(
 /**
  * Requests [trapRequester] when [active] turns true so Tab cycling starts
  * inside the trap. Entry focus only; wrap behaviour lives in [focusTrap].
+ * Invoke inside the overlay window: requests wait for that window's focus
+ * and the next layout frame before targeting the first focusable descendant.
  */
 @Composable
 fun FocusTrapEffect(
     active: Boolean,
     trapRequester: FocusRequester,
 ) {
-    LaunchedEffect(active) {
+    val view = LocalView.current
+    LaunchedEffect(active, view) {
         if (active) {
+            awaitWindowFocus(view)
+            withFrameNanos { }
             try {
                 trapRequester.requestFocus()
             } catch (_: IllegalStateException) {
