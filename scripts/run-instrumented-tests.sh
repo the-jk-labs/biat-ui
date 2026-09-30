@@ -12,13 +12,17 @@ export PATH="$taskSdkRoot/emulator:$taskSdkRoot/platform-tools:$PATH"
 taskImage="system-images;android-$taskApiLevel;google_apis;x86_64"
 taskAvd="biat-ci-$taskApiLevel"
 taskSerial="emulator-5554"
+export ANDROID_AVD_HOME="$PWD/build/android-avd"
+mkdir -p "$ANDROID_AVD_HOME"
 
 # yes exits on SIGPIPE when sdkmanager has consumed its input.
 set +o pipefail
 yes | sdkmanager --licenses > /dev/null
 set -o pipefail
 sdkmanager "platforms;android-37.0" "emulator" "$taskImage"
-printf 'no\n' | avdmanager create avd --force --name "$taskAvd" --package "$taskImage" --device "pixel_2"
+printf 'no\n' | avdmanager create avd --force --name "$taskAvd" --package "$taskImage" \
+    --device "pixel_2" --path "$ANDROID_AVD_HOME/$taskAvd.avd"
+emulator -list-avds
 if adb -s "$taskSerial" get-state > /dev/null 2>&1; then
     echo "Emulator port 5554 is already in use" >&2
     exit 1
