@@ -49,7 +49,10 @@ AGENTS.md | ROADMAP.md | README.md
    `core/accessibility/*` for semantics.
 3. Add `primitives/<name>/<Name>.kt` with slot API:
    `trigger: @Composable () -> Unit`, `content: @Composable () -> Unit`
-   (or typed variants). Never add default styling params.
+   (or typed variants). Multi-child structures accept a required caller-owned
+   `layout` slot. Row/Column arrangement and sheet content size/alignment belong
+   to the caller; only behavior containers may cover the overlay window.
+   Never add default styling params.
 4. Extend `StateMachinesTest` for new state transitions.
 5. Add a demo section in `sample/.../MainActivity.kt` proving arbitrary styling works.
 

@@ -2,6 +2,7 @@ package com.biat.ui
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -47,7 +48,12 @@ class GroupKeyboardTest {
         val state = MenuState(itemCount = 3, disabledIndices = setOf(1))
         var chosen = "none"
         rule.setContent {
-            Menu(state = state, label = "Actions", trigger = { BasicText("Open") }) {
+            Menu(
+                layout = { content -> Column { content() } },
+                state = state,
+                label = "Actions",
+                trigger = { BasicText("Open") },
+            ) {
                 listOf("Edit", "Delete", "Copy").forEachIndexed { index, label ->
                     MenuItem(state, enabled = index != 1, label = label, onSelect = { chosen = label }) {
                         BasicText(label)
@@ -74,6 +80,7 @@ class GroupKeyboardTest {
         rule.setContent {
             RadioGroup(
                 state,
+                layout = { content -> Column { content() } },
                 options =
                     listOf(
                         RadioGroupValue("a", "Alpha"),
@@ -100,6 +107,7 @@ class GroupKeyboardTest {
             Column {
                 ToggleGroup(
                     state,
+                    layout = { content -> Row { content() } },
                     items = listOf(ToggleGroupValue("a", "Bold"), ToggleGroupValue("b", "Italic")),
                     item = { entry, _ -> BasicText(entry.label) },
                 )
@@ -123,6 +131,7 @@ class GroupKeyboardTest {
             Column {
                 Tabs(
                     state,
+                    layout = { content -> Row { content() } },
                     tabs = listOf(TabValue("a", "Alpha"), TabValue("b", "Beta"), TabValue("c", "Gamma")),
                     tab = { entry, _, _ -> BasicText(entry.label) },
                     panel = {},
@@ -148,6 +157,7 @@ class GroupKeyboardTest {
             Column {
                 Toolbar(
                     state,
+                    layout = { content -> Row { content() } },
                     items = listOf(ToolbarValue("a", "Cut"), ToolbarValue("b", "Paste"), ToolbarValue("c", "Copy")),
                     item = { entry, _ -> BasicText(entry.label) },
                 )

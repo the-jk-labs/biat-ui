@@ -130,6 +130,9 @@ private fun DismissHarness() {
 private fun SheetHarness() {
     val state = rememberSheetState(initialOpen = true)
     Sheet(
+        layout = { content ->
+            Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter), contentAlignment = Alignment.BottomCenter) { content() }
+        },
         state = state,
         dismissOnEscape = false,
         dismissOnBackPress = false,

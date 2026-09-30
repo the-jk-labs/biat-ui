@@ -1,6 +1,7 @@
 package com.biat.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -33,6 +34,7 @@ class BitsParityCollapsibleTest {
     fun collapsible_clickTogglesPanel() {
         rule.setContent {
             Collapsible(
+                layout = { content -> Column { content() } },
                 state = rememberCollapsibleState(),
                 trigger = { Box(Modifier.testTag("ctrigger")) { BasicText("Trigger") } },
             ) {
@@ -51,6 +53,7 @@ class BitsParityCollapsibleTest {
         val items = listOf(AccordionValue("a", "A"), AccordionValue("b", "B"))
         rule.setContent {
             Accordion(
+                layout = { content -> Column { content() } },
                 state = rememberAccordionState(type = AccordionType.Multiple),
                 items = items,
                 trigger = { item, _ ->

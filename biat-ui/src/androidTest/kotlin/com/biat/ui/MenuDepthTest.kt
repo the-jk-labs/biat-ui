@@ -2,6 +2,7 @@ package com.biat.ui
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,6 +57,7 @@ class MenuDepthTest {
         val state = MenuState(itemCount = 2, disabledIndices = setOf(1))
         rule.setContent {
             Menu(
+                layout = { content -> Column { content() } },
                 state = state,
                 trigger = { BasicText("trigger") },
             ) {
@@ -113,6 +115,7 @@ class MenuDepthTest {
         val state = MenuState(itemCount = 1)
         rule.setContent {
             Menu(
+                layout = { content -> Column { content() } },
                 state = state,
                 trigger = { BasicText("trigger") },
             ) {
@@ -144,6 +147,7 @@ class MenuDepthTest {
         val state = MenuState(itemCount = 2)
         rule.setContent {
             Menu(
+                layout = { content -> Column { content() } },
                 state = state,
                 trigger = { BasicText("trigger") },
             ) {
@@ -172,6 +176,7 @@ class MenuDepthTest {
         val state = MenuState(itemCount = 1)
         rule.setContent {
             Menu(
+                layout = { content -> Column { content() } },
                 state = state,
                 trigger = { BasicText("trigger") },
             ) {
@@ -191,11 +196,13 @@ class MenuDepthTest {
         val sub = MenuState(itemCount = 1)
         rule.setContent {
             Menu(
+                layout = { content -> Column { content() } },
                 state = parent,
                 trigger = { BasicText("trigger") },
             ) {
                 MenuItem(state = parent, onSelect = {}) { BasicText("Edit") }
                 MenuSub(
+                    layout = { content -> Column { content() } },
                     state = sub,
                     label = "Share",
                     trigger = { BasicText("Share") },
@@ -223,10 +230,12 @@ class MenuDepthTest {
         val sub = MenuState(itemCount = 1)
         rule.setContent {
             Menu(
+                layout = { content -> Column { content() } },
                 state = parent,
                 trigger = { BasicText("trigger") },
             ) {
                 MenuSub(
+                    layout = { content -> Column { content() } },
                     state = sub,
                     label = "Share",
                     trigger = { FocusableTag("sub-trigger") },

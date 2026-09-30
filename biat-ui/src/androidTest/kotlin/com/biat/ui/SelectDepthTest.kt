@@ -1,5 +1,6 @@
 package com.biat.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +29,7 @@ class SelectDepthTest {
     ) {
         rule.setContent {
             Select(
+                layout = { content -> Column { content() } },
                 state = state,
                 options = options,
                 isLoading = isLoading,
@@ -90,6 +92,7 @@ class SelectDepthTest {
                     onQueryChange = { query = it },
                 )
             Select(
+                layout = { content -> Column { content() } },
                 state = state,
                 options = listOf("Kotlin", "Java", "Rust"),
                 empty = { BasicText("No matches") },

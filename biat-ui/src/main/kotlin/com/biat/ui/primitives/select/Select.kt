@@ -3,8 +3,6 @@ package com.biat.ui.primitives.select
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -34,6 +32,8 @@ import com.biat.ui.core.state.SelectState
 import com.biat.ui.core.state.rememberSelectState
 
 /**
+ * [layout] arranges the item slots without a library-defined Row or Column.
+ *
  * Headless Select / Combobox trigger + listbox.
  *
  * [options] drive keyboard highlight; [onSelected] fires on
@@ -65,6 +65,7 @@ import com.biat.ui.core.state.rememberSelectState
 fun <T> Select(
     state: SelectState<T> = rememberSelectState(),
     options: List<T>,
+    layout: @Composable (content: @Composable () -> Unit) -> Unit,
     dismissOnOutsideClick: Boolean = true,
     dismissOnEscape: Boolean = true,
     label: String? = null,
@@ -78,7 +79,7 @@ fun <T> Select(
     loading: @Composable () -> Unit = {},
     empty: @Composable () -> Unit = {},
     trigger: @Composable (selected: T?) -> Unit,
-    item: @Composable ColumnScope.(value: T, highlighted: Boolean, selected: Boolean) -> Unit,
+    item: @Composable (value: T, highlighted: Boolean, selected: Boolean) -> Unit,
     onSelected: ((T?) -> Unit)? = null,
 ) {
     val visible = state.filteredOptions(options, queryToString)
@@ -152,7 +153,7 @@ fun <T> Select(
                         dismissOnClickOutside = dismissOnOutsideClick,
                     ),
             ) {
-                Column(
+                Box(
                     modifier =
                         Modifier.onPreviewKeyEvent { event ->
                             if (event.type != KeyEventType.KeyDown) {
@@ -220,34 +221,34 @@ fun <T> Select(
                             }
                         },
                 ) {
-                    when {
-                        isLoading -> {
-                            loading()
-                        }
+                    layout {
+                        when {
+                            isLoading -> {
+                                loading()
+                            }
 
-                        visible.isEmpty() -> {
-                            empty()
-                        }
+                            visible.isEmpty() -> {
+                                empty()
+                            }
 
-                        else -> {
-                            visible.forEachIndexed { index, value ->
-                                val itemSource = remember { MutableInteractionSource() }
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .selectItemSemantics(
-                                                selected = state.selected == value,
-                                                highlighted = state.highlightedIndex == index,
-                                            ).clickable(
-                                                interactionSource = itemSource,
-                                                indication = null,
-                                                onClick = {
-                                                    state.select(value)
-                                                    onSelected?.invoke(value)
-                                                },
-                                            ),
-                                ) {
-                                    Column {
+                            else -> {
+                                visible.forEachIndexed { index, value ->
+                                    val itemSource = remember { MutableInteractionSource() }
+                                    Box(
+                                        modifier =
+                                            Modifier
+                                                .selectItemSemantics(
+                                                    selected = state.selected == value,
+                                                    highlighted = state.highlightedIndex == index,
+                                                ).clickable(
+                                                    interactionSource = itemSource,
+                                                    indication = null,
+                                                    onClick = {
+                                                        state.select(value)
+                                                        onSelected?.invoke(value)
+                                                    },
+                                                ),
+                                    ) {
                                         item(
                                             value,
                                             state.highlightedIndex == index,

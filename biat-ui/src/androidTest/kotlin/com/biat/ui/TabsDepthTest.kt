@@ -2,6 +2,8 @@ package com.biat.ui
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -123,6 +125,9 @@ private fun TabsDepthHarness(
             TabValue("c", "C"),
         )
     Tabs(
+        layout = { content ->
+            if (orientation == TabsOrientation.Vertical) Column { content() } else Row { content() }
+        },
         state = state,
         tabs = tabs,
         orientation = orientation,

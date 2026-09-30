@@ -1,5 +1,6 @@
 package com.biat.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
@@ -24,6 +25,7 @@ class BitsParityRadioGroupTest {
     fun radioGroup_clickSelectsSecond() {
         rule.setContent {
             RadioGroup(
+                layout = { content -> Column { content() } },
                 state = rememberRadioGroupState(initialSelected = "a"),
                 options = listOf(RadioGroupValue("a", "Alpha"), RadioGroupValue("b", "Beta")),
                 item = { item, _ -> BasicText(item.label) },

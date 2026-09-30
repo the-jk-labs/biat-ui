@@ -3,9 +3,6 @@ package com.biat.ui.primitives.togglegroup
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -33,16 +30,18 @@ data class ToggleGroupValue<T>(
 )
 
 /**
- * Headless ToggleGroup. Behavior only, zero styling.
+ * Headless ToggleGroup. Behavior only, zero styling. [layout] arranges the caller slots.
  *
- * Renders [items] inline; each button toggles its value in [state]. [type]
- * selects single vs multiple pressed; [allowDeselect] lets single mode clear
- * its pressed item. Buttons are caller visuals entirely.
+ * Renders [items] inline; each button toggles its value in [state].
+ * [ToggleGroupState.type] controls selection; [ToggleGroupState.allowDeselect]
+ * controls clearing. [horizontal] selects the arrow-key axis independently
+ * of [layout]. Buttons are caller visuals entirely.
  */
 @Composable
 fun <T> ToggleGroup(
     state: ToggleGroupState = rememberToggleGroupState(),
     items: List<ToggleGroupValue<T>>,
+    layout: @Composable (content: @Composable () -> Unit) -> Unit,
     label: String? = null,
     enabled: Boolean = true,
     horizontal: Boolean = true,
@@ -65,11 +64,7 @@ fun <T> ToggleGroup(
         }
     }
     CompositionLocalProvider(LocalFocusGroup provides group) {
-        if (horizontal) {
-            Row(modifier = container) { rows() }
-        } else {
-            Column(modifier = container) { rows() }
-        }
+        Box(modifier = container) { layout(rows) }
     }
 }
 
@@ -137,13 +132,13 @@ fun ToggleGroupContent(
             type = ToggleGroupType.Multiple,
         ),
     label: String? = null,
-    content: @Composable ColumnScope.(scope: ToggleGroupScope) -> Unit,
+    content: @Composable (scope: ToggleGroupScope) -> Unit,
 ) {
     val group = remember { FocusGroup() }
     FocusGroupEffect(group)
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     CompositionLocalProvider(LocalFocusGroup provides group) {
-        Column(modifier = Modifier.toggleGroupSemantics(label).focusGroupKeys(group, rtl = rtl)) {
+        Box(modifier = Modifier.toggleGroupSemantics(label).focusGroupKeys(group, rtl = rtl)) {
             content(ToggleGroupScope(state))
         }
     }

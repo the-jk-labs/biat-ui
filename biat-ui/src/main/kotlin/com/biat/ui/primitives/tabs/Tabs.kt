@@ -3,9 +3,6 @@ package com.biat.ui.primitives.tabs
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -31,7 +28,7 @@ data class TabValue<T>(
     val label: String,
 )
 
-/** Layout axis of the tab list. Vertical lists use Up/Down instead of Left/Right. */
+/** Keyboard axis of the tab list. Vertical lists use Up/Down instead of Left/Right. */
 enum class TabsOrientation {
     Horizontal,
     Vertical,
@@ -47,11 +44,13 @@ enum class TabsActivation {
 }
 
 /**
+ * [layout] arranges the item slots without a library-defined Row or Column.
+ *
  * Headless Tabs. Roving arrow-key navigation (orientation-aware, RTL-aware,
  * wrap-around) plus Home/End, selection state in [TabsState]. Zero styling.
  * [label] is exposed as the tab list content description for screen
  * readers; each tab already announces its own label + selected state.
- * Arrow keys move DOM focus between tabs; in [TabsActivation.Automatic]
+ * Arrow keys move Compose focus between tabs; in [TabsActivation.Automatic]
  * (the default) they also select, in [TabsActivation.Manual] Enter/Space
  * (via click) or pointer click selects the focused tab.
  */
@@ -59,10 +58,11 @@ enum class TabsActivation {
 fun <T> Tabs(
     state: TabsState = rememberTabsState(),
     tabs: List<TabValue<T>>,
+    layout: @Composable (content: @Composable () -> Unit) -> Unit,
     label: String? = null,
     orientation: TabsOrientation = TabsOrientation.Horizontal,
     activation: TabsActivation = TabsActivation.Automatic,
-    tab: @Composable RowScope.(tab: TabValue<T>, selected: Boolean, onSelect: () -> Unit) -> Unit,
+    tab: @Composable (tab: TabValue<T>, selected: Boolean, onSelect: () -> Unit) -> Unit,
     panel: @Composable (selected: TabValue<T>?) -> Unit,
 ) {
     val group = remember { FocusGroup() }
@@ -78,14 +78,8 @@ fun <T> Tabs(
             rtl = rtl,
         )
     CompositionLocalProvider(LocalFocusGroup provides group) {
-        if (orientation == TabsOrientation.Horizontal) {
-            Row(modifier = listModifier) {
-                tabs.forEach { item -> TabCell(state, item, tab) }
-            }
-        } else {
-            Column(modifier = listModifier) {
-                tabs.forEach { item -> TabCell(state, item, tab) }
-            }
+        Box(modifier = listModifier) {
+            layout { tabs.forEach { item -> TabCell(state, item, tab) } }
         }
     }
     panel(tabs.firstOrNull { state.isSelected(it.value) })
@@ -95,7 +89,7 @@ fun <T> Tabs(
 private fun <T> TabCell(
     state: TabsState,
     item: TabValue<T>,
-    tab: @Composable RowScope.(tab: TabValue<T>, selected: Boolean, onSelect: () -> Unit) -> Unit,
+    tab: @Composable (tab: TabValue<T>, selected: Boolean, onSelect: () -> Unit) -> Unit,
 ) {
     val selected = state.isSelected(item.value)
     val source = remember(item.value) { MutableInteractionSource() }
@@ -105,6 +99,6 @@ private fun <T> TabCell(
                 .tabSemantics(selected = selected, label = item.label)
                 .clickable(interactionSource = source, indication = null, onClick = { state.select(item.value) }),
     ) {
-        Row { tab(item, selected) { state.select(item.value) } }
+        tab(item, selected) { state.select(item.value) }
     }
 }

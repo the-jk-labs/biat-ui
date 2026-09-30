@@ -1,8 +1,12 @@
 package com.biat.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -89,7 +93,13 @@ class SemanticsTest {
     @Test
     fun sheet_labelExposed() {
         rule.setContent {
-            Sheet(state = SheetState(initialOpen = true), label = "Actions sheet") {
+            Sheet(
+                layout = { content ->
+                    Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter), contentAlignment = Alignment.BottomCenter) { content() }
+                },
+                state = SheetState(initialOpen = true),
+                label = "Actions sheet",
+            ) {
                 BasicText("body")
             }
         }
@@ -101,6 +111,7 @@ class SemanticsTest {
         val state = MenuState(itemCount = 1, initialOpen = true)
         rule.setContent {
             Menu(
+                layout = { content -> Column { content() } },
                 state = state,
                 label = "Actions",
                 trigger = { BasicText("open") },
@@ -189,6 +200,7 @@ class SemanticsTest {
     fun select_triggerDropdownRole() {
         rule.setContent {
             Select(
+                layout = { content -> Column { content() } },
                 state = SelectState<String>(),
                 options = listOf("a", "b"),
                 trigger = {
@@ -215,6 +227,7 @@ private fun TabsHarness(label: String?) {
             TabValue("b", "B"),
         )
     Tabs(
+        layout = { content -> Row { content() } },
         state = TabsState(initialSelected = "a"),
         tabs = tabs,
         label = label,

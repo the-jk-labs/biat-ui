@@ -3,8 +3,6 @@ package com.biat.ui.primitives.toolbar
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -34,7 +32,9 @@ data class ToolbarValue<T>(
 )
 
 /**
- * Headless Toolbar. Behavior only, zero styling.
+ * [layout] arranges the item slots without a library-defined Row or Column.
+ *
+ * Headless Toolbar. Behavior only, zero styling. [layout] arranges the caller slots.
  *
  * Roving-tabindex container: arrows move focus with wrap-around, Home/End
  * jump; disabled items are skipped. Activation stays caller-owned via
@@ -45,6 +45,7 @@ data class ToolbarValue<T>(
 fun <T> Toolbar(
     state: ToolbarState,
     items: List<ToolbarValue<T>>,
+    layout: @Composable (content: @Composable () -> Unit) -> Unit,
     label: String? = null,
     orientation: ToolbarOrientation = ToolbarOrientation.Horizontal,
     onActivate: (T) -> Unit = {},
@@ -78,11 +79,7 @@ fun <T> Toolbar(
         }
     }
     CompositionLocalProvider(LocalFocusGroup provides group) {
-        if (orientation == ToolbarOrientation.Horizontal) {
-            Row(modifier = container) { rows() }
-        } else {
-            Column(modifier = container) { rows() }
-        }
+        Box(modifier = container) { layout(rows) }
     }
 }
 
@@ -120,6 +117,7 @@ fun ToolbarItem(
 @Composable
 fun <T> Toolbar(
     items: List<ToolbarValue<T>>,
+    layout: @Composable (content: @Composable () -> Unit) -> Unit,
     label: String? = null,
     orientation: ToolbarOrientation = ToolbarOrientation.Horizontal,
     disabledIndices: Set<Int> = emptySet(),
@@ -134,6 +132,7 @@ fun <T> Toolbar(
     Toolbar(
         state = state,
         items = items,
+        layout = layout,
         label = label,
         orientation = orientation,
         onActivate = onActivate,

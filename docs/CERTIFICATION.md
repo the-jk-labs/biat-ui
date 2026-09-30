@@ -6,7 +6,7 @@ human keyboard interaction on every device.
 
 | Target | Coverage | Status |
 |---|---|---|
-| HONOR ALT-LX1, Android 14 / API 34 | Full instrumented suite, including focus, keys, dismiss, semantics and accessibility actions | 86 tests passed on 2026-09-30 at commit 1c6c84f |
+| HONOR ALT-LX1, Android 14 / API 34 | Full instrumented suite, including focus, keys, dismiss, semantics and accessibility actions | 89 tests passed on 2026-09-30 during the rc2 layout hardening |
 | Google APIs x86_64 emulator, API 24 | Full instrumented suite at the library minimum SDK | Required CI job; see the run for each commit |
 | Google APIs x86_64 emulator, API 36 | Full instrumented suite on a recent Android API | Required CI job; see the run for each commit |
 | Manual TalkBack, API 34 | Spoken labels, values, state, traversal and activation | Pending; automated semantics checks are not manual certification |

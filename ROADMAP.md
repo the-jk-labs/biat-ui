@@ -175,7 +175,8 @@ Status as of v0.1.0 scaffold (2026-09-26).
       and decorative separator exclusion, pinned by device tests.
 - [x] Instrumented tests in CI on API 24 and API 36, gating publishing;
       device/API results and manual certification gaps in docs/CERTIFICATION.md.
-- [ ] Caller-owned group and sheet layouts before the stable API freeze.
+- [x] Caller-owned group and sheet layouts before the stable API freeze;
+      layout slots replace fixed Row/Column and bottom/full-width placement.
 - [ ] Public API snapshot excludes generated implementation classes.
 - [ ] Release tag/version validation and migration/cookbook documentation.
 

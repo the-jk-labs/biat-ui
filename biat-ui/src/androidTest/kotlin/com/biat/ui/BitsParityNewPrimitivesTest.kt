@@ -1,5 +1,6 @@
 package com.biat.ui
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -60,6 +61,7 @@ class BitsParityNewPrimitivesTest {
     fun toggleGroup_clickPresses() {
         rule.setContent {
             ToggleGroup(
+                layout = { content -> Row { content() } },
                 state = rememberToggleGroupState(type = ToggleGroupType.Multiple),
                 items =
                     listOf(
@@ -80,6 +82,7 @@ class BitsParityNewPrimitivesTest {
         var activated: String? = null
         rule.setContent {
             Toolbar(
+                layout = { content -> Row { content() } },
                 state = rememberToolbarState(itemCount = 2),
                 items =
                     listOf(

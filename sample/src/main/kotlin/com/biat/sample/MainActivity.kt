@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -332,6 +333,7 @@ private fun MenuDemo() {
     var chosen by remember { mutableStateOf("none") }
     DemoCard("Menu (chosen: $chosen)") {
         Menu(
+            layout = { content -> Column { content() } },
             state = state,
             trigger = { DemoButton("Open menu") },
         ) {
@@ -356,6 +358,7 @@ private fun MenuDepthDemo() {
     var sort by remember { mutableStateOf("Name") }
     DemoCard("Menu depth (chosen: $chosen, hidden: $showHidden, sort: $sort)") {
         Menu(
+            layout = { content -> Column { content() } },
             state = state,
             trigger = { DemoButton("Open depth menu") },
         ) {
@@ -391,6 +394,7 @@ private fun MenuDepthDemo() {
                 }
             }
             MenuSub(
+                layout = { content -> Column { content() } },
                 state = subState,
                 label = "Share",
                 trigger = { MenuRow("Share >") },
@@ -476,6 +480,7 @@ private fun SelectDemo() {
     val options = listOf("Kotlin", "Java", "Rust")
     DemoCard("Select (selected: ${state.selected})") {
         Select(
+            layout = { content -> Column { content() } },
             state = state,
             options = options,
             trigger = { selected -> DemoButton(selected ?: "Pick language") },
@@ -501,6 +506,7 @@ private fun ComboboxDemo() {
     var loading by remember { mutableStateOf(false) }
     DemoCard("Combobox (query: ${state.query}, selected: ${state.selected})") {
         Select(
+            layout = { content -> Column { content() } },
             state = state,
             options = allOptions,
             isLoading = loading,
@@ -576,6 +582,7 @@ private fun TabsDemo() {
     val tabs = listOf(TabValue("a", "Account"), TabValue("b", "Password"))
     DemoCard("Tabs") {
         Tabs(
+            layout = { content -> Row { content() } },
             state = state,
             tabs = tabs,
             tab = { item, selected, _ ->
@@ -612,6 +619,7 @@ private fun TabsDepthDemo() {
     DemoCard("Tabs depth (manual + vertical)") {
         BasicText("Manual: arrows move focus, Enter selects")
         Tabs(
+            layout = { content -> Row { content() } },
             state = manual,
             tabs = tabs,
             activation = TabsActivation.Manual,
@@ -635,6 +643,7 @@ private fun TabsDepthDemo() {
         )
         BasicText("Vertical: Up/Down navigate")
         Tabs(
+            layout = { content -> Column { content() } },
             state = vertical,
             tabs = tabs,
             orientation = TabsOrientation.Vertical,
@@ -664,6 +673,9 @@ private fun SheetDemo() {
     val state = rememberSheetState()
     DemoCard("Sheet") {
         Sheet(
+            layout = { content ->
+                Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter), contentAlignment = Alignment.BottomCenter) { content() }
+            },
             state = state,
             trigger = { DemoButton("Open sheet") },
             scrim = { Box(Modifier.fillMaxSize().background(Color(0x88000000))) },
@@ -680,6 +692,9 @@ private fun SheetDepthDemo() {
     val state = rememberSheetState()
     DemoCard("Sheet depth (detent: ${state.detent}, drag the handle)") {
         Sheet(
+            layout = { content ->
+                Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter), contentAlignment = Alignment.BottomCenter) { content() }
+            },
             state = state,
             trigger = { DemoButton("Open depth sheet") },
             scrim = { Box(Modifier.fillMaxSize().background(Color(0x88000000))) },
@@ -720,6 +735,7 @@ private fun CollapsibleDemo() {
     val state = rememberCollapsibleState()
     DemoCard("Collapsible (${if (state.isExpanded) "open" else "closed"})") {
         Collapsible(
+            layout = { content -> Column { content() } },
             state = state,
             trigger = { DemoButton(if (state.isExpanded) "Hide" else "Show") },
         ) {
@@ -740,6 +756,7 @@ private fun AccordionDemo() {
         )
     DemoCard("Accordion (${state.openValues.size} open)") {
         Accordion(
+            layout = { content -> Column { content() } },
             state = state,
             items = items,
             trigger = { item, expanded ->
@@ -782,6 +799,7 @@ private fun RadioGroupDemo() {
     val state = rememberRadioGroupState(initialSelected = "a")
     DemoCard("RadioGroup (${state.selectedValue})") {
         RadioGroup(
+            layout = { content -> Column { content() } },
             state = state,
             options =
                 listOf(
@@ -832,6 +850,7 @@ private fun ToggleGroupDemo() {
     val state = rememberToggleGroupState(type = ToggleGroupType.Multiple)
     DemoCard("ToggleGroup (${state.pressedValues})") {
         ToggleGroup(
+            layout = { content -> Row { content() } },
             state = state,
             items =
                 listOf(
@@ -856,6 +875,7 @@ private fun ToolbarDemo() {
     var activated by remember { mutableStateOf("none") }
     DemoCard("Toolbar (activated: $activated)") {
         Toolbar(
+            layout = { content -> Row { content() } },
             items =
                 listOf(
                     ToolbarValue("cut", "Cut"),

@@ -51,7 +51,9 @@ Shared behavior lives in `com.biat.ui.core`: state machines, focus trap,
 roving focus, portal, dismiss handling, and accessibility semantics.
 
 The library has no Material dependency and defines no themes, colors, or
-layouts. All visuals belong to the caller; see `sample/` for examples.
+item arrangements. Multi-child primitives require a `layout` slot, such as
+`layout = { items -> Row { items() } }`, supplied by the caller. Sheet's layout
+slot has a `BoxScope` receiver for caller-owned sizing and positioning. All visuals belong to the caller; see `sample/` for examples.
 
 ## Build
 

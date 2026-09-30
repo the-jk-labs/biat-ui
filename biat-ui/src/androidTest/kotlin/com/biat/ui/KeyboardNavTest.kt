@@ -2,10 +2,14 @@ package com.biat.ui
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -79,7 +83,13 @@ class KeyboardNavTest {
     fun sheet_escapeCloses() {
         val state = SheetState(initialOpen = true)
         rule.setContent {
-            Sheet(state = state, dismissOnBackPress = false) {
+            Sheet(
+                layout = { content ->
+                    Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter), contentAlignment = Alignment.BottomCenter) { content() }
+                },
+                state = state,
+                dismissOnBackPress = false,
+            ) {
                 FocusableTag("content")
             }
         }
@@ -299,6 +309,7 @@ private fun FocusableTag(
 @Composable
 private fun MenuHarness(state: MenuState) {
     Menu(
+        layout = { content -> Column { content() } },
         state = state,
         trigger = { FocusableTag("trigger", request = !state.isOpen) },
     ) {
@@ -316,6 +327,7 @@ private fun SelectHarness(
     onSelected: ((String?) -> Unit)? = null,
 ) {
     Select(
+        layout = { content -> Column { content() } },
         state = state,
         options = listOf("a", "b", "c"),
         trigger = { FocusableTag("trigger", request = !state.isOpen) },
@@ -338,6 +350,7 @@ private fun TabsHarness(state: TabsState) {
             TabValue("c", "C"),
         )
     Tabs(
+        layout = { content -> Row { content() } },
         state = state,
         tabs = tabs,
         tab = { item, _, _ ->

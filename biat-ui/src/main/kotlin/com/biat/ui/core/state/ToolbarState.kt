@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-/** Layout axis of a Toolbar. Horizontal uses Left/Right, Vertical uses Up/Down. */
+/** Keyboard axis of a Toolbar. Horizontal uses Left/Right, Vertical uses Up/Down. */
 enum class ToolbarOrientation { Horizontal, Vertical }
 
 /**

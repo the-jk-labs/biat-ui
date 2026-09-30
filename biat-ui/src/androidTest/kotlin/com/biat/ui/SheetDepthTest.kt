@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
@@ -81,6 +82,9 @@ class SheetDepthTest {
         val state = SheetState()
         rule.setContent {
             Sheet(
+                layout = { content ->
+                    Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter), contentAlignment = Alignment.BottomCenter) { content() }
+                },
                 state = state,
                 dismissOnEscape = false,
                 dismissOnBackPress = false,
@@ -126,6 +130,9 @@ class SheetDepthTest {
 @androidx.compose.runtime.Composable
 private fun DragHarness(state: SheetState) {
     Sheet(
+        layout = { content ->
+            Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter), contentAlignment = Alignment.BottomCenter) { content() }
+        },
         state = state,
         dismissOnEscape = false,
         dismissOnBackPress = false,

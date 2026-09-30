@@ -3,8 +3,6 @@ package com.biat.ui.primitives.menu
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
@@ -44,6 +42,8 @@ import com.biat.ui.core.state.MenuState
 import com.biat.ui.core.state.rememberMenuState
 
 /**
+ * [layout] arranges the item slots without a library-defined Row or Column.
+ *
  * Headless dropdown Menu. Behavior only.
  *
  * Keyboard: Enter/Space/Down on trigger opens; Up/Down cycle highlight,
@@ -69,8 +69,9 @@ fun Menu(
     sideOffset: Dp = 0.dp,
     alignOffset: Dp = 0.dp,
     avoidCollisions: Boolean = true,
+    layout: @Composable (content: @Composable () -> Unit) -> Unit,
     trigger: @Composable () -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable () -> Unit,
 ) {
     val triggerSource = remember { MutableInteractionSource() }
     val triggerRequester = rememberFocusReturnRequester()
@@ -134,7 +135,7 @@ fun Menu(
                 focusGroup.onFocused = { if (it >= 0) state.highlight(it) }
                 FocusGroupEffect(focusGroup, initialFocus = true)
                 CompositionLocalProvider(LocalFocusGroup provides focusGroup) {
-                    Column(
+                    Box(
                         modifier =
                             Modifier
                                 .focusGroupKeys(focusGroup, horizontal = false)
@@ -158,8 +159,7 @@ fun Menu(
                                         }
                                     }
                                 },
-                        content = content,
-                    )
+                    ) { layout(content) }
                 }
             }
         }
@@ -311,8 +311,9 @@ fun MenuSub(
     sideOffset: Dp = 0.dp,
     alignOffset: Dp = 0.dp,
     avoidCollisions: Boolean = true,
+    layout: @Composable (content: @Composable () -> Unit) -> Unit,
     trigger: @Composable () -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable () -> Unit,
 ) {
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val openKey = if (rtl) Key.DirectionLeft else Key.DirectionRight
@@ -368,7 +369,7 @@ fun MenuSub(
                 focusGroup.onFocused = { if (it >= 0) state.highlight(it) }
                 FocusGroupEffect(focusGroup, initialFocus = true)
                 CompositionLocalProvider(LocalFocusGroup provides focusGroup) {
-                    Column(
+                    Box(
                         modifier =
                             Modifier
                                 .focusGroupKeys(focusGroup, horizontal = false)
@@ -392,8 +393,7 @@ fun MenuSub(
                                         }
                                     }
                                 },
-                        content = content,
-                    )
+                    ) { layout(content) }
                 }
             }
         }
