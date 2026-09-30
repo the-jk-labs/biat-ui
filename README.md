@@ -98,6 +98,7 @@ The public key must be distributed to a keyserver (`gpg --send-keys`).
 
 - `AGENTS.md`: contributor rules
 - `ROADMAP.md`: release plan
+- `docs/CERTIFICATION.md`: automated coverage and manual certification status
 
 ## License
 

@@ -162,7 +162,7 @@ Status as of v0.1.0 scaffold (2026-09-26).
 - [ ] SBOM for release artifacts (publish wiring itself is done above)
 - [ ] Migration + cookbook docs (Material → headless, common recipes)
 - [ ] TalkBack + keyboard certification matrix (devices/API levels)
-- [ ] GitHub Actions CI: build, unit + instrumented tests, lint, publish
+- [x] GitHub Actions CI: build, unit + instrumented tests, lint, publish
 
 ## 1.0.0-rc2: Behavior hardening
 
@@ -173,7 +173,8 @@ Status as of v0.1.0 scaffold (2026-09-26).
       and trigger focus restoration after the overlay window closes.
 - [x] Slider accessibility actions, native tri-state/disabled toggle semantics,
       and decorative separator exclusion, pinned by device tests.
-- [ ] Instrumented tests in CI, including a device/API certification record.
+- [x] Instrumented tests in CI on API 24 and API 36, gating publishing;
+      device/API results and manual certification gaps in docs/CERTIFICATION.md.
 - [ ] Caller-owned group and sheet layouts before the stable API freeze.
 - [ ] Public API snapshot excludes generated implementation classes.
 - [ ] Release tag/version validation and migration/cookbook documentation.

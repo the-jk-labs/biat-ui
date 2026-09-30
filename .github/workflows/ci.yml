@@ -26,16 +26,47 @@ jobs:
             PATH="$d:$PATH"
           done
           export PATH
+          set +o pipefail
           yes | sdkmanager --licenses > /dev/null
+          set -o pipefail
           sdkmanager "platforms;android-37.0"
       - name: Lint
         run: ./gradlew ktlintCheck
       - name: Test and assemble
         run: ./gradlew :biat-ui:testDebugUnitTest :biat-ui:assembleRelease :sample:assembleDebug :biat-ui:apiCheck
 
+  instrumented:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [24, 36]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Enable KVM
+        run: sudo chmod a+rw /dev/kvm
+      - name: Test on API ${{ matrix.api-level }}
+        run: bash scripts/run-instrumented-tests.sh "${{ matrix.api-level }}"
+      - name: Upload device reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instrumented-api-${{ matrix.api-level }}
+          path: |
+            biat-ui/build/reports/androidTests/
+            biat-ui/build/outputs/androidTest-results/
+            build/emulator-*.log
+          if-no-files-found: warn
+
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build]
+    needs: [build, instrumented]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +82,9 @@ jobs:
             PATH="$d:$PATH"
           done
           export PATH
+          set +o pipefail
           yes | sdkmanager --licenses > /dev/null
+          set -o pipefail
           sdkmanager "platforms;android-37.0"
       - name: Publish to Maven Central
         run: ./gradlew publishToMavenCentral

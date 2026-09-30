@@ -25,6 +25,7 @@ captures/
 .DS_Store
 
 # Kotlin
+.kotlin/
 *.kotlin_module
 
 # OS
