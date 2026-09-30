@@ -179,7 +179,8 @@ Status as of v0.1.0 scaffold (2026-09-26).
       layout slots replace fixed Row/Column and bottom/full-width placement.
 - [x] Public/protected JVM API snapshot excludes generated implementation classes
       and synthetic accessors; fixture tests preserve named nested types and default ABI.
-- [ ] Release tag/version validation and migration/cookbook documentation.
+- [x] Exact release tag/version validation before Maven Central uploads.
+- [ ] Migration/cookbook documentation.
 
 ## Non-goals (never)
 

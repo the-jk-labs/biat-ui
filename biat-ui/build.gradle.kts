@@ -11,10 +11,29 @@ plugins {
 }
 
 // Maven Central coordinates (namespace io.github.the-jk-labs is registered
-// on the Central Portal); the version is the frozen 1.0 release line,
+// on the Central Portal); the version is the current 1.0 release candidate,
 // see README "Versioning".
 group = "io.github.the-jk-labs"
 version = "1.0.0-rc2"
+
+val releaseTag = providers.gradleProperty("releaseTag")
+val verifyReleaseTag =
+    tasks.register("verifyReleaseTag") {
+        group = "verification"
+        description = "Requires releaseTag to match the published module version exactly."
+        doLast {
+            val expected = "v${project.version}"
+            val actual = releaseTag.orNull
+            check(actual == expected) {
+                "Release tag must be $expected, got ${actual ?: "<missing>"}. Pass -PreleaseTag=$expected."
+            }
+        }
+    }
+
+// Guard upload tasks as well as the aggregate publishing entry point.
+tasks.matching { it.name.startsWith("publish") && it.name.contains("MavenCentral") }.configureEach {
+    dependsOn(verifyReleaseTag)
+}
 
 mavenPublishing {
     // Uploads to the Portal and releases without manual clicks.

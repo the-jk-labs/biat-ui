@@ -16,6 +16,11 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
+      - name: Verify release tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: ./gradlew :biat-ui:verifyReleaseTag "-PreleaseTag=$RELEASE_TAG"
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
       # ubuntu-latest ships an Android SDK, but cmdline-tools is not on PATH.
       # (android-actions/setup-android is unmaintained and installs the
       # obsolete 'tools' package, which no longer exists upstream.)
@@ -87,8 +92,9 @@ jobs:
           set -o pipefail
           sdkmanager "platforms;android-37.0"
       - name: Publish to Maven Central
-        run: ./gradlew publishToMavenCentral
+        run: ./gradlew publishToMavenCentral "-PreleaseTag=$RELEASE_TAG"
         env:
+          RELEASE_TAG: ${{ github.ref_name }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}

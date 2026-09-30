@@ -87,9 +87,12 @@ to verify filtering and change detection.
 
 ## Publishing
 
-Releases are fully automatic. Pushing a `v*` tag runs CI (lint, tests,
-assembles, `apiCheck`) and then publishes `io.github.the-jk-labs:biat-ui`
-to Maven Central with auto-release; artifacts appear within 10 to 30 minutes.
+Pushing a tag that exactly matches `v` plus the module version runs CI
+(lint, JVM tests, API 24/36 device tests, assembles, `apiCheck`) and then
+publishes `io.github.the-jk-labs:biat-ui` to Maven Central with auto-release.
+Mismatched tags fail before publishing. For the current candidate, validate
+with `./gradlew :biat-ui:verifyReleaseTag -PreleaseTag=v1.0.0-rc2` before
+creating the tag. Direct Central upload tasks require the same property.
 Dry-run locally without credentials via `./gradlew :biat-ui:publishToMavenLocal`.
 
 Maintainers must provide four GitHub Actions secrets once:
