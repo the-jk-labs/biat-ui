@@ -137,9 +137,6 @@ Current development version: 1.0.0-rc2 (2026-09-30). Earlier sections record com
       by ktlint-cli 1.8.0 + `.editorconfig` with `ktlint_official`, wired into
       `check` and the CI Lint step; whole tree formatted clean). Detekt not
       adopted; API-signature linting waits on the binary-compat item above.
-- [ ] Screenshot-free sample gallery (all styling in sample, themes switcher).
-      DEFERRED by maintainer decision: the single-file sample already proves
-      arbitrary styling; a navigable gallery returns as a post-1.0 item.
 
 ## v1.0.0: Stable (in progress)
 
@@ -157,6 +154,8 @@ Current development version: 1.0.0-rc2 (2026-09-30). Earlier sections record com
 - [ ] Manual TalkBack + physical keyboard certification matrix.
       Automated coverage is recorded separately in docs/CERTIFICATION.md.
 - [x] GitHub Actions CI: build, JVM + instrumented tests, lint, API check and publishing.
+
+Release scope is closed: do not add public primitives before the stable API is frozen.
 
 ## 1.0.0-rc2: Behavior hardening
 
@@ -176,8 +175,37 @@ Current development version: 1.0.0-rc2 (2026-09-30). Earlier sections record com
 - [x] Exact release tag/version validation before Maven Central uploads.
 - [x] Migration/cookbook documentation, compiler-checked recipes and repaired KDoc links.
 
+## Post-1.0: Headless behavior depth
+
+Behavioral coverage, not Material 3 component-name parity, guides this work. A
+candidate must provide reusable state, focus, keyboard, dismissal, or
+accessibility behavior while leaving all visuals and layout to the caller.
+
+- [ ] Screenshot-free sample gallery (all styling in sample, themes switcher).
+      The single-file sample already proves arbitrary styling; add a navigable
+      gallery only after the stable release.
+- [ ] Snackbar host: queue, timeout, action, dismissal, and accessibility
+      announcement behavior with caller-owned rendering.
+- [ ] Progress and meter semantics: determinate progress/meter ranges and
+      indeterminate progress state without indicator visuals.
+- [ ] Menu-family extensions when a reusable behavior gap is proven: long-press
+      context menus and a menu bar can build on the existing menu/focus core.
+- [ ] Evaluate a calendar/date-range primitive only with demonstrated demand and
+      a defined locale, constraints, keyboard, and accessibility contract. Do
+      not start a date/time picker by default.
+
+Compose side sheets, drawer-like UI, rich tooltips, and chip-like controls from
+the existing Sheet, Tooltip, Toggle, ToggleGroup, RadioGroup, Menu, and Select
+primitives. Add a generic behavior helper only when that composition exposes a
+proven shared gap.
+
 ## Non-goals (never)
 
-Material components, themes, colors, typography, opinionated layouts,
-"beautiful defaults", design-system constraints. If a PR adds pixels to
-`biat-ui/`, it gets rejected.
+Material 3 component-name parity; Material-specific visual variants such as
+buttons, FABs, cards, badges, chips, app bars, navigation bars/rails/drawers,
+and carousels; themes, dynamic color, typography, shapes, elevation, motion,
+opinionated layouts, "beautiful defaults", or design-system constraints.
+
+Visual-only wrappers around Compose Foundation controls such as BasicTextField,
+LazyList, and Pager are also out of scope unless they establish a new reusable
+behavior contract. If a PR adds pixels to `biat-ui/`, it gets rejected.
